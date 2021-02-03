@@ -1,0 +1,3 @@
+rootProject.name = "sketchware-blocks-view"
+include ':app'
+include ':lib'

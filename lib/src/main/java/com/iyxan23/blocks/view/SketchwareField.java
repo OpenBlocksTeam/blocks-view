@@ -12,14 +12,10 @@ public class SketchwareField {
 
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
-     * @param format The block's format
-     * @param id The block's ID
-     * @param next_block The block's next block
-     * @param parameters The block's parameters
-     * @param color The block's color
+     * @param block The block
      */
-    public SketchwareField(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
-        block = new SketchwareBlock(format, id, next_block, parameters, color);
+    public SketchwareField(SketchwareBlock block) {
+        this.block = block;
         is_block = true;
     }
 

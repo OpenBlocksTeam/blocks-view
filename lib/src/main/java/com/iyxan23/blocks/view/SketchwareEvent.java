@@ -10,7 +10,7 @@ public class SketchwareEvent {
     public int color = 0xFFF39B0E;
     public int color_dark = 0xFFC8800E;
 
-    public ArrayList<SketchwareBlock> blocks;
+    public ArrayList<SketchwareBlock> blocks = new ArrayList<>();
 
     public SketchwareEvent(String activity_name, String name) {
         this.activity_name = activity_name;

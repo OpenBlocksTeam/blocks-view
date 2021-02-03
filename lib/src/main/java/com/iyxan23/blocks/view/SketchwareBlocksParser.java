@@ -17,6 +17,10 @@ public class SketchwareBlocksParser {
         this.logic_data = logic_data;
     }
 
+    /**
+     * Parses the logic_data string into an array of SketchwareEvents
+     * @return Parsed data
+     */
     public ArrayList<SketchwareEvent> parse() {
         // TODO
         return null;

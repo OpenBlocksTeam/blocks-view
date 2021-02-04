@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -48,6 +49,7 @@ public class SketchwareBlocksView extends View {
         event_test.blocks.add(new SketchwareBlock("Finish Activity", "5", -1, new ArrayList<>(), 0xFF1173E4));
 
         text_paint = new Paint();
+        text_paint.setTypeface(Typeface.DEFAULT);
         text_paint.setStyle(Paint.Style.FILL);
         text_paint.setFakeBoldText(true);
         text_paint.setAntiAlias(true);

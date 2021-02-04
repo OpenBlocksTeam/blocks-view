@@ -2,6 +2,7 @@ package com.iyxan23.blocks.view;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 
 import java.util.ArrayList;
 
@@ -35,6 +36,9 @@ public class SketchwareBlock {
         int block_height = 60;
         int event_offset = 50;
 
+        int block_left = 50;
+        int block_width = (int) text_paint.measureText(format) + 20;
+
         int top_position;
 
         if (blocks_down == 1) {
@@ -53,15 +57,17 @@ public class SketchwareBlock {
 
         // Draw the block's shadow
         rect_paint.setColor(color_dark);
-        canvas.drawRect(50, top_position, 400, bottom_position + shadow_height, rect_paint);
-        
+        canvas.drawRect(block_left, top_position, block_left + block_width, bottom_position + shadow_height, rect_paint);
+
+        // This is the little bottom thing
         if (!is_bottom)
             canvas.drawRect(100, top_position, 175, bottom_position + shadow_height + block_outset_height, rect_paint);
 
         // Draw the actual block
         rect_paint.setColor(color);
-        canvas.drawRect(50, top_position, 400, bottom_position, rect_paint);
+        canvas.drawRect(block_left, top_position, block_left + block_width, bottom_position, rect_paint);
 
+        // This is the little bottom thing
         if (!is_bottom)
             canvas.drawRect(100, top_position, 175, bottom_position + block_outset_height, rect_paint);
 

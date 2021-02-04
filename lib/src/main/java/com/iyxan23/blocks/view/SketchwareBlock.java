@@ -32,6 +32,15 @@ public class SketchwareBlock {
         this.is_bottom = next_block == -1;
     }
 
+    /**
+     * This function draws the block into the canvas specified at a given level to the bottom (blocks_down)
+     *
+     * @param canvas The canvas where it will be drawn into
+     * @param rect_paint The paint for the rectangle
+     * @param text_paint The paint for the text
+     * @param blocks_down The block's position
+     * @param previous_block_color The previous block's color, used to draw the outset of the block above
+     */
     public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int blocks_down, int previous_block_color) {
         boolean is_overlapping = true;  // This variable should be controllable by the developer
 

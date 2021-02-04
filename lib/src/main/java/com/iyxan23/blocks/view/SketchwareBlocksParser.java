@@ -55,10 +55,8 @@ public class SketchwareBlocksParser {
         for (String line: lines) {
 
             // Check if we're outside of an event
-            if (!line.trim().equals("")) {
-                if (skip_event) {
-                    continue;
-                }
+            if (line.trim().equals("")) {
+                skip_event = false;
 
                 // Okay, Let's do the sorting here
                 SketchwareEvent event = new SketchwareEvent(activity_name, event_name);
@@ -95,7 +93,9 @@ public class SketchwareBlocksParser {
                 continue;
 
             } else {
-                skip_event = false;
+                if (skip_event) {
+                    continue;
+                }
             }
 
             // If we're aren't in an event name

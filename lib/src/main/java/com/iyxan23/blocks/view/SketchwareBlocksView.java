@@ -17,7 +17,7 @@ public class SketchwareBlocksView extends View {
     Paint rect_paint;
     Paint text_paint;
 
-    SketchwareEvent event_test;
+    SketchwareEvent data;
 
     public SketchwareBlocksView(Context context) {
         super(context);
@@ -39,14 +39,23 @@ public class SketchwareBlocksView extends View {
         initialize();
     }
 
-    private void initialize() {
-        event_test = new SketchwareEvent("MainActivity", "onCreate");
+    public void setEvent(SketchwareEvent event) {
+        this.data = event;
 
-        event_test.blocks.add(new SketchwareBlock("Test", "1", 2, new ArrayList<>(), 0xFFE10C0C));
-        event_test.blocks.add(new SketchwareBlock("Hello", "2", 3, new ArrayList<>(), 0xFFD1159C));
-        event_test.blocks.add(new SketchwareBlock("World", "3", 4, new ArrayList<>(), 0xFF14D231));
-        event_test.blocks.add(new SketchwareBlock("Dark Blue", "4", 5, new ArrayList<>(), 0xFF2115D1));
-        event_test.blocks.add(new SketchwareBlock("Finish Activity", "5", -1, new ArrayList<>(), 0xFF1173E4));
+        initialize();
+    }
+
+    private void initialize() {
+        if (data == null) {
+            data = new SketchwareEvent("MainActivity", "onCreate");
+
+            data.blocks.add(new SketchwareBlock("Hello World", "1", 2, new ArrayList<>(), 0xFFE10C0C));
+            data.blocks.add(new SketchwareBlock("This is SketchwareBlocksView", "2", 3, new ArrayList<>(), 0xFFD1159C));
+            data.blocks.add(new SketchwareBlock("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
+            data.blocks.add(new SketchwareBlock("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
+            data.blocks.add(new SketchwareBlock("Made by Iyxan23 (github.com/Iyxan23)", "4", 5, new ArrayList<>(), 0xFF2115D1));
+            data.blocks.add(new SketchwareBlock("Finish Activity", "5", -1, new ArrayList<>(), 0xFF1173E4));
+        }
 
         text_paint = new Paint();
         text_paint.setTypeface(Typeface.DEFAULT);
@@ -76,8 +85,8 @@ public class SketchwareBlocksView extends View {
         canvas.drawText("On activity create", 60, 85, text_paint);
          */
         // Draw the blocks in backwards (to preserve the outset thing)
-        for (int i = event_test.blocks.size() - 1; i > -1; i--) {
-            event_test.blocks
+        for (int i = data.blocks.size() - 1; i > -1; i--) {
+            data.blocks
                     .get(i)
                     .draw(canvas, rect_paint, text_paint, i + 1);
         }
@@ -90,6 +99,6 @@ public class SketchwareBlocksView extends View {
         }
          */
 
-        event_test.draw(canvas, rect_paint, text_paint);
+        data.draw(canvas, rect_paint, text_paint);
     }
 }

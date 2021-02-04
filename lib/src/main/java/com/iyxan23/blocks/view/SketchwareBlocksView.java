@@ -73,31 +73,22 @@ public class SketchwareBlocksView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        // Draw the blocks in backwards (from bottom to top)
         /*
-        rect_paint.setColor(0xFFB1720C);
-        canvas.drawRect(50, 50, 400, 110, rect_paint);
-        canvas.drawRect(100, 50, 175, 125, rect_paint);
-        rect_paint.setColor(0xFFE08E0A);
-        canvas.drawRect(50, 50, 400, 100, rect_paint);
-        canvas.drawRect(50, 35, 300, 100, rect_paint);
-        canvas.drawRect(100, 50, 175, 115, rect_paint);
-
-        canvas.drawText("On activity create", 60, 85, text_paint);
-         */
-        // Draw the blocks in backwards (to preserve the outset thing)
         for (int i = data.blocks.size() - 1; i > -1; i--) {
             data.blocks
-                    .get(i)
-                    .draw(canvas, rect_paint, text_paint, i + 1);
+                .get(i)
+                .draw(canvas, rect_paint, text_paint, i + 1);
         }
-        /*
-        // Draw the blocks (only used to debug)
-        for (int i = 0; i < event_test.blocks.size(); i++) {
-            event_test.blocks
-                    .get(i)
-                    .draw(canvas, rect_paint, text_paint, i + 1);
+        */
+        // Draw the blocks from top to bottom
+        int previous_block_color = data.color;
+        for (int i = 0; i < data.blocks.size(); i++) {
+            data.blocks
+                .get(i)
+                .draw(canvas, rect_paint, text_paint, i + 1, previous_block_color);
+            previous_block_color = data.blocks.get(i).color;
         }
-         */
 
         data.draw(canvas, rect_paint, text_paint);
     }

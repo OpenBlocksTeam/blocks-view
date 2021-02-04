@@ -32,9 +32,14 @@ public class SketchwareBlock {
         this.is_bottom = next_block == -1;
     }
 
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int blocks_down) {
+    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int blocks_down, int previous_block_color) {
+        boolean is_overlapping = true;  // This variable should be controllable by the developer
+
         int block_height = 60;
         int event_offset = 50;
+
+        int shadow_height = 10;
+        int block_outset_height = 10;
 
         int block_left = 50;
         int block_width = (int) text_paint.measureText(format) + 20;
@@ -43,17 +48,19 @@ public class SketchwareBlock {
 
         if (blocks_down == 1) {
             top_position = event_offset + block_height;
+
         } else {
             top_position = (blocks_down + 1) * block_height - (block_height - event_offset);
 
             // Set the offset for blocks below the first block
-            top_position += (blocks_down - 1) * 10;
+            top_position += (blocks_down - 1) * (block_height - event_offset);
+
+            if (is_overlapping)
+                // Overlap the previous block's shadow
+                top_position -= (blocks_down - 1) * shadow_height;
         }
 
         int bottom_position = top_position + block_height;
-
-        int shadow_height = 10;
-        int block_outset_height = 15;
 
         // Draw the block's shadow
         rect_paint.setColor(color_dark);
@@ -70,6 +77,18 @@ public class SketchwareBlock {
         // This is the little bottom thing
         if (!is_bottom)
             canvas.drawRect(100, top_position, 175, bottom_position + block_outset_height, rect_paint);
+
+        // Draw the previous block's outset (only if we're overlapping it)
+        if (is_overlapping) {
+            rect_paint.setColor(previous_block_color);
+            canvas.drawRect(100, top_position, 175, top_position + block_outset_height, rect_paint);
+        } else {
+            rect_paint.setColor(Utilities.manipulateColor(previous_block_color, 0.7f));
+            canvas.drawRect(100, top_position, 175, top_position + block_outset_height, rect_paint);
+
+            rect_paint.setColor(previous_block_color);
+            canvas.drawRect(100, top_position, 175, top_position + block_outset_height - shadow_height, rect_paint);
+        }
 
         // Draw the block's text
         // TODO: ADD A FORMATTER

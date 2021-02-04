@@ -27,13 +27,13 @@ public class SketchwareEvent {
         // Draw the "shadow"
         rect_paint.setColor(color_dark);
         canvas.drawRect(50, 50, 400, 110, rect_paint);
-        canvas.drawRect(100, 50, 175, 125, rect_paint);
+        canvas.drawRect(100, 50, 175, 120, rect_paint);
 
         // Draw the actual block
         rect_paint.setColor(color);
         canvas.drawRect(50, 50, 400, 100, rect_paint);
         canvas.drawRect(50, 35, 300, 100, rect_paint);
-        canvas.drawRect(100, 50, 175, 115, rect_paint);
+        canvas.drawRect(100, 50, 175, 110, rect_paint);
 
         // Draw the text
         canvas.drawText(activity_name + ": " + name, 60, 85, text_paint);

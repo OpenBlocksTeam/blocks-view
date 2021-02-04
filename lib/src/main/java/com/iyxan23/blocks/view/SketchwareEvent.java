@@ -1,5 +1,8 @@
 package com.iyxan23.blocks.view;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+
 import java.util.ArrayList;
 
 public class SketchwareEvent {
@@ -15,5 +18,21 @@ public class SketchwareEvent {
     public SketchwareEvent(String activity_name, String name) {
         this.activity_name = activity_name;
         this.name = name;
+    }
+
+    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint) {
+        // Draw the "shadow"
+        rect_paint.setColor(color_dark);
+        canvas.drawRect(50, 50, 400, 110, rect_paint);
+        canvas.drawRect(100, 50, 175, 125, rect_paint);
+
+        // Draw the actual block
+        rect_paint.setColor(color);
+        canvas.drawRect(50, 50, 400, 100, rect_paint);
+        canvas.drawRect(50, 35, 300, 100, rect_paint);
+        canvas.drawRect(100, 50, 175, 115, rect_paint);
+
+        // Draw the text
+        canvas.drawText(activity_name + ": " + name, 60, 85, text_paint);
     }
 }

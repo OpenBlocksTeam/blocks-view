@@ -3,7 +3,10 @@ package com.iyxan23.blocks.view;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SketchwareEvent {
 
@@ -34,5 +37,11 @@ public class SketchwareEvent {
 
         // Draw the text
         canvas.drawText(activity_name + ": " + name, 60, 85, text_paint);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Sketchware Event:\n\tActivityName:" + activity_name + "\n\tEventName: " + name + "\nBlocks:\n" + blocks.toString();
     }
 }

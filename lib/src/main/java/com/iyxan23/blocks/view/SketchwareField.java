@@ -61,12 +61,12 @@ public class SketchwareField {
     public void draw(Canvas canvas, int left, int top, int bottom, Paint block_text_paint) {
         if (!is_block) {
             // Draw the white background
-            canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom, rect_paint);
+            canvas.drawRect(left, top + padding, left + getWidth(block_text_paint), bottom - padding, rect_paint);
 
             // Draw the text / value
-            canvas.drawText(value, left + 5, top, text_paint);
+            canvas.drawText(value, left + padding, top + ((bottom - top) / 2) + padding, text_paint);
         } else {
-            // TODO
+            // TODO: DRAW A SIMPLER VERSION OF THE BLOCK
         }
     }
 }

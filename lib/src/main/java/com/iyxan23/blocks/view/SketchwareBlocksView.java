@@ -17,6 +17,10 @@ public class SketchwareBlocksView extends View {
     Paint rect_paint;
     Paint text_paint;
 
+    int left_position = 50;
+    int top_position = 50;
+    int shadow_height = 10;
+
     SketchwareEvent data;
 
     public SketchwareBlocksView(Context context) {
@@ -73,20 +77,47 @@ public class SketchwareBlocksView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        // Draw the blocks in backwards (from bottom to top)
-        /*
-        for (int i = data.blocks.size() - 1; i > -1; i--) {
-            data.blocks
-                .get(i)
-                .draw(canvas, rect_paint, text_paint, i + 1);
-        }
-        */
+
+        boolean is_overlapping = true;
+
+        int block_height = 60;
+        int event_offset = 50;
+
+        int shadow_height = 10;
+
         // Draw the blocks from top to bottom
         int previous_block_color = data.color;
         for (int i = 0; i < data.blocks.size(); i++) {
+
+            int top_position;
+
+            if (i == 1) {
+                top_position = 50 + block_height;
+
+            } else {
+                top_position = (i + 1) * block_height - (block_height - event_offset);
+
+                // Set the offset for blocks below the first block
+                top_position += (i - 1) * (block_height - event_offset);
+
+                if (is_overlapping)
+                    // Overlap the previous block's shadow
+                    top_position -= (i - 1) * shadow_height;
+            }
+
             data.blocks
                 .get(i)
-                .draw(canvas, rect_paint, text_paint, i + 1, previous_block_color);
+                .draw(
+                        canvas,
+                        rect_paint,
+                        text_paint,
+                        top_position,
+                        left_position,
+                        block_height,
+                        shadow_height,
+                        is_overlapping,
+                        previous_block_color
+                );
             previous_block_color = data.blocks.get(i).color;
         }
 

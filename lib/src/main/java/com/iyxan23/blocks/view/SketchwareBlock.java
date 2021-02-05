@@ -20,6 +20,8 @@ public class SketchwareBlock {
     public int color;
     public int color_dark;
 
+    int text_padding = 10;
+
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
         this.format = format;
         this.id = id;
@@ -30,6 +32,16 @@ public class SketchwareBlock {
 
         // next_block is -1 if there is nothing after it
         this.is_bottom = next_block == -1;
+    }
+
+    /**
+     * This function returns the approximate width of the block
+     *
+     * @param text_paint The text paint that is going to be used
+     * @return The block's width
+     */
+    public int getWidth(Paint text_paint) {
+        return text_padding + (int) text_paint.measureText(format) + text_padding;
     }
 
     /**

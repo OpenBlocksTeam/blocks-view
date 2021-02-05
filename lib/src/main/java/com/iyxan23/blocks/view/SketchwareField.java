@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class SketchwareField {
 
     // This boolean indicates if this is a block or not
-    public boolean is_block = true;
+    public boolean is_block;
     public String value = "";  // This value is going to be used if is_block is false
 
     public SketchwareBlock block;

@@ -45,7 +45,7 @@ public class SketchwareBlock {
     public ArrayList<Object[]> parseFormat() {
         ArrayList<Object[]> tmp = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile("%[a-z].(\\w+)");
+        Pattern pattern = Pattern.compile("%[a-z]\\.(\\w+)|%[a-z]");
         Matcher matcher = pattern.matcher(format);
 
         int index = 0;
@@ -56,7 +56,7 @@ public class SketchwareBlock {
             tmp.add(new Object[] {
                     matcher.start(),
                     matcher.end(),
-                    matcher.group(0),
+                    matcher.groupCount() == 1 ? matcher.group(0).substring(1) : "",  // Skip the first char because we want to skip the .
                     parameters.get(index)
             });
             index++;

@@ -91,14 +91,17 @@ public class SketchwareBlocksView extends View {
 
             int top_position;
 
-            if (i == 1) {
-                top_position = 50 + block_height;
+            if (i == 0) {
+                top_position = event_offset + block_height;
 
             } else {
                 top_position = (i + 1) * block_height - (block_height - event_offset);
 
                 // Set the offset for blocks below the first block
                 top_position += (i - 1) * (block_height - event_offset);
+
+                // Don't forget the first block
+                top_position += block_height;
 
                 if (is_overlapping)
                     // Overlap the previous block's shadow

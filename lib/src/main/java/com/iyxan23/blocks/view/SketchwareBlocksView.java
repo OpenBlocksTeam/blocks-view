@@ -58,6 +58,12 @@ public class SketchwareBlocksView extends View {
             data.blocks.add(new SketchwareBlock("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
             data.blocks.add(new SketchwareBlock("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
             data.blocks.add(new SketchwareBlock("Made by Iyxan23 (github.com/Iyxan23)", "4", 5, new ArrayList<>(), 0xFF2115D1));
+
+            ArrayList<SketchwareField> fields = new ArrayList<>();
+            fields.add(new SketchwareField("parameters"));
+            fields.add(new SketchwareField("yeah"));
+
+            data.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "4", 5, fields, 0xFFE65319));
             data.blocks.add(new SketchwareBlock("Finish Activity", "5", -1, new ArrayList<>(), 0xFF1173E4));
         }
 

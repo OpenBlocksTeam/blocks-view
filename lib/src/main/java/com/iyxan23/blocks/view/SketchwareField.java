@@ -42,7 +42,7 @@ public class SketchwareField {
         text_paint.setColor(0xFF000000);
         text_paint.setAntiAlias(true);
         text_paint.setStyle(Paint.Style.FILL);
-        text_paint.setTextSize(18f);
+        text_paint.setTextSize(20f);
 
         rect_paint.setStyle(Paint.Style.FILL);
         rect_paint.setColor(0xFFFFFFFF);

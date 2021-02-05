@@ -16,6 +16,8 @@ public class SketchwareField {
     Paint text_paint = new Paint();
     Paint rect_paint = new Paint();
 
+    int padding = 5;
+
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
      * @param block The block
@@ -47,19 +49,19 @@ public class SketchwareField {
         rect_paint.setAntiAlias(true);
     }
 
-    public int getWidth() {
+    public int getWidth(Paint block_text_paint) {
         // Padding for the text should only be about 5
         if (!is_block) {
-            return (int) text_paint.measureText(value) + 5 * 2;
+            return (int) text_paint.measureText(value) + padding * 2;
         } else {
-            // TODO
+            return block.getWidth(block_text_paint);
         }
     }
 
-    public void draw(Canvas canvas, int left, int top, int bottom) {
+    public void draw(Canvas canvas, int left, int top, int bottom, Paint block_text_paint) {
         if (!is_block) {
             // Draw the white background
-            canvas.drawRect(left, top, left + getWidth(), bottom, rect_paint);
+            canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom, rect_paint);
 
             // Draw the text / value
             canvas.drawText(value, left + 5, top, text_paint);

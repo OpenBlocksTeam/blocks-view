@@ -16,7 +16,7 @@ public class SketchwareField {
     Paint text_paint = new Paint();
     Paint rect_paint = new Paint();
 
-    int padding = 5;
+    int padding = 10;
 
     /**
      * This will initialize this class as a SketchwareBlock (return value block)

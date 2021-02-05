@@ -72,7 +72,32 @@ public class SketchwareBlock {
      * @return The block's width
      */
     public int getWidth(Paint text_paint) {
-        return text_padding + (int) text_paint.measureText(format) + text_padding;
+        if (parameters.size() == 0)
+            return text_padding + (int) text_paint.measureText(format) + text_padding;
+
+        // Remove these
+        ArrayList<Object[]> params = parseFormat();
+        StringBuilder final_string = new StringBuilder();
+
+        // The parameters widths (will be added with the measure text)
+        int params_widths = 0;
+
+        int last_num = 0;
+        for (Object[] param: params) {
+            final_string.append(format.substring(last_num, (int) param[0]));
+            last_num = (int) param[1];
+
+            SketchwareField field = (SketchwareField) param[3];
+
+            params_widths +=
+                            field.getWidth(text_paint) +
+                            5 * 2;  // The padding between the text and the field
+        }
+
+        // Add the last string at the end
+        final_string.append(format.substring(last_num));
+
+        return text_padding + (int) text_paint.measureText(final_string.toString()) + text_padding + params_widths;
     }
 
     /**

@@ -5,6 +5,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SketchwareBlock {
 
@@ -32,6 +34,34 @@ public class SketchwareBlock {
 
         // next_block is -1 if there is nothing after it
         this.is_bottom = next_block == -1;
+    }
+
+    /**
+     * This function parses the format
+     *
+     * @return Returns ArrayList of [start_pos, end_pos, name, SketchwareField]
+     */
+    public ArrayList<Object[]> parseFormat() {
+        ArrayList<Object[]> tmp = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("%[a-z].(\\w+)");
+        Matcher matcher = pattern.matcher(format);
+
+        int index = 0;
+        while (matcher.find()) {
+            if (parameters.size() < index)
+                throw new IllegalStateException("Parameters have less elements than the format");
+
+            tmp.add(new Object[] {
+                    matcher.start(),
+                    matcher.end(),
+                    matcher.group(0),
+                    parameters.get(index)
+            });
+            index++;
+        }
+
+        return tmp;
     }
 
     /**

@@ -114,7 +114,8 @@ public class SketchwareBlock {
     public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, boolean is_overlapping, int previous_block_color) {
         int block_outset_height = 10;
 
-        int block_width = (int) text_paint.measureText(format) + 20;
+        // int block_width = (int) text_paint.measureText(format) + 20;
+        int block_width = getWidth(text_paint);
 
         int bottom_position = top + height;
 
@@ -149,6 +150,33 @@ public class SketchwareBlock {
         // Draw the block's text
         // TODO: ADD A FORMATTER
 
-        canvas.drawText(format, 60, top + 45, text_paint);
+        ArrayList<Object[]> parsed_format = parseFormat();
+        StringBuilder final_string = new StringBuilder();
+
+        // Draw the parameters
+        int x = 60;  // The initial x's text position
+
+        int text_top = top + 45;
+
+        int last_num = 0;
+        for (Object[] param: parsed_format) {
+            String text = format.substring(last_num, (int) param[0]);
+            canvas.drawText(text, x, text_top, text_paint);
+
+            x += text_paint.measureText(text) + 5;
+
+            last_num = (int) param[1];
+
+            SketchwareField field = (SketchwareField) param[3];
+
+            field.draw(canvas, x, top, bottom_position, text_paint);
+
+            x += field.getWidth(text_paint) + 5;
+        }
+
+        String text = format.substring(last_num);
+        canvas.drawText(text, x, text_top, text_paint);
+
+        // canvas.drawText(format, 60, top + 45, text_paint);
     }
 }

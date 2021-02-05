@@ -91,7 +91,7 @@ public class SketchwareBlock {
 
             params_widths +=
                             field.getWidth(text_paint) +
-                            5 * 2;  // The padding between the text and the field
+                            field.padding;  // The padding between the text and the field
         }
 
         // Add the last string at the end

@@ -66,7 +66,8 @@ public class SketchwareField {
             // Draw the text / value
             canvas.drawText(value, left + padding, top + ((bottom - top) / 2) + padding, text_paint);
         } else {
-            // TODO: DRAW A SIMPLER VERSION OF THE BLOCK
+            // Well, draw the block as the parameter, I guess
+            block.draw(canvas, rect_paint, block_text_paint, top, left, bottom - top, 0, 0, false, 0x00000000);
         }
     }
 }

@@ -64,14 +64,27 @@ public class SketchwareBlocksView extends View {
             data.blocks.add(new SketchwareBlock("This is SketchwareBlocksView", "2", 3, new ArrayList<>(), 0xFFD1159C));
             data.blocks.add(new SketchwareBlock("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
             data.blocks.add(new SketchwareBlock("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
-            data.blocks.add(new SketchwareBlock("Made by Iyxan23 (github.com/Iyxan23)", "4", 5, new ArrayList<>(), 0xFF2115D1));
 
             ArrayList<SketchwareField> fields = new ArrayList<>();
             fields.add(new SketchwareField("parameters"));
             fields.add(new SketchwareField("yeah"));
 
-            data.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "4", 5, fields, 0xFFE65319));
-            data.blocks.add(new SketchwareBlock("Finish Activity", "5", -1, new ArrayList<>(), 0xFF1173E4));
+            data.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE65319));
+
+            ArrayList<SketchwareField> field_recursive1 = new ArrayList<>();
+
+            ArrayList<SketchwareField> field_recursive3 = new ArrayList<>();
+            field_recursive3.add(new SketchwareField("A field"));
+
+            ArrayList<SketchwareField> field_recursive2 = new ArrayList<>();
+            field_recursive2.add(new SketchwareField(new SketchwareBlock("recursive2 %s", "10", -1, field_recursive3, 0xFF0000FF)));
+
+            field_recursive1.add(new SketchwareField(new SketchwareBlock("recursive1 %s", "10", -1, field_recursive2, 0xFF15D807)));
+
+            data.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, field_recursive1, 0xFFE65319));
+
+            data.blocks.add(new SketchwareBlock("Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
+            data.blocks.add(new SketchwareBlock("Finish Activity", "8", -1, new ArrayList<>(), 0xFF1173E4));
         }
 
         text_paint = new Paint();

@@ -50,7 +50,7 @@ public class SketchwareBlock {
 
         int index = 0;
         while (matcher.find()) {
-            if (parameters.size() < index)
+            if (parameters.size() <= index)
                 throw new IllegalStateException("Parameters have less elements than the format");
 
             tmp.add(new Object[] {

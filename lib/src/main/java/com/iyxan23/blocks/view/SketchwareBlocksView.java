@@ -19,7 +19,14 @@ public class SketchwareBlocksView extends View {
 
     int left_position = 50;
     int top_position = 50;
+
     int shadow_height = 10;
+    int block_outset_height = 15;
+
+    int block_height = 60;
+    int event_offset = 50;
+
+    boolean is_overlapping = false;
 
     SketchwareEvent data;
 
@@ -84,13 +91,6 @@ public class SketchwareBlocksView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        boolean is_overlapping = true;
-
-        int block_height = 60;
-        int event_offset = 50;
-
-        int shadow_height = 10;
-
         // Draw the blocks from top to bottom
         int previous_block_color = data.color;
         for (int i = 0; i < data.blocks.size(); i++) {
@@ -107,11 +107,13 @@ public class SketchwareBlocksView extends View {
                 top_position += (i - 1) * (block_height - event_offset);
 
                 // Don't forget the first block
-                top_position += block_height;
+                top_position += block_height + shadow_height;
 
-                if (is_overlapping)
+                if (is_overlapping) {
                     // Overlap the previous block's shadow
                     top_position -= (i - 1) * shadow_height;
+                    top_position -= shadow_height; // Overlap the first block
+                }
             }
 
             data.blocks
@@ -124,6 +126,7 @@ public class SketchwareBlocksView extends View {
                         left_position,
                         block_height,
                         shadow_height,
+                        block_outset_height,
                         is_overlapping,
                         previous_block_color
                 );

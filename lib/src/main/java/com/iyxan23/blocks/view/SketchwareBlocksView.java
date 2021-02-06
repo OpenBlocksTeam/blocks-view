@@ -1,6 +1,7 @@
 package com.iyxan23.blocks.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,7 +22,7 @@ public class SketchwareBlocksView extends View {
     int top_position = 50;
 
     int shadow_height = 10;
-    int block_outset_height = 15;
+    int block_outset_height = 10;
 
     int block_height = 60;
     int event_offset = 50;
@@ -32,31 +33,54 @@ public class SketchwareBlocksView extends View {
 
     public SketchwareBlocksView(Context context) {
         super(context);
-        initialize();
+        initialize(context, null);
     }
 
     public SketchwareBlocksView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initialize();
+        initialize(context, attrs);
     }
 
     public SketchwareBlocksView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialize();
+        initialize(context, attrs);
     }
 
     public SketchwareBlocksView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        initialize();
+        initialize(context, attrs);
     }
 
     public void setEvent(SketchwareEvent event) {
         this.data = event;
 
-        initialize();
+        initialize(null, null);
     }
 
-    private void initialize() {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    private void initialize(Context context, AttributeSet attrs) {
+        if (attrs != null) {
+            TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.SketchwareBlocksView);
+
+            left_position = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_left_position, left_position);
+            top_position = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_top_position, top_position);
+
+            shadow_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_shadow_height, shadow_height);
+
+            block_outset_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_height, block_outset_height);
+            block_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_height, block_height);
+
+            event_offset = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_offset, event_offset);
+
+            is_overlapping = attributes.getBoolean(R.styleable.SketchwareBlocksView_is_overlapping, is_overlapping);
+
+            attributes.recycle();
+        }
+
         if (data == null) {
             data = new SketchwareEvent("MainActivity", "onCreate");
 

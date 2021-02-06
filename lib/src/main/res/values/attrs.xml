@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SketchwareBlocksView">
+        <attr name="left_position" format="dimension"/>
+        <attr name="top_position" format="dimension"/>
+        <attr name="shadow_height" format="dimension"/>
+        <attr name="block_outset_height" format="dimension"/>
+        <attr name="block_height" format="dimension"/>
+        <attr name="event_offset" format="dimension"/>
+        <attr name="is_overlapping" format="boolean"/>
+    </declare-styleable>
+</resources>

@@ -111,9 +111,7 @@ public class SketchwareBlock {
      * @param height The height of the block
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, boolean is_overlapping, int previous_block_color) {
-        int block_outset_height = 10;
-
+    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_height, boolean is_overlapping, int previous_block_color) {
         // int block_width = (int) text_paint.measureText(format) + 20;
         int block_width = getWidth(text_paint);
 
@@ -154,7 +152,7 @@ public class SketchwareBlock {
         StringBuilder final_string = new StringBuilder();
 
         // Draw the parameters
-        int x = 60;  // The initial x's text position
+        int x = left + text_padding;  // The initial x's text position
 
         int text_top = top + 45;
 

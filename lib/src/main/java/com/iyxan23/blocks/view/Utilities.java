@@ -32,7 +32,7 @@ public class Utilities {
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent dp equivalent to px value
      */
-    public float convertPxToDp(Context context, float px) {
+    public static float convertPxToDp(Context context, float px) {
         return px / context.getResources().getDisplayMetrics().density;
     }
 
@@ -43,7 +43,7 @@ public class Utilities {
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent px equivalent to dp depending on device density
      */
-    public float convertDpToPx(Context context, float dp) {
+    public static float convertDpToPx(Context context, float dp) {
         return dp * context.getResources().getDisplayMetrics().density;
     }
 }

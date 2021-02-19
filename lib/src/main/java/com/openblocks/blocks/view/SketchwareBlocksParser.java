@@ -1,8 +1,4 @@
-package com.iyxan23.blocks.view;
-
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
+package com.openblocks.blocks.view;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +6,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

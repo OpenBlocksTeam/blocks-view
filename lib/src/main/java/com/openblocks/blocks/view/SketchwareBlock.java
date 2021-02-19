@@ -110,9 +110,14 @@ public class SketchwareBlock {
     }
 
     public int getHeight(Paint text_paint) {
-        // Return the default height if this is a parameter
-        if (is_parameter)
+        // Return the default height if this is a parameter and it has no other parameters
+        if (is_parameter && parameters.size() == 0)
             return default_height;
+
+        // If there aren't any parameters, and this isn't a parameter block, this means that this
+        // block is just a freestanding block, nothing special in it, get text height and add 2 text_padding.
+        if (parameters.size() == 0)
+            return (int) text_paint.getTextSize() + text_padding * 2;
 
         // Let's calculate the height
         // Quite easy, just loop per every parameters and get the maximum height
@@ -195,16 +200,13 @@ public class SketchwareBlock {
             canvas.drawRect(left + 50, top, 175, top + block_outset_height - shadow_height, rect_paint);
         }
 
-        // Draw the block's text
-        // TODO: ADD A FORMATTER
-
+        // Draw the block's text and parameters
         ArrayList<Object[]> parsed_format = parseFormat();
-        StringBuilder final_string = new StringBuilder();
 
         // Draw the parameters
         int x = left + text_padding;  // The initial x's text position
 
-        int text_top = top + 45;
+        int text_top = top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2);
 
         int last_num = 0;
         for (Object[] param: parsed_format) {
@@ -217,7 +219,7 @@ public class SketchwareBlock {
 
             SketchwareField field = (SketchwareField) param[3];
 
-            field.draw(canvas, x, top, bottom_position, text_paint);
+            field.draw(canvas, x, top + text_padding, text_paint);
 
             x += field.getWidth(text_paint) + 5;
         }

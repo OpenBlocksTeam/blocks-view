@@ -25,13 +25,24 @@ public class SketchwareBlock {
 
     int text_padding = 10;
 
+    // Indicates if this block is a parameter or not
+    boolean is_parameter;
+
+    // Will be used in the overloaded draw function
+    public int default_height = 60; // The same as in SketchwareBlocksView
+
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
+        this(format, id, next_block, parameters, color, false);
+    }
+
+    public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, boolean is_parameter) {
         this.format = format;
         this.id = id;
         this.next_block = next_block;
         this.parameters = parameters;
         this.color = color;
         this.color_dark = Utilities.manipulateColor(color, 0.7f);
+        this.is_parameter = is_parameter;
 
         // next_block is -1 if there is nothing after it
         this.is_bottom = next_block == -1;
@@ -98,6 +109,47 @@ public class SketchwareBlock {
         final_string.append(format.substring(last_num));
 
         return text_padding + (int) text_paint.measureText(final_string.toString()) + text_padding + params_widths;
+    }
+
+    public int getHeight(Paint text_paint) {
+        // Return the default height if this is a parameter
+        if (is_parameter)
+            return default_height;
+
+        // Let's calculate the height
+        // Quite easy, just loop per every parameters and get the maximum height
+        int max_height = 0;
+        for (SketchwareField parameter : parameters) {
+            if (parameter.is_block) {
+                // This is a block!
+                // We can just call the getHeight of that block recursively
+                max_height = Math.max(parameter.block.getHeight(text_paint), max_height);
+            } else {
+                Paint.FontMetrics fm = text_paint.getFontMetrics();
+                float height = fm.descent - fm.ascent;
+
+                max_height = Math.max((int) height, max_height);
+            }
+        }
+
+        return max_height + text_padding * 2; // 2 paddings because there will be padding on the top and the bottom
+    }
+
+    /**
+     * This function is an overloaded function of draw, but without height
+     * the height is get by using the global variable (can be set manually)
+     *
+     * This function will be used to draw the lowest child inside every parameters
+     *
+     * @param canvas The canvas where it will be drawn into
+     * @param rect_paint The paint for the rectangle
+     * @param text_paint The paint for the text
+     * @param top The y position of the block
+     * @param left The x position of the block
+     * @param previous_block_color The previous block's color, used to draw the outset of the block above
+     */
+    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+        draw(canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_height, is_overlapping, previous_block_color);
     }
 
     /**

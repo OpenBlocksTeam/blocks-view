@@ -1,2 +1,4 @@
-# sketchware-blocks-view
-A custom widget used to display and parse sketchware blocks from a data/logic file.
+# SketchwareBlocksView
+A very simple custom widget used to display sketchware blocks by just decrypting the data/logic file.
+
+This project is very experimental, and is not suitable for production usage.

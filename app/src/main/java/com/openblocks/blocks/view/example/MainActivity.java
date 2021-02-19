@@ -4,8 +4,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.openblocks.blocks.view.R;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override

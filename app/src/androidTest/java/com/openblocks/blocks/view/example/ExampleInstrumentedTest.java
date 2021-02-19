@@ -1,4 +1,4 @@
-package com.openblocks.blocks.view;
+package com.openblocks.blocks.view.example;
 
 import android.content.Context;
 

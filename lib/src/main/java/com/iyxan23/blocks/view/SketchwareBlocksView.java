@@ -63,7 +63,14 @@ public class SketchwareBlocksView extends View {
         Log.v("Chart onMeasure w", MeasureSpec.toString(widthMeasureSpec));
         Log.v("Chart onMeasure h", MeasureSpec.toString(heightMeasureSpec));
 
-        int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
+        int largest_width = 0;
+        int blocks_height_sum = 0;
+        for (SketchwareBlock block : data.blocks) {
+            largest_width = Math.max(block.getWidth(text_paint), largest_width);
+        }
+
+        int desiredWidth = left_position + largest_width + getPaddingLeft() + getPaddingRight() + left_position /* Just to get some padding on the right */;
+
         int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
 
         setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),

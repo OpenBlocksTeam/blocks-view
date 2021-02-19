@@ -160,13 +160,13 @@ public class SketchwareBlocksParser {
                                 )
                         )
                 );
+            } else {
+                params.add(
+                        new SketchwareField(
+                                (String) params_.get(index)
+                        )
+                );
             }
-
-            params.add(
-                    new SketchwareField(
-                            (String) params_.get(index)
-                    )
-            );
         }
 
         return params;

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -59,7 +60,35 @@ public class SketchwareBlocksView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.v("Chart onMeasure w", MeasureSpec.toString(widthMeasureSpec));
+        Log.v("Chart onMeasure h", MeasureSpec.toString(heightMeasureSpec));
+
+        int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
+        int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
+
+        setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),
+                measureDimension(desiredHeight, heightMeasureSpec));
+    }
+
+    private int measureDimension(int desiredSize, int measureSpec) {
+        int result;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if (specMode == MeasureSpec.EXACTLY) {
+            result = specSize;
+        } else {
+            result = desiredSize;
+            if (specMode == MeasureSpec.AT_MOST) {
+                result = Math.min(result, specSize);
+            }
+        }
+
+        if (result < desiredSize){
+            Log.w("SketchwareBlocksView", "The view is too small, the content might get cut");
+        }
+
+        return result;
     }
 
     private void initialize(Context context, AttributeSet attrs) {

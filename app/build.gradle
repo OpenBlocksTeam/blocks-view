@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.iyxan23.blocks.view"
+        applicationId "com.openblocks.blocks.view.example"
         minSdkVersion 22
         targetSdkVersion 30
         versionCode 1

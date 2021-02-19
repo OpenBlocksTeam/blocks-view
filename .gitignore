@@ -12,4 +12,10 @@
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+
+app/debug/output-metadata.json
+app/debug/app-debug.apk
+app/release/app-release.apk
+app/release/output-metadata.json
+
+app/google-services.json

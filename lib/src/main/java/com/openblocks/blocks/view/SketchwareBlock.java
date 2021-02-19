@@ -1,9 +1,7 @@
-package com.iyxan23.blocks.view;
+package com.openblocks.blocks.view;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;

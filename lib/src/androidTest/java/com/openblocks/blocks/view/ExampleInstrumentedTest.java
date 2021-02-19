@@ -1,4 +1,4 @@
-package com.iyxan23.blocks.view;
+package com.openblocks.blocks.view;
 
 import android.content.Context;
 

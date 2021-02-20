@@ -70,7 +70,7 @@ public class SketchwareField {
 
     public void draw(Canvas canvas, int left, int top, Paint block_text_paint) {
         if (!is_block) {
-            int bottom_background = top + (getHeight(block_text_paint) - padding);
+            int bottom_background = top + (getHeight(block_text_paint));
 
             // Draw the white background
             canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);

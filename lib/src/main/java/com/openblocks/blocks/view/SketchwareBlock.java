@@ -128,10 +128,7 @@ public class SketchwareBlock {
                 // We can just call the getHeight of that block recursively
                 max_height = Math.max(parameter.block.getHeight(text_paint), max_height);
             } else {
-                Paint.FontMetrics fm = text_paint.getFontMetrics();
-                float height = fm.descent - fm.ascent;
-
-                max_height = Math.max((int) height, max_height);
+                max_height = Math.max(parameter.getHeight(text_paint), max_height);
             }
         }
 

@@ -201,17 +201,23 @@ public class SketchwareBlock {
         }
 
         // Draw the block's text and parameters
+        drawParameters(canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), text_paint);
+
+        // canvas.drawText(format, 60, top + 45, text_paint);
+    }
+
+    public final void drawParameters(Canvas canvas, int left, int top, int block_text_location, Paint text_paint) {
         ArrayList<Object[]> parsed_format = parseFormat();
 
         // Draw the parameters
         int x = left + text_padding;  // The initial x's text position
 
-        int text_top = top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2);
+        // int text_top = top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2);
 
         int last_num = 0;
         for (Object[] param: parsed_format) {
             String text = format.substring(last_num, (int) param[0]);
-            canvas.drawText(text, x, text_top, text_paint);
+            canvas.drawText(text, x, block_text_location, text_paint);
 
             x += text_paint.measureText(text) + 5;
 
@@ -225,8 +231,6 @@ public class SketchwareBlock {
         }
 
         String text = format.substring(last_num);
-        canvas.drawText(text, x, text_top, text_paint);
-
-        // canvas.drawText(format, 60, top + 45, text_paint);
+        canvas.drawText(text, x, block_text_location, text_paint);
     }
 }

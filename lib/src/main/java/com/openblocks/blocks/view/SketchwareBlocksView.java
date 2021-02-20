@@ -138,9 +138,9 @@ public class SketchwareBlocksView extends View {
             field_recursive3.add(new SketchwareField("A field"));
 
             ArrayList<SketchwareField> field_recursive2 = new ArrayList<>();
-            field_recursive2.add(new SketchwareField(new SketchwareBlock("recursive2 %s", "10", -1, field_recursive3, 0xFF0000FF)));
+            field_recursive2.add(new SketchwareField(new SketchwareBlock("recursive 2 %s", "10", -1, field_recursive3, 0xFF0000FF)));
 
-            field_recursive1.add(new SketchwareField(new SketchwareBlock("recursive1 %s", "10", -1, field_recursive2, 0xFF15D807)));
+            field_recursive1.add(new SketchwareField(new SketchwareBlock("recursive 1 %s", "10", -1, field_recursive2, 0xFF15D807)));
 
             event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, field_recursive1, 0xFFE65319));
 

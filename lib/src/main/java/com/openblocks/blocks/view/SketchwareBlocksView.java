@@ -203,6 +203,6 @@ public class SketchwareBlocksView extends View {
             previous_block_color = current_block.color;
         }
 
-        event.draw(canvas, rect_paint, text_paint);
+        event.draw(canvas, event_offset, 10, left_position, event_offset, 15, shadow_height, rect_paint, text_paint);
     }
 }

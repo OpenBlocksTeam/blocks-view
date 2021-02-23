@@ -132,17 +132,17 @@ public class SketchwareBlocksView extends View {
 
             event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE65319));
 
-            ArrayList<SketchwareField> field_recursive1 = new ArrayList<>();
+            ArrayList<SketchwareField> value_of_recursive = new ArrayList<>();
 
-            ArrayList<SketchwareField> field_recursive3 = new ArrayList<>();
-            field_recursive3.add(new SketchwareField("A field"));
+            ArrayList<SketchwareField> get_id_recursive = new ArrayList<>();
+            get_id_recursive.add(new SketchwareField("Hello World"));
 
-            ArrayList<SketchwareField> field_recursive2 = new ArrayList<>();
-            field_recursive2.add(new SketchwareField(new SketchwareBlock("recursive 2 %s", "10", -1, field_recursive3, 0xFF0000FF)));
+            ArrayList<SketchwareField> recursive_fields_root = new ArrayList<>();
+            recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF)));
 
-            field_recursive1.add(new SketchwareField(new SketchwareBlock("recursive 1 %s", "10", -1, field_recursive2, 0xFF15D807)));
+            value_of_recursive.add(new SketchwareField(new SketchwareBlock("value of %s", "10", -1, recursive_fields_root, 0xFF15D807)));
 
-            event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, field_recursive1, 0xFFE65319));
+            event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
 
             event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
             event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "8", 8, new ArrayList<>(), 0xFFE10C0C));

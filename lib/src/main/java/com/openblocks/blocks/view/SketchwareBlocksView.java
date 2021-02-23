@@ -29,7 +29,7 @@ public class SketchwareBlocksView extends View {
 
     boolean is_overlapping = false;
 
-    SketchwareEvent data;
+    SketchwareEvent event;
 
     public SketchwareBlocksView(Context context) {
         super(context);
@@ -52,7 +52,7 @@ public class SketchwareBlocksView extends View {
     }
 
     public void setEvent(SketchwareEvent event) {
-        this.data = event;
+        this.event = event;
 
         initialize(null, null);
     }
@@ -64,13 +64,15 @@ public class SketchwareBlocksView extends View {
 
         int largest_width = 0;
         int blocks_height_sum = 0;
-        for (SketchwareBlock block : data.blocks) {
+        for (SketchwareBlock block : event.blocks) {
             largest_width = Math.max(block.getWidth(text_paint), largest_width);
+
+            blocks_height_sum += block.getHeight(text_paint);
         }
 
         int desiredWidth = left_position + largest_width + getPaddingLeft() + getPaddingRight() + left_position /* Just to get some padding on the right */;
 
-        int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
+        int desiredHeight = event_offset + blocks_height_sum + getPaddingTop() + getPaddingBottom();
 
         setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),
                 measureDimension(desiredHeight, heightMeasureSpec));
@@ -116,34 +118,35 @@ public class SketchwareBlocksView extends View {
             attributes.recycle();
         }
 
-        if (data == null) {
-            data = new SketchwareEvent("MainActivity", "onCreate");
+        if (event == null) {
+            event = new SketchwareEvent("MainActivity", "onCreate");
 
-            data.blocks.add(new SketchwareBlock("Hello World", "1", 2, new ArrayList<>(), 0xFFE10C0C));
-            data.blocks.add(new SketchwareBlock("This is SketchwareBlocksView", "2", 3, new ArrayList<>(), 0xFFD1159C));
-            data.blocks.add(new SketchwareBlock("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
-            data.blocks.add(new SketchwareBlock("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
+            event.blocks.add(new SketchwareBlock("Hello World", "1", 2, new ArrayList<>(), 0xFFE10C0C));
+            event.blocks.add(new SketchwareBlock("This is SketchwareBlocksView", "2", 3, new ArrayList<>(), 0xFFD1159C));
+            event.blocks.add(new SketchwareBlock("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
+            event.blocks.add(new SketchwareBlock("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
 
             ArrayList<SketchwareField> fields = new ArrayList<>();
             fields.add(new SketchwareField("parameters"));
             fields.add(new SketchwareField("yeah"));
 
-            data.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE65319));
+            event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE65319));
 
-            ArrayList<SketchwareField> field_recursive1 = new ArrayList<>();
+            ArrayList<SketchwareField> value_of_recursive = new ArrayList<>();
 
-            ArrayList<SketchwareField> field_recursive3 = new ArrayList<>();
-            field_recursive3.add(new SketchwareField("A field"));
+            ArrayList<SketchwareField> get_id_recursive = new ArrayList<>();
+            get_id_recursive.add(new SketchwareField("Hello World"));
 
-            ArrayList<SketchwareField> field_recursive2 = new ArrayList<>();
-            field_recursive2.add(new SketchwareField(new SketchwareBlock("recursive2 %s", "10", -1, field_recursive3, 0xFF0000FF)));
+            ArrayList<SketchwareField> recursive_fields_root = new ArrayList<>();
+            recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF)));
 
-            field_recursive1.add(new SketchwareField(new SketchwareBlock("recursive1 %s", "10", -1, field_recursive2, 0xFF15D807)));
+            value_of_recursive.add(new SketchwareField(new SketchwareBlock("value of %s", "10", -1, recursive_fields_root, 0xFF15D807)));
 
-            data.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, field_recursive1, 0xFFE65319));
+            event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
 
-            data.blocks.add(new SketchwareBlock("Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
-            data.blocks.add(new SketchwareBlock("Finish Activity", "8", -1, new ArrayList<>(), 0xFF1173E4));
+            event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
+            event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "8", 8, new ArrayList<>(), 0xFFE10C0C));
+            event.blocks.add(new SketchwareBlock("Finish Activity", "9", -1, new ArrayList<>(), 0xFF1173E4));
         }
 
         text_paint = new Paint();
@@ -164,47 +167,42 @@ public class SketchwareBlocksView extends View {
         super.onDraw(canvas);
 
         // Draw the blocks from top to bottom
-        int previous_block_color = data.color;
-        for (int i = 0; i < data.blocks.size(); i++) {
+        int previous_block_color = event.color;
+        int previous_top_position = event_offset;  // Start with event_offset
+        int previous_block_height = block_height - shadow_height;  // Because if not, the first block would get overlapped by the event
+        for (int i = 0; i < event.blocks.size(); i++) {
+
+            SketchwareBlock current_block = event.blocks.get(i);
+            current_block.default_height = block_height;
 
             int top_position;
 
-            if (i == 0) {
-                top_position = event_offset + block_height;
+            top_position = previous_top_position + previous_block_height + shadow_height;
 
-            } else {
-                top_position = (i + 1) * block_height - (block_height - event_offset);
-
-                // Set the offset for blocks below the first block
-                top_position += (i - 1) * (block_height - event_offset);
-
-                // Don't forget the first block
-                top_position += block_height + shadow_height;
-
-                if (is_overlapping) {
-                    // Overlap the previous block's shadow
-                    top_position -= (i - 1) * shadow_height;
-                    top_position -= shadow_height; // Overlap the first block
-                }
+            if (is_overlapping) {
+                // Overlap the previous block's shadow
+                top_position -= shadow_height;
             }
 
-            data.blocks
-                .get(i)
+            previous_top_position = top_position;
+
+            previous_block_height = current_block.getHeight(text_paint);
+
+            current_block
                 .draw(
                         canvas,
                         rect_paint,
                         text_paint,
                         top_position,
                         left_position,
-                        block_height,
                         shadow_height,
                         block_outset_height,
                         is_overlapping,
                         previous_block_color
                 );
-            previous_block_color = data.blocks.get(i).color;
+            previous_block_color = current_block.color;
         }
 
-        data.draw(canvas, rect_paint, text_paint);
+        event.draw(canvas, rect_paint, text_paint);
     }
 }

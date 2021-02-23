@@ -22,6 +22,7 @@ public class SketchwareField {
      */
     public SketchwareField(SketchwareBlock block) {
         this.block = block;
+        this.block.is_parameter = true;
         is_block = true;
         init();
     }
@@ -56,16 +57,31 @@ public class SketchwareField {
         }
     }
 
-    public void draw(Canvas canvas, int left, int top, int bottom, Paint block_text_paint) {
+    public int getHeight(Paint block_text_paint) {
         if (!is_block) {
+            Paint.FontMetrics fm = text_paint.getFontMetrics();
+            float height = fm.descent - fm.ascent;
+
+            return (int) height + padding * 2;
+        } else {
+            return block.getHeight(block_text_paint);
+        }
+    }
+
+    public void draw(Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height) {
+        if (!is_block) {
+            int bottom_background = top + parent_block_height;
+
             // Draw the white background
-            canvas.drawRect(left, top + padding, left + getWidth(block_text_paint), bottom - padding, rect_paint);
+            canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);
 
             // Draw the text / value
-            canvas.drawText(value, left + padding, top + ((bottom - top) / 2) + padding, text_paint);
+            canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
         } else {
             // Well, draw the block as the parameter, I guess
-            block.draw(canvas, rect_paint, block_text_paint, top, left, bottom - top, 0, 0, false, 0x00000000);
+            block.draw(canvas, rect_paint, block_text_paint, top, left, 0, padding, false, 0x00000000);
+            //                                                                              ^
+                                        /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
         }
     }
 }

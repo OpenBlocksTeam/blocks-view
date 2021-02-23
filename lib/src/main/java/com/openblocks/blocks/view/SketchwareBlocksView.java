@@ -144,8 +144,9 @@ public class SketchwareBlocksView extends View {
 
             event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, field_recursive1, 0xFFE65319));
 
-            // event.blocks.add(new SketchwareBlock("Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
-            // event.blocks.add(new SketchwareBlock("Finish Activity", "8", -1, new ArrayList<>(), 0xFF1173E4));
+            event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
+            event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "8", 8, new ArrayList<>(), 0xFFE10C0C));
+            event.blocks.add(new SketchwareBlock("Finish Activity", "9", -1, new ArrayList<>(), 0xFF1173E4));
         }
 
         text_paint = new Paint();

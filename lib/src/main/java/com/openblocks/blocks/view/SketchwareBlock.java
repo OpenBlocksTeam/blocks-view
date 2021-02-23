@@ -132,7 +132,7 @@ public class SketchwareBlock {
             }
         }
 
-        return max_height + text_padding * 2; // 2 paddings because there will be padding on the top and the bottom
+        return Math.max(default_height, max_height + text_padding * 2); // 2 paddings because there will be padding on the top and the bottom
     }
 
     /**

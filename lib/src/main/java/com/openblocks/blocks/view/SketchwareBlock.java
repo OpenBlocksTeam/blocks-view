@@ -198,12 +198,12 @@ public class SketchwareBlock {
         }
 
         // Draw the block's text and parameters
-        drawParameters(canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), text_paint);
+        drawParameters(canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), height, shadow_height, text_paint);
 
         // canvas.drawText(format, 60, top + 45, text_paint);
     }
 
-    public final void drawParameters(Canvas canvas, int left, int top, int block_text_location, Paint text_paint) {
+    public final void drawParameters(Canvas canvas, int left, int top, int block_text_location, int height, int shadow_height, Paint text_paint) {
         ArrayList<Object[]> parsed_format = parseFormat();
 
         // Draw the parameters
@@ -222,7 +222,10 @@ public class SketchwareBlock {
 
             SketchwareField field = (SketchwareField) param[3];
 
-            field.draw(canvas, x, top + text_padding, text_paint);
+            if (shadow_height == 0)
+                shadow_height = text_padding;
+
+            field.draw(canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height);
 
             x += field.getWidth(text_paint) + 5;
         }

@@ -74,12 +74,12 @@ public class SketchwareBlocksView extends View {
         for (SketchwareBlock block : event.blocks) {
             largest_width = Math.max(block.getWidth(text_paint), largest_width);
 
-            blocks_height_sum += block.getHeight(text_paint);
+            blocks_height_sum += block.getHeight(text_paint) + shadow_height;
         }
 
         int desiredWidth = left_position + largest_width + getPaddingLeft() + getPaddingRight() + left_position /* Just to get some padding on the right */;
 
-        int desiredHeight = event_offset + blocks_height_sum + getPaddingTop() + getPaddingBottom();
+        int desiredHeight = event_offset + event_height + blocks_height_sum + getPaddingTop() + getPaddingBottom() + top_position;
 
         setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),
                 measureDimension(desiredHeight, heightMeasureSpec));

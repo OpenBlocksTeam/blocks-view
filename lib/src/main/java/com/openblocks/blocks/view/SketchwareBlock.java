@@ -117,7 +117,7 @@ public class SketchwareBlock {
         // If there aren't any parameters, and this isn't a parameter block, this means that this
         // block is just a freestanding block, nothing special in it, get text height and add 2 text_padding.
         if (parameters.size() == 0)
-            return (int) text_paint.getTextSize() + text_padding * 2;
+            return Math.max(default_height, (int) text_paint.getTextSize() + text_padding * 2);
 
         // Let's calculate the height
         // Quite easy, just loop per every parameters and get the maximum height

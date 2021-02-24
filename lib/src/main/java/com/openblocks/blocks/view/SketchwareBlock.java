@@ -148,8 +148,8 @@ public class SketchwareBlock {
      * @param left The x position of the block
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_height, boolean is_overlapping, int previous_block_color) {
-        draw(canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_height, is_overlapping, previous_block_color);
+    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+        draw(canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
     }
 
     /**
@@ -163,11 +163,13 @@ public class SketchwareBlock {
      * @param height The height of the block
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
         // int block_width = (int) text_paint.measureText(format) + 20;
         int block_width = getWidth(text_paint);
 
         int bottom_position = top + height;
+
+        int block_outset_left = left + block_outset_left_margin;
 
         // Draw the block's shadow
         rect_paint.setColor(color_dark);
@@ -175,7 +177,7 @@ public class SketchwareBlock {
 
         // This is the little bottom thing
         if (!is_bottom)
-            canvas.drawRect(left + 50, top, 175, bottom_position + shadow_height + block_outset_height, rect_paint);
+            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, bottom_position + shadow_height + block_outset_height, rect_paint);
 
         // Draw the actual block
         rect_paint.setColor(color);
@@ -183,18 +185,18 @@ public class SketchwareBlock {
 
         // This is the little bottom thing
         if (!is_bottom)
-            canvas.drawRect(left + 50, top, 175, bottom_position + block_outset_height, rect_paint);
+            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, bottom_position + block_outset_height, rect_paint);
 
         // Draw the previous block's outset (only if we're overlapping it)
         if (is_overlapping) {
             rect_paint.setColor(previous_block_color);
-            canvas.drawRect(left + 50, top, 175, top + block_outset_height, rect_paint);
+            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height, rect_paint);
         } else {
             rect_paint.setColor(Utilities.manipulateColor(previous_block_color, 0.7f));
-            canvas.drawRect(left + 50, top, 175, top + block_outset_height, rect_paint);
+            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height, rect_paint);
 
             rect_paint.setColor(previous_block_color);
-            canvas.drawRect(left + 50, top, 175, top + block_outset_height - shadow_height, rect_paint);
+            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height - shadow_height, rect_paint);
         }
 
         // Draw the block's text and parameters

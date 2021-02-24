@@ -31,6 +31,9 @@ public class SketchwareBlocksView extends View {
 
     int event_height = 50; // add this to styleable
 
+    int block_outset_left_margin = 50; // add this to styleable
+    int block_outset_width = 75; // add this to styleable
+
     boolean is_overlapping = false;
 
     SketchwareEvent event;
@@ -217,6 +220,8 @@ public class SketchwareBlocksView extends View {
                         top_position,
                         left_position,
                         shadow_height,
+                        block_outset_left_margin,
+                        block_outset_width,
                         block_outset_height,
                         is_overlapping,
                         previous_block_color

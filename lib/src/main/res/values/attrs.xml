@@ -8,5 +8,6 @@
         <attr name="block_height" format="dimension"/>
         <attr name="event_offset" format="dimension"/>
         <attr name="is_overlapping" format="boolean"/>
+        <attr name="nested_bottom_margin" format="dimension"/>
     </declare-styleable>
 </resources>

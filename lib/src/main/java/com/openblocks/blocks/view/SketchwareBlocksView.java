@@ -27,6 +27,10 @@ public class SketchwareBlocksView extends View {
     int block_height = 60;
     int event_offset = 50;
 
+    int nested_bottom_margin = 20;
+
+    int event_height = 50; // add this to styleable
+
     boolean is_overlapping = false;
 
     SketchwareEvent event;
@@ -115,6 +119,8 @@ public class SketchwareBlocksView extends View {
 
             is_overlapping = attributes.getBoolean(R.styleable.SketchwareBlocksView_is_overlapping, is_overlapping);
 
+            nested_bottom_margin = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_nested_bottom_margin, nested_bottom_margin);
+
             attributes.recycle();
         }
 
@@ -146,7 +152,17 @@ public class SketchwareBlocksView extends View {
 
             event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
             event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "8", 8, new ArrayList<>(), 0xFFE10C0C));
-            event.blocks.add(new SketchwareBlock("Finish Activity", "9", -1, new ArrayList<>(), 0xFF1173E4));
+
+            ArrayList<SketchwareBlock> bloks = new ArrayList<>();
+            bloks.add(new SketchwareBlock("Yeah, nested blocks!", "1", 2, new ArrayList<>(), 0xFFE10C0C));
+            bloks.add(new SketchwareBlock("Very cool, right?", "2", -1, new ArrayList<>(), 0xFFE65319));
+
+            ArrayList<SketchwareField> a = new ArrayList<>();
+            a.add(new SketchwareField("oh god"));
+
+            event.blocks.add(new SketchwareNestedBlock("Did i say nested? %a", "9", 10, a, 0xFF21167B, bloks)); //0xFFE10C0C
+
+            event.blocks.add(new SketchwareBlock("Finish Activity", "10", -1, new ArrayList<>(), 0xFF1173E4));
         }
 
         text_paint = new Paint();
@@ -168,8 +184,8 @@ public class SketchwareBlocksView extends View {
 
         // Draw the blocks from top to bottom
         int previous_block_color = event.color;
-        int previous_top_position = event_offset;  // Start with event_offset
-        int previous_block_height = block_height - shadow_height;  // Because if not, the first block would get overlapped by the event
+        int previous_top_position = event_height;  // Start with event_offset
+        int previous_block_height = event_height;  // Because if not, the first block would get overlapped by the event
         for (int i = 0; i < event.blocks.size(); i++) {
 
             SketchwareBlock current_block = event.blocks.get(i);
@@ -188,6 +204,11 @@ public class SketchwareBlocksView extends View {
 
             previous_block_height = current_block.getHeight(text_paint);
 
+            // Apply the bottom margin if this is a nested block
+            if (current_block instanceof SketchwareNestedBlock) {
+                ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
+            }
+
             current_block
                 .draw(
                         canvas,
@@ -203,6 +224,6 @@ public class SketchwareBlocksView extends View {
             previous_block_color = current_block.color;
         }
 
-        event.draw(canvas, event_offset, 10, left_position, event_offset, 15, shadow_height, rect_paint, text_paint);
+        event.draw(canvas, event_height, 10, left_position, event_offset, 15, shadow_height, rect_paint, text_paint);
     }
 }

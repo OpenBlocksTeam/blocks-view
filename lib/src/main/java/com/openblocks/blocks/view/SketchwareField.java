@@ -79,9 +79,9 @@ public class SketchwareField {
             canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
         } else {
             // Well, draw the block as the parameter, I guess
-            block.draw(canvas, rect_paint, block_text_paint, top, left, 0, padding, false, 0x00000000);
-            //                                                                              ^
-                                        /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
+            block.draw(canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, padding, false, 0x00000000);
+            //                                                                                                                        ^
+                                                                                       /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
         }
     }
 }

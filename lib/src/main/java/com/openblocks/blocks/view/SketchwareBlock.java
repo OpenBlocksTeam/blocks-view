@@ -29,6 +29,20 @@ public class SketchwareBlock {
     // Will be used in the overloaded draw function
     public int default_height = 60; // The same as in SketchwareBlocksView
 
+    /**
+     * Constructs a simple SketchwareBlocks with just a text and a color
+     *
+     * @param text The text of the block
+     * @param color The color of the block
+     */
+    public SketchwareBlock(String text, int color) {
+        this(text, "1", 2, color);
+    }
+
+    public SketchwareBlock(String text, String id, int next_block, int color) {
+        this(text, id, next_block, new ArrayList<>(), color, false);
+    }
+
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
         this(format, id, next_block, parameters, color, false);
     }
@@ -146,6 +160,11 @@ public class SketchwareBlock {
      * @param text_paint The paint for the text
      * @param top The y position of the block
      * @param left The x position of the block
+     * @param shadow_height The shadow height of the block
+     * @param block_outset_left_margin The outset block's left margin (RTL)
+     * @param block_outset_width The outset block's width
+     * @param block_outset_height The outset block's height
+     * @param is_overlapping Do you want to overlap the block above's shadow?
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
     public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
@@ -161,6 +180,11 @@ public class SketchwareBlock {
      * @param top The y position of the block
      * @param left The x position of the block
      * @param height The height of the block
+     * @param shadow_height The shadow height of the block
+     * @param block_outset_left_margin The outset block's left margin (RTL)
+     * @param block_outset_width The outset block's width
+     * @param block_outset_height The outset block's height
+     * @param is_overlapping Do you want to overlap the block above's shadow?
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
     public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {

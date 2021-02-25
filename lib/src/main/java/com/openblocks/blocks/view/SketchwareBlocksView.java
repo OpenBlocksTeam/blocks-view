@@ -11,6 +11,8 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.openblocks.blocks.view.styles.SketchwareBlockOriginalStyle;
+
 import java.util.ArrayList;
 
 public class SketchwareBlocksView extends View {
@@ -37,6 +39,8 @@ public class SketchwareBlocksView extends View {
     boolean is_overlapping = false;
 
     SketchwareEvent event;
+
+    Context context;
 
     public SketchwareBlocksView(Context context) {
         super(context);
@@ -107,6 +111,8 @@ public class SketchwareBlocksView extends View {
     }
 
     private void initialize(Context context, AttributeSet attrs) {
+        this.context = context;
+
         if (attrs != null) {
             TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.SketchwareBlocksView);
 
@@ -126,6 +132,9 @@ public class SketchwareBlocksView extends View {
 
             attributes.recycle();
         }
+
+        event = new SketchwareEvent("MainActivity", "onCreate");
+        event.blocks.add(new SketchwareBlockOriginalStyle("Hello World!", 0xFFFFFFFF));
 
         if (event == null) {
             event = new SketchwareEvent("MainActivity", "onCreate");
@@ -214,6 +223,7 @@ public class SketchwareBlocksView extends View {
 
             current_block
                 .draw(
+                        context,
                         canvas,
                         rect_paint,
                         text_paint,

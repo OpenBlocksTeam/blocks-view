@@ -1,5 +1,6 @@
 package com.openblocks.blocks.view;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
@@ -68,7 +69,7 @@ public class SketchwareField {
         }
     }
 
-    public void draw(Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height) {
+    public void draw(Context context, Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height) {
         if (!is_block) {
             int bottom_background = top + parent_block_height;
 
@@ -79,7 +80,7 @@ public class SketchwareField {
             canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
         } else {
             // Well, draw the block as the parameter, I guess
-            block.draw(canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, padding, false, 0x00000000);
+            block.draw(context, canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, padding, false, 0x00000000);
             //                                                                                                                        ^
                                                                                        /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
         }

@@ -1,5 +1,6 @@
 package com.openblocks.blocks.view;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
@@ -171,13 +172,14 @@ public class SketchwareBlock {
      * @param is_overlapping Do you want to overlap the block above's shadow?
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
-        draw(canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+        draw(context, canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
     }
 
     /**
      * This function draws the block into the canvas specified at a given level to the bottom (blocks_down)
      *
+     * @param context The context
      * @param canvas The canvas where it will be drawn into
      * @param rect_paint The paint for the rectangle
      * @param text_paint The paint for the text
@@ -191,7 +193,7 @@ public class SketchwareBlock {
      * @param is_overlapping Do you want to overlap the block above's shadow?
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
         // int block_width = (int) text_paint.measureText(format) + 20;
         int block_width = getWidth(text_paint);
 
@@ -228,12 +230,12 @@ public class SketchwareBlock {
         }
 
         // Draw the block's text and parameters
-        drawParameters(canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), height, shadow_height, text_paint);
+        drawParameters(context, canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), height, shadow_height, text_paint);
 
         // canvas.drawText(format, 60, top + 45, text_paint);
     }
 
-    public final void drawParameters(Canvas canvas, int left, int top, int block_text_location, int height, int shadow_height, Paint text_paint) {
+    public final void drawParameters(Context context, Canvas canvas, int left, int top, int block_text_location, int height, int shadow_height, Paint text_paint) {
         ArrayList<Object[]> parsed_format = parseFormat();
 
         // Draw the parameters
@@ -255,7 +257,7 @@ public class SketchwareBlock {
             if (shadow_height == 0)
                 shadow_height = text_padding;
 
-            field.draw(canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height);
+            field.draw(context,canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height);
 
             x += field.getWidth(text_paint) + 5;
         }

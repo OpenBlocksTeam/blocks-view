@@ -1,5 +1,6 @@
 package com.openblocks.blocks.view;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Parcelable;
@@ -52,12 +53,12 @@ public class SketchwareNestedBlock extends SketchwareBlock {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
         Paint original_block_paint = new Paint();
         original_block_paint.setColor(rect_paint.getColor());
         original_block_paint.setTextSize(rect_paint.getTextSize());
 
-        super.draw(canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
 
         // Draw the childes! (similar to SketchwareBlocksView)
         previous_block_color = 0;
@@ -85,6 +86,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
             current_block
                     .draw(
+                            context,
                             canvas,
                             rect_paint,
                             text_paint,
@@ -125,6 +127,6 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         // Ok, draw the "indent"
         canvas.drawRect(left, top + block_height, left + indent_width, bottom_block_bottom_position, extensions_paint);
 
-        drawParameters(canvas, left, top, top + ((getBlockHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), getBlockHeight(text_paint), shadow_height, text_paint);
+        drawParameters(context,canvas, left, top, top + ((getBlockHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), getBlockHeight(text_paint), shadow_height, text_paint);
     }
 }

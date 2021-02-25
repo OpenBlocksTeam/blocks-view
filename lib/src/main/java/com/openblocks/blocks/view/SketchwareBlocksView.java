@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -27,12 +28,14 @@ public class SketchwareBlocksView extends View {
     int block_height = 60;
     int event_top = 50;
 
-    int nested_bottom_margin = 20;
+    int nested_bottom_margin = 30;
 
-    int event_height = 50; // add this to styleable
+    int event_height = 50;
 
-    int block_outset_left_margin = 50; // add this to styleable
-    int block_outset_width = 75; // add this to styleable
+    int block_outset_left_margin = 50;
+    int block_outset_width = 75;
+
+    float block_text_size = 30f;
 
     boolean is_overlapping = false;
 
@@ -120,9 +123,13 @@ public class SketchwareBlocksView extends View {
             shadow_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_shadow_height, shadow_height);
 
             block_outset_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_height, block_outset_height);
+            block_outset_width = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_width, block_outset_width);
+            block_outset_left_margin = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_left_margin, block_outset_left_margin);
+            block_text_size = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_text_size, (int) block_text_size);
             block_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_height, block_height);
 
             event_top = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_top, event_top);
+            event_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_height, event_height);
 
             is_overlapping = attributes.getBoolean(R.styleable.SketchwareBlocksView_is_overlapping, is_overlapping);
 
@@ -178,7 +185,7 @@ public class SketchwareBlocksView extends View {
         text_paint.setFakeBoldText(true);
         text_paint.setAntiAlias(true);
         text_paint.setColor(0xFFFFFFFF);
-        text_paint.setTextSize(30f);
+        text_paint.setTextSize(block_text_size);
 
         rect_paint = new Paint();
         rect_paint.setAntiAlias(true);

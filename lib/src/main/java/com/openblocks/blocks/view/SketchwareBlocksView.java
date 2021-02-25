@@ -11,8 +11,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.openblocks.blocks.view.styles.SketchwareBlockOriginalStyle;
-
 import java.util.ArrayList;
 
 public class SketchwareBlocksView extends View {
@@ -27,7 +25,7 @@ public class SketchwareBlocksView extends View {
     int block_outset_height = 10;
 
     int block_height = 60;
-    int event_offset = 50;
+    int event_top = 50;
 
     int nested_bottom_margin = 20;
 
@@ -83,7 +81,7 @@ public class SketchwareBlocksView extends View {
 
         int desiredWidth = left_position + largest_width + getPaddingLeft() + getPaddingRight() + left_position /* Just to get some padding on the right */;
 
-        int desiredHeight = event_offset + event_height + blocks_height_sum + getPaddingTop() + getPaddingBottom() + top_position;
+        int desiredHeight = event_top + event_height + blocks_height_sum + getPaddingTop() + getPaddingBottom() + top_position;
 
         setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),
                 measureDimension(desiredHeight, heightMeasureSpec));
@@ -124,7 +122,7 @@ public class SketchwareBlocksView extends View {
             block_outset_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_height, block_outset_height);
             block_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_height, block_height);
 
-            event_offset = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_offset, event_offset);
+            event_top = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_top, event_top);
 
             is_overlapping = attributes.getBoolean(R.styleable.SketchwareBlocksView_is_overlapping, is_overlapping);
 
@@ -132,9 +130,6 @@ public class SketchwareBlocksView extends View {
 
             attributes.recycle();
         }
-
-        event = new SketchwareEvent("MainActivity", "onCreate");
-        event.blocks.add(new SketchwareBlockOriginalStyle("Hello World!", 0xFFFFFFFF));
 
         if (event == null) {
             event = new SketchwareEvent("MainActivity", "onCreate");
@@ -197,7 +192,7 @@ public class SketchwareBlocksView extends View {
         // Draw the blocks from top to bottom
         int previous_block_color = event.color;
         int previous_top_position = event_height;  // Start with event_offset
-        int previous_block_height = event_height;  // Because if not, the first block would get overlapped by the event
+        int previous_block_height = event_top;  // Because if not, the first block would get overlapped by the event
         for (int i = 0; i < event.blocks.size(); i++) {
 
             SketchwareBlock current_block = event.blocks.get(i);
@@ -239,6 +234,6 @@ public class SketchwareBlocksView extends View {
             previous_block_color = current_block.color;
         }
 
-        event.draw(canvas, event_height, 10, left_position, event_offset, 15, shadow_height, rect_paint, text_paint);
+        event.draw(canvas, event_height, 10, left_position, event_top, 15, shadow_height, rect_paint, text_paint);
     }
 }

@@ -43,6 +43,10 @@ public class SketchwareBlock {
         this(text, id, next_block, new ArrayList<>(), color, false);
     }
 
+    public SketchwareBlock(String format, ArrayList<SketchwareField> parameters, int color) {
+        this(format, "1", 2, parameters, color);
+    }
+
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
         this(format, id, next_block, parameters, color, false);
     }

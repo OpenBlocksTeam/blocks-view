@@ -9,6 +9,7 @@
         <attr name="block_outset_left_margin" format="dimension"/>
         <attr name="block_height" format="dimension"/>
         <attr name="block_text_size" format="dimension"/>
+        <attr name="block_text_color" format="color"/>
         <attr name="event_top" format="dimension"/>
         <attr name="event_height" format="dimension"/>
         <attr name="is_overlapping" format="boolean"/>

@@ -36,6 +36,7 @@ public class SketchwareBlocksView extends View {
     int block_outset_width = 75;
 
     float block_text_size = 30f;
+    int block_text_color = 0xFFFFFFFF;
 
     boolean is_overlapping = false;
 
@@ -128,6 +129,8 @@ public class SketchwareBlocksView extends View {
             block_text_size = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_text_size, (int) block_text_size);
             block_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_height, block_height);
 
+            block_text_color = attributes.getColor(R.styleable.SketchwareBlocksView_block_text_color, block_text_color);
+
             event_top = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_top, event_top);
             event_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_height, event_height);
 
@@ -184,7 +187,7 @@ public class SketchwareBlocksView extends View {
         text_paint.setStyle(Paint.Style.FILL);
         text_paint.setFakeBoldText(true);
         text_paint.setAntiAlias(true);
-        text_paint.setColor(0xFFFFFFFF);
+        text_paint.setColor(block_text_color);
         text_paint.setTextSize(block_text_size);
 
         rect_paint = new Paint();

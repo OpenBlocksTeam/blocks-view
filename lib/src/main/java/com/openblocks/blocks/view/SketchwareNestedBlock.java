@@ -3,11 +3,8 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.function.Consumer;
 
 public class SketchwareNestedBlock extends SketchwareBlock {
 
@@ -63,7 +60,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         // Draw the childes! (similar to SketchwareBlocksView)
         previous_block_color = 0;
         int block_height = getBlockHeight(text_paint);
-        int previous_top_position = top;  // Start with event_offset
+        int previous_top_position = top;
         int previous_block_height = block_height - shadow_height;  // Because if not, the first block would get overlapped by the event
 
         for (int i = 0; i < blocks.size(); i++) {

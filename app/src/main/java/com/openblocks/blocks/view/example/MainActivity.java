@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,19 +27,14 @@ import javax.crypto.spec.SecretKeySpec;
 public class MainActivity extends AppCompatActivity {
 
     final int PICK_EVENT_REC_CODE = 10;
+    ArrayList<SketchwareEvent> events = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent i = new Intent();
-        i   .setAction(Intent.ACTION_OPEN_DOCUMENT)
-            .addCategory(Intent.CATEGORY_OPENABLE);
-
-        startActivityForResult(i, PICK_EVENT_REC_CODE);
-
-        Toast.makeText(this, "Navigate to a logic file", Toast.LENGTH_SHORT).show();
+        pickFile();
     }
 
     @Override
@@ -48,26 +46,40 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = data.getData();
 
                 String decrypted_data = decrypt_from_path(uri.getPath());
-                ArrayList<SketchwareEvent> events = new SketchwareBlocksParser(decrypted_data).parse();
+                events = new SketchwareBlocksParser(decrypted_data).parse();
 
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("Choose an event to display");
-
-                String[] items = new String[events.size()];
-
-                for (int i = 0; i < events.size(); i++) {
-                    items[i] = events.get(i).activity_name + ": " + events.get(i).name;
-                }
-
-                alertDialog.setItems(items, (dialog, which) -> {
-                    SketchwareBlocksView blocksView = findViewById(R.id.blocks_view);
-                    blocksView.setEvent(events.get(which));
-                });
-
-                AlertDialog alert = alertDialog.create();
-                alert.show();
+                pickEvent();
             }
         }
+    }
+
+    private void pickFile() {
+        Intent i = new Intent();
+        i   .setAction(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE);
+
+        startActivityForResult(i, PICK_EVENT_REC_CODE);
+
+        Toast.makeText(this, "Navigate to a logic file", Toast.LENGTH_SHORT).show();
+    }
+
+    private void pickEvent() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Choose an event to display");
+
+        String[] items = new String[events.size()];
+
+        for (int i = 0; i < events.size(); i++) {
+            items[i] = events.get(i).activity_name + ": " + events.get(i).name;
+        }
+
+        alertDialog.setItems(items, (dialog, which) -> {
+            SketchwareBlocksView blocksView = findViewById(R.id.blocks_view);
+            blocksView.setEvent(events.get(which));
+        });
+
+        AlertDialog alert = alertDialog.create();
+        alert.show();
     }
 
     public static String decrypt_from_path(String path) {
@@ -98,5 +110,26 @@ public class MainActivity extends AppCompatActivity {
         return "";
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.open_file) {
+            pickFile();
+
+            return true;
+        } else if (id == R.id.open_event) {
+            pickEvent();
+            
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

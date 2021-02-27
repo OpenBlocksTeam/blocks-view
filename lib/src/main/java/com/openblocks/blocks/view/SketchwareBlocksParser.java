@@ -69,7 +69,7 @@ public class SketchwareBlocksParser {
                         event.blocks.add(new SketchwareBlock(
                                 /* Format:           */ block.getString("spec"),
                                 /* Block ID:         */ id,
-                                /* Next Block ID:    */ Integer.parseInt(block.getString("next_block")),
+                                /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
                                 /* Parameter:        */ parseParameter(block, id),
                                 /* Block color:      */ block.getInt("color")
                         ));

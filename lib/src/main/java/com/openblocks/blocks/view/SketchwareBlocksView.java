@@ -57,6 +57,7 @@ public class SketchwareBlocksView extends SurfaceView {
     Vibrator vibrator;
 
     ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks;
+    int picked_up_block = -1;
 
     public SketchwareBlocksView(Context context) {
         super(context);
@@ -218,6 +219,11 @@ public class SketchwareBlocksView extends SurfaceView {
             public void onLongPress(MotionEvent e) {
                 vibrator.vibrate(100);
                 isHolding = true;
+
+                int x = (int) e.getX();
+                int y = (int) e.getY();
+
+                picked_up_block = pickup_block(x, y);
             }
         });
     }
@@ -240,21 +246,21 @@ public class SketchwareBlocksView extends SurfaceView {
                 if (isHolding) {
                     // Move the block to the designated location
                     // Pickup the block first
-                    int block_index = pickup_block(x, y);
 
-                    if (block_index == -1) {
+                    if (picked_up_block == -1) {
                         // There is no block here, just quit
                         break;
                     }
 
                     // Move the block
-                    unconnected_blocks.get(block_index).first.x = x;
-                    unconnected_blocks.get(block_index).first.y = y;
+                    unconnected_blocks.get(picked_up_block).first.x = x;
+                    unconnected_blocks.get(picked_up_block).first.y = y;
 
                     // Redraw
                     invalidate();
                 }
-                break;
+
+                return true;
 
             case MotionEvent.ACTION_UP:
                 isHolding = false;

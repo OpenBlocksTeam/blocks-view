@@ -3,6 +3,7 @@ package com.openblocks.blocks.view.example;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +18,9 @@ import com.openblocks.blocks.view.SketchwareBlocksParser;
 import com.openblocks.blocks.view.SketchwareBlocksView;
 import com.openblocks.blocks.view.SketchwareEvent;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
@@ -33,8 +37,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        pickFile();
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        new Handler().postDelayed(this::pickFile, 1000);
     }
 
     @Override
@@ -44,9 +53,29 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PICK_EVENT_REC_CODE) {
             if (data != null) {
                 Uri uri = data.getData();
+                try {
+                    InputStream stream = getContentResolver().openInputStream(uri);
 
-                String decrypted_data = decrypt_from_path(uri.getPath());
-                events = new SketchwareBlocksParser(decrypted_data).parse();
+                    int count;
+                    byte[] buffer = new byte[1024];
+                    ByteArrayOutputStream byteStream =
+                            new ByteArrayOutputStream(stream.available());
+
+                    while (true) {
+                        count = stream.read(buffer);
+                        if (count <= 0)
+                            break;
+                        byteStream.write(buffer, 0, count);
+                    }
+
+                    stream.close();
+
+                    events = new SketchwareBlocksParser(decrypt(byteStream.toByteArray())).parse();
+
+                    byteStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 pickEvent();
             }
@@ -54,13 +83,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void pickFile() {
-        Intent i = new Intent();
-        i   .setAction(Intent.ACTION_OPEN_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE);
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        i   .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*");
 
         startActivityForResult(i, PICK_EVENT_REC_CODE);
 
-        Toast.makeText(this, "Navigate to a logic file", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Navigate to a logic file", Toast.LENGTH_LONG).show();
     }
 
     private void pickEvent() {
@@ -76,24 +105,12 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.setItems(items, (dialog, which) -> {
             SketchwareBlocksView blocksView = findViewById(R.id.blocks_view);
             blocksView.setEvent(events.get(which));
+            Log.d("MainActivity", "pickEvent: event: " + events);
+            blocksView.invalidate();
         });
 
         AlertDialog alert = alertDialog.create();
         alert.show();
-    }
-
-    public static String decrypt_from_path(String path) {
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(path, "r");
-            byte[] bArr = new byte[((int) randomAccessFile.length())];
-            randomAccessFile.readFully(bArr);
-
-            return decrypt(bArr);
-        } catch (Exception e) {
-            Log.e("Decryptor", "Error while decrypting, at path: " + path);
-            e.printStackTrace();
-        }
-        return "";
     }
 
     public static String decrypt(byte[] data) {

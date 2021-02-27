@@ -107,8 +107,8 @@ public class SketchwareBlocksParser {
                         continue;
                     }
 
-                    activity_name = m.group(0);
-                    event_name = m.group(1);
+                    activity_name = m.group(1);
+                    event_name = m.group(2);
                 }
 
             } else {

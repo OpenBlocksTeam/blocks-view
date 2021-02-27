@@ -250,6 +250,9 @@ public class SketchwareBlocksView extends SurfaceView {
                     // Move the block
                     unconnected_blocks.get(block_index).first.x = x;
                     unconnected_blocks.get(block_index).first.y = y;
+
+                    // Redraw
+                    invalidate();
                 }
                 break;
 
@@ -396,6 +399,31 @@ public class SketchwareBlocksView extends SurfaceView {
         }
 
         event.draw(canvas, event_height, 10, left_position, event_top, 15, shadow_height, rect_paint, text_paint);
+
+
+        // Nullcheck
+        if (unconnected_blocks == null)
+            return;
+
+        // Draw the unconnected blocks
+        for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
+            Vector2D position = block.first;
+
+            block.second.draw(
+                    context,
+                    canvas,
+                    rect_paint,
+                    text_paint,
+                    position.y,
+                    position.x,
+                    shadow_height,
+                    block_outset_left_margin,
+                    block_outset_width,
+                    block_outset_height,
+                    is_overlapping,
+                    0xFFFFFFFF
+            );
+        }
     }
 
 

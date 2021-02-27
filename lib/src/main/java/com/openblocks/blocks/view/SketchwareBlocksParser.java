@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,30 +97,29 @@ public class SketchwareBlocksParser {
             // If we're aren't in an event name
             if (event_name.equals("")) {
                 String header_regex = "@(\\w+).java_(.+)";
-                String var_header_regex = "@\\w+.java_var";
-                String func_header_regex = "@\\w+.java_func";
-
-                if (line.matches(var_header_regex) || line.matches(func_header_regex)) {
-                    skip_event = true;
-                    continue;
-                }
 
                 Pattern r = Pattern.compile(header_regex);
                 Matcher m = r.matcher(line);
 
                 if (m.find()) {
+                    if (Objects.equals(m.group(1), "var") || Objects.equals(m.group(1), "func")) {
+                        skip_event = true;
+                        continue;
+                    }
+
                     activity_name = m.group(0);
                     event_name = m.group(1);
                 }
 
             } else {
-
                 // Fetch every blocks in this event into tmp_blocks
+
                 try {
                     JSONObject json = new JSONObject(line);
 
                     tmp_blocks.put(json.getString("id"), json);
                 } catch (JSONException e) {
+                    e.printStackTrace();
                     // Something is wrong
                 }
             }

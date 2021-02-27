@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -19,12 +20,14 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class SketchwareBlocksView extends SurfaceView {
+public class SketchwareBlocksView extends View {
+
+    private static final String TAG = "SketchwareBlocksView";
 
     Paint rect_paint;
     Paint text_paint;
+    Paint shadow_paint;
 
     int left_position = 50;
     int top_position = 50;
@@ -56,7 +59,10 @@ public class SketchwareBlocksView extends SurfaceView {
 
     Vibrator vibrator;
 
-    ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks;
+    int picked_up_x_offset = 0;
+    int picked_up_y_offset = 0;
+
+    ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks = new ArrayList<>();
     int picked_up_block = -1;
 
     public SketchwareBlocksView(Context context) {
@@ -81,8 +87,10 @@ public class SketchwareBlocksView extends SurfaceView {
 
     public void setEvent(SketchwareEvent event) {
         this.event = event;
+        unconnected_blocks.clear();
+        picked_up_block = -1;
 
-        initialize(null, null);
+        initialize(this.context, null);
     }
 
     @Override
@@ -129,6 +137,8 @@ public class SketchwareBlocksView extends SurfaceView {
 
     private void initialize(Context context, AttributeSet attrs) {
         this.context = context;
+
+        unconnected_blocks.add(new Pair<>(new Vector2D(300, 500), new SketchwareBlock("hello world", 0xFFE65319)));
 
         try {
             vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
@@ -215,8 +225,13 @@ public class SketchwareBlocksView extends SurfaceView {
         rect_paint.setAntiAlias(true);
         rect_paint.setStyle(Paint.Style.FILL);
 
+        shadow_paint = new Paint();
+        //shadow_paint.setColor(0x00000000);
+        shadow_paint.setShadowLayer(16, 0, 0, Color.BLACK);
+
         gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(MotionEvent e) {
+                Log.d(TAG, "onLongPress: long press!");
                 vibrator.vibrate(100);
                 isHolding = true;
 
@@ -224,6 +239,13 @@ public class SketchwareBlocksView extends SurfaceView {
                 int y = (int) e.getY();
 
                 picked_up_block = pickup_block(x, y);
+
+                if (picked_up_block == -1)
+                    return;
+
+                Pair<Vector2D, SketchwareBlock> block = unconnected_blocks.get(picked_up_block);
+                picked_up_x_offset = block.first.x - x;
+                picked_up_y_offset = block.first.y - y;
             }
         });
     }
@@ -231,15 +253,15 @@ public class SketchwareBlocksView extends SurfaceView {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent mot_event) {
-        if (gestureDetector.onTouchEvent(mot_event)) {
-            return true;
-        }
+        gestureDetector.onTouchEvent(mot_event);
 
         switch (mot_event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                break;
+                Log.d(TAG, "onTouchEvent: DOWN");
+                return true;
 
             case MotionEvent.ACTION_MOVE:
+                Log.d(TAG, "onTouchEvent: MOVE");
                 int x = (int) mot_event.getX();
                 int y = (int) mot_event.getY();
 
@@ -253,8 +275,8 @@ public class SketchwareBlocksView extends SurfaceView {
                     }
 
                     // Move the block
-                    unconnected_blocks.get(picked_up_block).first.x = x;
-                    unconnected_blocks.get(picked_up_block).first.y = y;
+                    unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
+                    unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
 
                     // Redraw
                     invalidate();
@@ -263,7 +285,9 @@ public class SketchwareBlocksView extends SurfaceView {
                 return true;
 
             case MotionEvent.ACTION_UP:
+                Log.d(TAG, "onTouchEvent: UP");
                 isHolding = false;
+                picked_up_block = -1;
                 return true;
         }
 
@@ -412,9 +436,24 @@ public class SketchwareBlocksView extends SurfaceView {
             return;
 
         // Draw the unconnected blocks
+        int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
             Vector2D position = block.first;
 
+            // Important for certain APIs
+            setLayerType(LAYER_TYPE_SOFTWARE, shadow_paint);
+
+            if (index == picked_up_block) {
+                canvas.drawRect(
+                        position.x,
+                        position.y,
+                        position.x + block.second.getWidth(text_paint),
+                        position.y + block.second.getHeight(text_paint),
+                        shadow_paint
+                );
+            }
+
+            // Draw the block
             block.second.draw(
                     context,
                     canvas,
@@ -427,8 +466,10 @@ public class SketchwareBlocksView extends SurfaceView {
                     block_outset_width,
                     block_outset_height,
                     is_overlapping,
-                    0xFFFFFFFF
+                    0x00000000
             );
+
+            index++;
         }
     }
 

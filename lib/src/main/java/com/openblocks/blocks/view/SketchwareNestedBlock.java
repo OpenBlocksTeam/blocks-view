@@ -57,6 +57,8 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
 
+        int block_outset_left = left + block_outset_left_margin;
+
         // Draw the childes! (similar to SketchwareBlocksView)
         previous_block_color = 0;
         int block_height = getBlockHeight(text_paint);
@@ -115,10 +117,10 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         // Don't forget the outset
         if (is_overlapping) {
-            canvas.drawRect(left + 50, bottom_block_top_position, 175, bottom_block_bottom_position + block_outset_height, extensions_paint);
+            canvas.drawRect(block_outset_left, bottom_block_top_position, block_outset_left + block_outset_width, bottom_block_bottom_position + block_outset_height, extensions_paint);
         } else {
-            canvas.drawRect(left + 50, bottom_block_top_position, 175, bottom_block_bottom_position + block_outset_height, extensions_paint);
-            canvas.drawRect(left + 50, bottom_block_top_position, 175, bottom_block_bottom_position + block_outset_height - shadow_height, extensions_paint);
+            canvas.drawRect(block_outset_left, bottom_block_top_position, block_outset_left + block_outset_width, bottom_block_bottom_position + block_outset_height, extensions_paint);
+            canvas.drawRect(block_outset_left, bottom_block_top_position, block_outset_left + block_outset_width, bottom_block_bottom_position + block_outset_height - shadow_height, extensions_paint);
         }
 
         // Ok, draw the "indent"

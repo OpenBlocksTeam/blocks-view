@@ -16,6 +16,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -60,6 +61,9 @@ public class SketchwareBlocksView extends View {
 
     int picked_up_x_offset = 0;
     int picked_up_y_offset = 0;
+
+    int unconnected_top_offset = 0;
+    int unconnected_left_offset = 0;
 
     ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks = new ArrayList<>();
     int picked_up_block = -1;
@@ -269,7 +273,7 @@ public class SketchwareBlocksView extends View {
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "onTouchEvent: MOVE");
+                //Log.d(TAG, "onTouchEvent: MOVE");
                 int x = (int) mot_event.getX();
                 int y = (int) mot_event.getY();
 
@@ -287,6 +291,9 @@ public class SketchwareBlocksView extends View {
                     unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
                 } else {
                     // casually moving the canvas
+                    unconnected_top_offset = y - move_y_delta + event_top;
+                    unconnected_left_offset = x - move_x_delta + left_position;
+
                     event_top = y - move_y_delta;
                     left_position = x - move_x_delta;
                 }
@@ -321,7 +328,10 @@ public class SketchwareBlocksView extends View {
         // Check if a block already exists in the unconnected_blocks
         int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
-            Vector2D block_position = block.first;
+            Vector2D block_position = block.first.clone();
+            block_position.x += unconnected_left_offset;
+            block_position.y += unconnected_top_offset;
+
             SketchwareBlock mBlock = block.second;
 
             RectF block_bounds = new RectF(
@@ -465,7 +475,9 @@ public class SketchwareBlocksView extends View {
         // Draw the unconnected blocks
         int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
-            Vector2D position = block.first;
+            Vector2D position = block.first.clone();
+            position.x += unconnected_left_offset;
+            position.y += unconnected_top_offset;
 
             // Important for certain APIs
             setLayerType(LAYER_TYPE_SOFTWARE, shadow_paint);
@@ -506,5 +518,11 @@ public class SketchwareBlocksView extends View {
         public int y;
 
         public Vector2D(int x, int y) { this.x = x; this.y = y; }
+
+        @NonNull
+        @Override
+        protected Vector2D clone() {
+            return new Vector2D(this.x, this.y);
+        }
     }
 }

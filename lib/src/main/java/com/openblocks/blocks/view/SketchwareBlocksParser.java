@@ -144,8 +144,14 @@ public class SketchwareBlocksParser {
 
             if (m.find()) {
                 // Ah it references into m.group(1) block id
+                String block_reference = m.group(1);
+
                 // blacklist the id so we don't accidentally parse a return value block
-                block_id_blacklist.add(Integer.parseInt(m.group(1)));
+                block_id_blacklist.add(Integer.parseInt(block_reference));
+
+                Log.d(TAG, "parseParameter: this block references into " + m.group(1));
+
+                JSONObject parameter_block = tmp_blocks.get(block_reference);
 
                 params.add(
                         new SketchwareField(
@@ -153,7 +159,7 @@ public class SketchwareBlocksParser {
                                         /* Format:           */ block.getString("spec"),
                                         /* Block ID:         */ id,
                                         /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
-                                        /* Parameter:        */ parseParameter(block, id),
+                                        /* Parameter:        */ parseParameter(parameter_block, block_reference),
                                         /* Block color:      */ block.getInt("color")
                                 )
                         )

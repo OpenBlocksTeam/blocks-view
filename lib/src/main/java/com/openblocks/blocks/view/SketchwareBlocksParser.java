@@ -102,7 +102,7 @@ public class SketchwareBlocksParser {
                 Matcher m = r.matcher(line);
 
                 if (m.find()) {
-                    if (Objects.equals(m.group(1), "var") || Objects.equals(m.group(1), "func")) {
+                    if (Objects.equals(m.group(2), "var") || Objects.equals(m.group(2), "func")) {
                         skip_event = true;
                         continue;
                     }

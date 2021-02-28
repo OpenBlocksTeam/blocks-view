@@ -73,4 +73,12 @@ public class SketchwareEvent {
     public String toString() {
         return "Sketchware Event:\n\tActivityName:" + activity_name + "\n\tEventName: " + name + "\nBlocks:\n" + blocks.toString();
     }
+
+    @NonNull
+    @Override
+    protected Object clone() {
+        SketchwareEvent clone_event = new SketchwareEvent(this.activity_name, this.name);
+        clone_event.blocks = (ArrayList<SketchwareBlock>) blocks.clone();
+        return clone_event;
+    }
 }

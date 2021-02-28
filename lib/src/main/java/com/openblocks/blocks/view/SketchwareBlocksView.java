@@ -14,7 +14,6 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -86,7 +85,7 @@ public class SketchwareBlocksView extends View {
     }
 
     public void setEvent(SketchwareEvent event) {
-        this.event = event;
+        this.event = (SketchwareEvent) event.clone();
         unconnected_blocks.clear();
         picked_up_block = -1;
 

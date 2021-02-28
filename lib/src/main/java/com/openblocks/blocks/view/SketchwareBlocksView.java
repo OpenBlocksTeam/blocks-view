@@ -303,7 +303,7 @@ public class SketchwareBlocksView extends View {
 
                 move_y_delta = 0;
                 move_x_delta = 0;
-                
+
                 return true;
         }
 
@@ -382,10 +382,10 @@ public class SketchwareBlocksView extends View {
                 // then we're gonna add this block to the unconnected blocks
                 event.blocks.remove(i);
 
-                unconnected_blocks.add(new Pair<>(new Vector2D(left_position, top_position), current_block));
+                unconnected_blocks.add(0, new Pair<>(new Vector2D(left_position, top_position), current_block));
 
-                // Return the position of the unconnected block (it should be at the last item)
-                return unconnected_blocks.size() - 1;
+                // Return the position of the unconnected block (it should be at the first item)
+                return 0;
             }
         }
 

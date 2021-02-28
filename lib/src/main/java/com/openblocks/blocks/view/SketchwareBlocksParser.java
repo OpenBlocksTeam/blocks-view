@@ -140,9 +140,9 @@ public class SketchwareBlocksParser {
             Matcher m = r.matcher(params_.getString(index));
 
             if (m.find()) {
-                // Ah it references into m.group(0) block id
+                // Ah it references into m.group(1) block id
                 // blacklist the id so we don't accidentally parse a return value block
-                block_id_blacklist.add(Integer.parseInt(m.group(0)));
+                block_id_blacklist.add(Integer.parseInt(m.group(1)));
 
                 params.add(
                         new SketchwareField(

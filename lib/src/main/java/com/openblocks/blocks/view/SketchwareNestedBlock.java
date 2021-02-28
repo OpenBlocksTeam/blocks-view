@@ -3,6 +3,7 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -109,11 +110,11 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         // draw the bottom part's shadow
         extensions_paint.setColor(Utilities.manipulateColor(this.color, 0.7f));
-        canvas.drawRect(left, bottom_block_top_position, getWidth(text_paint), bottom_block_bottom_position + shadow_height, extensions_paint);
+        canvas.drawRect(left, bottom_block_top_position, left + getWidth(text_paint), bottom_block_bottom_position + shadow_height, extensions_paint);
 
         extensions_paint.setColor(this.color);
         // Then draw the bottom part
-        canvas.drawRect(left, bottom_block_top_position, getWidth(text_paint), bottom_block_bottom_position, extensions_paint);
+        canvas.drawRect(left, bottom_block_top_position, left + getWidth(text_paint), bottom_block_bottom_position, extensions_paint);
 
         // Don't forget the outset
         if (is_overlapping) {

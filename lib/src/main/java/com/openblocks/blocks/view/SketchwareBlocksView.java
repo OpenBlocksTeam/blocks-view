@@ -249,6 +249,9 @@ public class SketchwareBlocksView extends View {
         });
     }
 
+    int move_x_delta = 0;
+    int move_y_delta = 0;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent mot_event) {
@@ -257,6 +260,12 @@ public class SketchwareBlocksView extends View {
         switch (mot_event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "onTouchEvent: DOWN");
+
+                if (picked_up_block == -1) {
+                    move_x_delta = (int) mot_event.getX() - left_position;
+                    move_y_delta = (int) mot_event.getY() - event_top;
+                }
+
                 return true;
 
             case MotionEvent.ACTION_MOVE:
@@ -276,10 +285,14 @@ public class SketchwareBlocksView extends View {
                     // Move the block
                     unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
                     unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
-
-                    // Redraw
-                    invalidate();
+                } else {
+                    // casually moving the canvas
+                    event_top = y - move_y_delta;
+                    left_position = x - move_x_delta;
                 }
+
+                // Redraw
+                invalidate();
 
                 return true;
 
@@ -287,6 +300,10 @@ public class SketchwareBlocksView extends View {
                 Log.d(TAG, "onTouchEvent: UP");
                 isHolding = false;
                 picked_up_block = -1;
+
+                move_y_delta = 0;
+                move_x_delta = 0;
+                
                 return true;
         }
 

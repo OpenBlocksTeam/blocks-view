@@ -37,7 +37,7 @@ public class SketchwareEvent {
      * @param rect_paint The paint that is used to draw the rect
      * @param text_paint The paint that is used to draw the text
      */
-    public void draw(Canvas canvas, int height, int outset_height, int left_position, int top_position, int top_bump_height, int shadow_height, Paint rect_paint, Paint text_paint) {
+    public void draw(Canvas canvas, int height, int outset_height, int left_position, int top_position, int top_bump_height, int outset_left_margin, int outset_width, int shadow_height, Paint rect_paint, Paint text_paint) {
 
 //        int height = 50;
 //        int outset_height = 10;
@@ -50,7 +50,7 @@ public class SketchwareEvent {
         canvas.drawRect(left_position, top_position, text_width + left_position, top_position + height + shadow_height, rect_paint);
 
         // The outset part
-        canvas.drawRect(left_position + 50, top_position, 175, top_position + height + shadow_height + outset_height, rect_paint);
+        canvas.drawRect(left_position + outset_left_margin, top_position, left_position + outset_left_margin + outset_width, top_position + height + shadow_height + outset_height, rect_paint);
 
 
         // Draw the actual block
@@ -61,11 +61,11 @@ public class SketchwareEvent {
         canvas.drawRect(left_position, top_position - top_bump_height, left_position + 250, top_position + height, rect_paint);
 
         // outset
-        canvas.drawRect(left_position + 50, top_position, 175, top_position + height + outset_height, rect_paint);
+        canvas.drawRect(left_position + outset_left_margin, top_position, left_position + outset_left_margin + outset_width, top_position + height + outset_height, rect_paint);
 
 
         // Draw the text
-        canvas.drawText(text, 60, top_bump_height + top_position + (height) / 2, text_paint);
+        canvas.drawText(text, left_position + text_padding, top_bump_height + top_position + (height) / 2, text_paint);
     }
 
     @NonNull

@@ -444,7 +444,18 @@ public class SketchwareBlocksView extends View {
             previous_block_color = current_block.color;
         }
 
-        event.draw(canvas, event_height, 10, left_position, event_top, 15, shadow_height, rect_paint, text_paint);
+        event.draw(canvas,
+                event_height,
+                10,
+                left_position,
+                event_top,
+                15,
+                block_outset_left_margin,
+                block_outset_width,
+                shadow_height,
+                rect_paint,
+                text_paint
+        );
 
 
         // Nullcheck

@@ -40,6 +40,9 @@ public class SketchwareBlocksParser {
         // "id": JSONObject
         HashMap<String, JSONObject> tmp_blocks = new HashMap<>();
 
+        // We need this so we can evaluate the blocks before we hit the end of the file
+        logic_data += "\n";
+
         String[] lines = logic_data.split("\n");
 
         // This boolean is going to skip an entire event until a blank line

@@ -68,6 +68,8 @@ public class SketchwareBlocksView extends View {
     ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks = new ArrayList<>();
     int picked_up_block = -1;
 
+    /** This array list is used to indicate where the block should land on when dropped */
+    ArrayList<Integer> top_positions = new ArrayList<>();
     public SketchwareBlocksView(Context context) {
         super(context);
         initialize(context, null);
@@ -97,6 +99,14 @@ public class SketchwareBlocksView extends View {
     }
 
     private void initialize(Context context, AttributeSet attrs) {
+        // Debug
+        line_paint = new Paint();
+        line_paint.setColor(Color.parseColor("#000000"));
+        line_paint.setAntiAlias(true);
+        line_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+
+
+
         this.context = context;
 
         unconnected_blocks.add(new Pair<>(new Vector2D(300, 500), new SketchwareBlock("hello world", 0xFFE65319)));
@@ -255,8 +265,12 @@ public class SketchwareBlocksView extends View {
     }
 
 
+    // Variables used to calculate the offset between when we move the canvas / blocks
     int move_x_delta = 0;
     int move_y_delta = 0;
+
+    /** The position of an element inside {@link #top_positions} where the dragged block wants to be dropped to */
+    int drop_location = -1;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -291,6 +305,8 @@ public class SketchwareBlocksView extends View {
                     // Move the block
                     unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
                     unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
+
+                    drop_location = predictDropLocation();
                 } else {
                     // casually moving the canvas
                     unconnected_top_offset = y - move_y_delta + event_top;
@@ -307,8 +323,22 @@ public class SketchwareBlocksView extends View {
 
             case MotionEvent.ACTION_UP:
                 Log.d(TAG, "onTouchEvent: UP");
+
+                // Check if we have a relevant drop location below us
+                if (drop_location != -1) {
+                    // Ohh ok, let's add the block into the block collection, at the specified index
+                    event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block).second);
+
+                    // Then remove it from the unconnected blocks
+                    unconnected_blocks.remove(picked_up_block);
+                }
+
+                // Reset values
                 isHolding = false;
                 picked_up_block = -1;
+
+                draw_line_at_pos = -1;
+                drop_location = -1;
 
                 move_y_delta = 0;
                 move_x_delta = 0;
@@ -317,6 +347,41 @@ public class SketchwareBlocksView extends View {
         }
 
         return false;
+    }
+
+    // The bounds where of how big we should detect if the user wants to drop a block
+    int detection_distance_vertical = 20;
+    int detection_distance_right = 400;
+
+    // debug
+    int draw_line_at_pos = -1;
+
+    Paint line_paint;
+
+    private int predictDropLocation() {
+        //Log.d(TAG, "predictDropLocation() called with: x = [" + x + "], y = [" + y + "]");
+
+        int index = 0;
+        for (Integer point: top_positions) {
+            Vector2D picked_up_block_position = unconnected_blocks.get(picked_up_block).first;
+
+            //if (bounds.contains(x - picked_up_x_offset, y)) {
+            if (
+                    picked_up_block_position.y > point - detection_distance_vertical &&
+                    picked_up_block_position.y < point + detection_distance_vertical &&
+                    picked_up_block_position.x > left_position &&
+                    picked_up_block_position.x < event.blocks.get(index).getWidth(text_paint)
+            ) {
+                draw_line_at_pos = point;
+                Log.d(TAG, "predictDropLocation: top: " + point);
+                return point;
+            }
+
+            index++;
+        }
+
+        draw_line_at_pos = -1;
+        return -1;
     }
 
     /**
@@ -331,8 +396,8 @@ public class SketchwareBlocksView extends View {
         int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
             Vector2D block_position = block.first.clone();
-            block_position.x += unconnected_left_offset;
-            block_position.y += unconnected_top_offset;
+            //block_position.x += unconnected_left_offset;
+            //block_position.y += unconnected_top_offset;
 
             SketchwareBlock mBlock = block.second;
 
@@ -410,6 +475,8 @@ public class SketchwareBlocksView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        top_positions.clear();
+
         canvas.drawColor(0xFFFFFFFF);
 
         // Draw the blocks from top to bottom
@@ -438,6 +505,8 @@ public class SketchwareBlocksView extends View {
             if (current_block instanceof SketchwareNestedBlock) {
                 ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
+
+            top_positions.add(top_position);
 
             current_block
                 .draw(
@@ -479,8 +548,6 @@ public class SketchwareBlocksView extends View {
         int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
             Vector2D position = block.first.clone();
-            position.x += unconnected_left_offset;
-            position.y += unconnected_top_offset;
 
             // Important for certain APIs
             setLayerType(LAYER_TYPE_SOFTWARE, shadow_paint);
@@ -513,8 +580,16 @@ public class SketchwareBlocksView extends View {
 
             index++;
         }
+
+
+
+
+        // Debug
+        if (draw_line_at_pos != -1) {
+            canvas.drawRect(left_position, draw_line_at_pos - 5, left_position + detection_distance_right, draw_line_at_pos + 5, line_paint);
+        }
     }
-    
+
     public static class Vector2D {
         public int x;
         public int y;

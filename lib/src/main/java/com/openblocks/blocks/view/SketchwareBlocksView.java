@@ -235,9 +235,6 @@ public class SketchwareBlocksView extends View {
         gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(MotionEvent e) {
                 Log.d(TAG, "onLongPress: long press!");
-                vibrator.vibrate(100);
-                isHolding = true;
-
                 int x = (int) e.getX();
                 int y = (int) e.getY();
 
@@ -249,6 +246,9 @@ public class SketchwareBlocksView extends View {
                 Pair<Vector2D, SketchwareBlock> block = unconnected_blocks.get(picked_up_block);
                 picked_up_x_offset = block.first.x - x;
                 picked_up_y_offset = block.first.y - y;
+
+                vibrator.vibrate(100);
+                isHolding = true;
             }
         });
     }

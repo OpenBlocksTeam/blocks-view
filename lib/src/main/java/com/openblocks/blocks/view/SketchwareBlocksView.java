@@ -55,21 +55,28 @@ public class SketchwareBlocksView extends View {
     Context context;
 
     GestureDetector gestureDetector;
+
+    /** Indicates if we're holding a block */
     boolean isHolding = false;
 
     Vibrator vibrator;
 
+    /** When the block is picked up, we need to know the offset between the xy point of the (picked up) block (top left) and the cursor */
     int picked_up_x_offset = 0;
     int picked_up_y_offset = 0;
 
+    /** When we move the blocks, the {@link #unconnected_blocks} must also move */
     int unconnected_top_offset = 0;
     int unconnected_left_offset = 0;
 
     ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks = new ArrayList<>();
+
+    /** The index of the block we picked inside {@link #unconnected_blocks} */
     int picked_up_block = -1;
 
     /** This array list is used to indicate where the block should land on when dropped */
     ArrayList<Integer> top_positions = new ArrayList<>();
+
     public SketchwareBlocksView(Context context) {
         super(context);
         initialize(context, null);
@@ -90,6 +97,10 @@ public class SketchwareBlocksView extends View {
         initialize(context, attrs);
     }
 
+    /**
+     * Set the event (collection of blocks) that is to be displayed
+     * @param event The event / collection of blocks
+     */
     public void setEvent(SketchwareEvent event) {
         this.event = (SketchwareEvent) event.clone();
         unconnected_blocks.clear();

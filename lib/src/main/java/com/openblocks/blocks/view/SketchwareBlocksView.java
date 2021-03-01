@@ -96,48 +96,6 @@ public class SketchwareBlocksView extends View {
         initialize(this.context, null);
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.v("Chart onMeasure w", MeasureSpec.toString(widthMeasureSpec));
-        Log.v("Chart onMeasure h", MeasureSpec.toString(heightMeasureSpec));
-
-        int largest_width = 0;
-        int blocks_height_sum = 0;
-        for (SketchwareBlock block : event.blocks) {
-            largest_width = Math.max(block.getWidth(text_paint), largest_width);
-
-            blocks_height_sum += block.getHeight(text_paint) + shadow_height;
-        }
-
-        int desiredWidth = left_position + largest_width + getPaddingLeft() + getPaddingRight() + left_position /* Just to get some padding on the right */;
-
-        int desiredHeight = event_top + event_height + blocks_height_sum + getPaddingTop() + getPaddingBottom() + top_position;
-
-        setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),
-                measureDimension(desiredHeight, heightMeasureSpec));
-    }
-
-    private int measureDimension(int desiredSize, int measureSpec) {
-        int result;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        if (specMode == MeasureSpec.EXACTLY) {
-            result = specSize;
-        } else {
-            result = desiredSize;
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = Math.min(result, specSize);
-            }
-        }
-
-        if (result < desiredSize){
-            Log.w("SketchwareBlocksView", "The view is too small, the content might get cut");
-        }
-
-        return result;
-    }
-
     private void initialize(Context context, AttributeSet attrs) {
         this.context = context;
 
@@ -252,6 +210,50 @@ public class SketchwareBlocksView extends View {
             }
         });
     }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        Log.v("Chart onMeasure w", MeasureSpec.toString(widthMeasureSpec));
+        Log.v("Chart onMeasure h", MeasureSpec.toString(heightMeasureSpec));
+
+        int largest_width = 0;
+        int blocks_height_sum = 0;
+        for (SketchwareBlock block : event.blocks) {
+            largest_width = Math.max(block.getWidth(text_paint), largest_width);
+
+            blocks_height_sum += block.getHeight(text_paint) + shadow_height;
+        }
+
+        int desiredWidth = left_position + largest_width + getPaddingLeft() + getPaddingRight() + left_position /* Just to get some padding on the right */;
+
+        int desiredHeight = event_top + event_height + blocks_height_sum + getPaddingTop() + getPaddingBottom() + top_position;
+
+        setMeasuredDimension(measureDimension(desiredWidth, widthMeasureSpec),
+                measureDimension(desiredHeight, heightMeasureSpec));
+    }
+
+    private int measureDimension(int desiredSize, int measureSpec) {
+        int result;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if (specMode == MeasureSpec.EXACTLY) {
+            result = specSize;
+        } else {
+            result = desiredSize;
+            if (specMode == MeasureSpec.AT_MOST) {
+                result = Math.min(result, specSize);
+            }
+        }
+
+        if (result < desiredSize){
+            Log.w("SketchwareBlocksView", "The view is too small, the content might get cut");
+        }
+
+        return result;
+    }
+
 
     int move_x_delta = 0;
     int move_y_delta = 0;
@@ -403,6 +405,7 @@ public class SketchwareBlocksView extends View {
         return -1;
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -511,8 +514,7 @@ public class SketchwareBlocksView extends View {
             index++;
         }
     }
-
-
+    
     public static class Vector2D {
         public int x;
         public int y;

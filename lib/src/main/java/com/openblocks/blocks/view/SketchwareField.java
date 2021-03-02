@@ -145,8 +145,8 @@ public class SketchwareField {
                     // Draw the right circle
                     canvas.drawCircle(padding + left + getWidth(block_text_paint), middle, radius, rect_paint);
 
-                    // Draw a rectangle
-                    canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);
+                    // Draw a rectangle between the half part of the left circle to the half part of the right circle
+                    canvas.drawRect((radius >> 1) + left, top, left + getWidth(block_text_paint) - (radius >> 1), bottom_background, rect_paint);
 
                     // Draw the text / value
                     canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);

@@ -298,19 +298,28 @@ public class SketchwareBlocksView extends View {
         gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(MotionEvent e) {
                 Log.d(TAG, "onLongPress: long press!");
+
+                // Get the x y position of the long press
                 int x = (int) e.getX();
                 int y = (int) e.getY();
 
+                // Pick up the block
                 picked_up_block = pickup_block(x, y);
 
+                // Check if there isn't any blocks below us
                 if (picked_up_block == -1)
+                    // Meh, nothing, just return
                     return;
 
+                // If no, get the block, and pick it up!
                 Pair<Vector2D, SketchwareBlock> block = unconnected_blocks.get(picked_up_block);
                 picked_up_x_offset = block.first.x - x;
                 picked_up_y_offset = block.first.y - y;
 
+                // Oh yeah vibrate a little, just to give some sense
                 vibrator.vibrate(100);
+
+                // And set that we're holding something
                 isHolding = true;
             }
         });
@@ -326,43 +335,54 @@ public class SketchwareBlocksView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent mot_event) {
+        // Check if this is a long press
         gestureDetector.onTouchEvent(mot_event);
 
         switch (mot_event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "onTouchEvent: DOWN");
 
+                // If we didn't picked up anything, and we're just touching the canvas
                 if (picked_up_block == -1) {
+                    // The user is moving the canvas!
+                    // Set the delta / differences
                     move_x_delta = (int) mot_event.getX() - left_position;
                     move_y_delta = (int) mot_event.getY() - event_top;
                 }
 
+                // We handled the ACTION_DOWN, return true!
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                //Log.d(TAG, "onTouchEvent: MOVE");
+
+                // Get the x and y position of our cursor / touch position
                 int x = (int) mot_event.getX();
                 int y = (int) mot_event.getY();
 
+                // Are we holding a block?
                 if (isHolding) {
                     // Move the block to the designated location
-                    // Pickup the block first
 
+                    // Check if we picked up a block
                     if (picked_up_block == -1) {
-                        // There is no block here, just quit
+                        // We didn't picked anything, just quit
                         break;
                     }
 
-                    // Move the block
+                    // K, let's move the block
                     unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
                     unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
 
+                    // Predict the drop location of where the block should be dropped to
                     drop_location = predictDropLocation();
                 } else {
-                    // casually moving the canvas
+                    // so the user is casually moving the view
+
+                    // Set the offset for unconnected blocks
                     unconnected_top_offset = y - move_y_delta + event_top;
                     unconnected_left_offset = x - move_x_delta + left_position;
 
+                    // and also for every blocks
                     event_top = y - move_y_delta;
                     left_position = x - move_x_delta;
                 }
@@ -586,19 +606,25 @@ public class SketchwareBlocksView extends View {
 
         top_positions.clear();
 
+        // Empty our canvas
         canvas.drawColor(0xFFFFFFFF);
 
         // Draw the blocks from top to bottom
         int previous_block_color = event.color;
         int previous_top_position = event_height;  // Start with event_offset
         int previous_block_height = event_top;  // Because if not, the first block would get overlapped by the event
+
+        // Loop per each block
         for (int i = 0; i < event.blocks.size(); i++) {
 
+            // get the current block
             SketchwareBlock current_block = event.blocks.get(i);
+
+            // Set the height to the defined height
             current_block.default_height = block_height;
 
+            // Get the top position of that block
             int top_position;
-
             top_position = previous_top_position + previous_block_height + shadow_height;
 
             if (is_overlapping) {
@@ -606,8 +632,8 @@ public class SketchwareBlocksView extends View {
                 top_position -= shadow_height;
             }
 
+            // Set the previous stuff to this stuff, will be used later
             previous_top_position = top_position;
-
             previous_block_height = current_block.getHeight(text_paint);
 
             // Apply the bottom margin if this is a nested block
@@ -615,8 +641,10 @@ public class SketchwareBlocksView extends View {
                 ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
+            // Oh yeah add the top_position to our top_positions array list
             top_positions.add(top_position);
 
+            // Finally, draw our block
             current_block
                 .draw(
                         context,
@@ -632,10 +660,13 @@ public class SketchwareBlocksView extends View {
                         is_overlapping,
                         previous_block_color
                 );
+
             previous_block_color = current_block.color;
         }
 
-        event.draw(canvas,
+        // After drawing all the blocks, let's draw the event / the yellow thing on the top
+        event.draw(
+                canvas,
                 event_height,
                 10,
                 left_position,
@@ -649,7 +680,7 @@ public class SketchwareBlocksView extends View {
         );
 
 
-        // Nullcheck
+        // Null check
         if (unconnected_blocks == null)
             return;
 
@@ -690,10 +721,7 @@ public class SketchwareBlocksView extends View {
             index++;
         }
 
-
-
-
-        // Debug
+        // Draw the line where it indicates if we're dropping a block into the collection
         if (draw_line_at_pos != -1) {
             canvas.drawRect(left_position, draw_line_at_pos - 5, left_position + detection_distance_right, draw_line_at_pos + 5, line_paint);
         }

@@ -9,15 +9,26 @@ import androidx.annotation.NonNull;
 
 public class SketchwareField {
 
-    // This boolean indicates if this is a block or not
-    public boolean is_block;
+    /**
+     * This type enum is used to identify what this field really is
+     */
+    public enum Type {
+        STRING,     // Will look like block / rectangle, something like this [ ]
+        INTEGER,    // Will look like an ellipse / rounded rectangle, something like this ( )
+        BOOLEAN,    // Will look something like this < >
+        OTHER       // Some kind of subset of other objects, ex: ArrayList, where you can put the same subset, but not with other subset, will look the same as string
+    }
+
+    public boolean is_block; // This boolean indicates if this is a block or not
     public String value = "";  // This value is going to be used if is_block is false
 
     public SketchwareBlock block;
+    public Type type;
 
     Paint text_paint = new Paint();
     Paint rect_paint = new Paint();
 
+    // This is the padding around the field
     int padding = 10;
 
     /**
@@ -37,6 +48,19 @@ public class SketchwareField {
      */
     public SketchwareField(String value) {
         this.value = value;
+        this.type = Type.STRING;
+        is_block = false;
+        init();
+    }
+
+    /**
+     * This constructor initializes this class as a fixed value
+     * @param value The value
+     * @param type The type of this field
+     */
+    public SketchwareField(String value, Type type) {
+        this.value = value;
+        this.type = type;
         is_block = false;
         init();
     }
@@ -100,11 +124,24 @@ public class SketchwareField {
         if (!is_block) {
             int bottom_background = top + parent_block_height;
 
-            // Draw the white background
-            canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);
+            switch (type) {
+                case STRING:
+                    // Draw the white background
+                    canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);
 
-            // Draw the text / value
-            canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
+                    // Draw the text / value
+                    canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
+                    break;
+
+                case INTEGER:
+                    break;
+
+                case BOOLEAN:
+                    break;
+
+                case OTHER:
+                    break;
+            }
         } else {
             // Well, draw the block as the parameter, I guess
             block.draw(context, canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, padding, false, 0x00000000);

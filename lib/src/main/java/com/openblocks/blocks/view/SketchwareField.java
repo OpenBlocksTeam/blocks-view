@@ -134,6 +134,23 @@ public class SketchwareField {
                     break;
 
                 case INTEGER:
+                    // FIXME: UNTESTED
+                    int radius = parent_block_height / 2;
+                    int middle = top + radius;
+
+                    // Draw the oval-ly background
+                    // Draw the left circle
+                    canvas.drawCircle(padding + left, middle, top - bottom_background, rect_paint);
+
+                    // Draw the right circle
+                    canvas.drawCircle(padding + left + getWidth(block_text_paint), middle, radius, rect_paint);
+
+                    // Draw a rectangle
+                    canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);
+
+                    // Draw the text / value
+                    canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
+
                     break;
 
                 case BOOLEAN:

@@ -10,6 +10,9 @@ import androidx.core.content.res.ResourcesCompat;
 import com.openblocks.blocks.view.R;
 import com.openblocks.blocks.view.SketchwareBlock;
 
+/**
+ * This class is used to draw a good old sketchware block instead of the current default block design
+ */
 public class SketchwareBlockOriginalStyle extends SketchwareBlock {
     public SketchwareBlockOriginalStyle(String text, int color) {
         super(text, color);

@@ -4,12 +4,18 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class is a model used to represent a block
+ */
 public class SketchwareBlock {
 
+    // Variables ===================================================================================
     public String format;
     public String id;
     public ArrayList<SketchwareField> parameters;
@@ -29,7 +35,11 @@ public class SketchwareBlock {
 
     // Will be used in the overloaded draw function
     public int default_height = 60; // The same as in SketchwareBlocksView
+    // Variables ===================================================================================
 
+
+
+    // Constructors ================================================================================
     /**
      * Constructs a simple SketchwareBlocks with just a text and a color
      *
@@ -64,7 +74,10 @@ public class SketchwareBlock {
         // next_block is -1 if there is nothing after it
         this.is_bottom = next_block == -1;
     }
+    // Constructors ================================================================================
 
+
+    // Essential functions =========================================================================
     /**
      * This function parses the format
      *
@@ -79,7 +92,8 @@ public class SketchwareBlock {
         int index = 0;
         while (matcher.find()) {
             if (parameters.size() <= index)
-                throw new IllegalStateException("Parameters have less elements than the format");
+                //throw new IllegalStateException("Parameters have less elements than the format");
+                continue;
 
             tmp.add(new Object[] {
                     matcher.start(),
@@ -153,7 +167,11 @@ public class SketchwareBlock {
 
         return Math.max(default_height, max_height + text_padding * 2); // 2 paddings because there will be padding on the top and the bottom
     }
+    // Essential functions =========================================================================
 
+
+
+    // Draw functions ==============================================================================
     /**
      * This function is an overloaded function of draw, but without height
      * the height is get by using the global variable (can be set manually)
@@ -176,6 +194,7 @@ public class SketchwareBlock {
         draw(context, canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
     }
 
+    // TODO: Maybe at least reduce the parameters
     /**
      * This function draws the block into the canvas specified at a given level to the bottom (blocks_down)
      *
@@ -231,8 +250,6 @@ public class SketchwareBlock {
 
         // Draw the block's text and parameters
         drawParameters(context, canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), height, shadow_height, text_paint);
-
-        // canvas.drawText(format, 60, top + 45, text_paint);
     }
 
     public final void drawParameters(Context context, Canvas canvas, int left, int top, int block_text_location, int height, int shadow_height, Paint text_paint) {
@@ -264,5 +281,25 @@ public class SketchwareBlock {
 
         String text = format.substring(last_num);
         canvas.drawText(text, x, block_text_location, text_paint);
+    }
+    // Draw functions ==============================================================================
+
+
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "SketchwareBlock{" +
+                "format='" + format + '\'' +
+                ", id='" + id + '\'' +
+                ", parameters=" + parameters +
+                ", is_bottom=" + is_bottom +
+                ", next_block=" + next_block +
+                ", color=" + color +
+                ", color_dark=" + color_dark +
+                ", text_padding=" + text_padding +
+                ", is_parameter=" + is_parameter +
+                ", default_height=" + default_height +
+                '}';
     }
 }

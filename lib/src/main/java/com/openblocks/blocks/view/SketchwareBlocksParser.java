@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class is a parser that can be used to parse Sketchware's decrypted logic file
+ */
 public class SketchwareBlocksParser {
 
     String logic_data;

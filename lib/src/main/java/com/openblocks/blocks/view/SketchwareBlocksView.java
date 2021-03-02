@@ -23,6 +23,9 @@ import org.w3c.dom.Attr;
 
 import java.util.ArrayList;
 
+/**
+ * This class is the View that should be used inside your layout, Used to display blocks in an event
+ */
 public class SketchwareBlocksView extends View {
 
     /**

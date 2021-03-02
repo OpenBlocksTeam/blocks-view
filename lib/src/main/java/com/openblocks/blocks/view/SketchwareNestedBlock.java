@@ -7,6 +7,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+/**
+ * This class is used to represent a nested block, where it can contain a collection of blocks inside itself
+ */
 public class SketchwareNestedBlock extends SketchwareBlock {
 
     public ArrayList<SketchwareBlock> blocks;
@@ -21,6 +24,26 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         blocks = blocks_inside;
     }
 
+    @Override
+    public int getWidth(Paint text_paint) {
+        return super.getWidth(text_paint);
+    }
+
+    /* Difference between getHeight and getBlockHeight is that:
+     *
+     * getHeight: Get the entire blocks' height + the block itself height
+     * getBlockHeight: Get just the block's height
+     */
+
+    @Override
+    public int getHeight(Paint text_paint) {
+        return calculateBlockHeights(text_paint) + getBlockHeight(text_paint) + block_bottom_height + bottom_margin;
+    }
+
+    public int getBlockHeight(Paint text_paint) {
+        return super.getHeight(text_paint);
+    }
+
     private int calculateBlockHeights(Paint block_text_paint) {
         int sum = 0;
 
@@ -29,25 +52,6 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         }
 
         return sum;
-    }
-
-    @Override
-    public int getWidth(Paint text_paint) {
-        return super.getWidth(text_paint);
-    }
-
-    @Override
-    public int getHeight(Paint text_paint) {
-        return calculateBlockHeights(text_paint) + getBlockHeight(text_paint) + block_bottom_height + bottom_margin;
-    }
-
-    /* Difference between getHeight and getBlockHeight is that:
-     *
-     * getHeight: Get the entire blocks' height + the block itself height
-     * getBlockHeight: Get just the block's height
-     */
-    public int getBlockHeight(Paint text_paint) {
-        return super.getHeight(text_paint);
     }
 
     @Override

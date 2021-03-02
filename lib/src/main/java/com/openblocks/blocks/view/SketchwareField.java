@@ -3,6 +3,9 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.AttributeSet;
+
+import androidx.annotation.NonNull;
 
 public class SketchwareField {
 
@@ -38,6 +41,10 @@ public class SketchwareField {
         init();
     }
 
+
+    /**
+     * This function initializes paints, just like initialize() on SketchwareBlocksView
+     */
     private void init() {
         text_paint.setColor(0xFF000000);
         text_paint.setAntiAlias(true);
@@ -49,6 +56,11 @@ public class SketchwareField {
         rect_paint.setAntiAlias(true);
     }
 
+    /**
+     * This function returns the width of this field.
+     * @param block_text_paint The paint used for the block, our field paint is different, this is just used for "block fields", if you 100% thinks that this isn't a block field, set this to null
+     * @return The width of this field
+     */
     public int getWidth(Paint block_text_paint) {
         // Padding for the text should only be about 5
         if (!is_block) {
@@ -58,6 +70,11 @@ public class SketchwareField {
         }
     }
 
+    /**
+     * This function returns the height of this field.
+     * @param block_text_paint The paint used for the block, our field paint is different, this is just used for "block fields", if you 100% thinks that this isn't a block field, set this to null
+     * @return The height of this field
+     */
     public int getHeight(Paint block_text_paint) {
         if (!is_block) {
             Paint.FontMetrics fm = text_paint.getFontMetrics();
@@ -69,6 +86,16 @@ public class SketchwareField {
         }
     }
 
+
+    /**
+     * This function draws the field at the specified location (We won't add any paddings to it)
+     * @param context The context
+     * @param canvas The canvas
+     * @param left The left position
+     * @param top The top position
+     * @param block_text_paint The paint used for blocks, if you're sure that this isn't a block field, set this to null
+     * @param parent_block_height The parent's block height, NOT THE BLOCK ON TOP OF THE FIELD
+     */
     public void draw(Context context, Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height) {
         if (!is_block) {
             int bottom_background = top + parent_block_height;
@@ -84,5 +111,18 @@ public class SketchwareField {
             //                                                                                                                        ^
                                                                                        /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "SketchwareField{" +
+                "is_block=" + is_block +
+                ", value='" + value + '\'' +
+                ", block=" + block +
+                ", text_paint=" + text_paint +
+                ", rect_paint=" + rect_paint +
+                ", padding=" + padding +
+                '}';
     }
 }

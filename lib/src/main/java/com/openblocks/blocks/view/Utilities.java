@@ -1,8 +1,10 @@
 package com.openblocks.blocks.view;
 
-import android.content.Context;
 import android.graphics.Color;
 
+/**
+ * This class is a simple utility class
+ */
 public class Utilities {
 
     /**

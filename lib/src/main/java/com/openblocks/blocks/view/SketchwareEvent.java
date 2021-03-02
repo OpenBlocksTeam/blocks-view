@@ -7,6 +7,9 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
+/**
+ * This class is used to represent a collection of blocks and an event / orange-yellow thingy at the top
+ */
 public class SketchwareEvent {
 
     public String activity_name;

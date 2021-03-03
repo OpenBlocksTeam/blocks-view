@@ -1,8 +1,10 @@
 package com.openblocks.blocks.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -181,6 +183,79 @@ public class SketchwareBlock {
         }
 
         return Math.max(default_height, max_height + text_padding * 2); // 2 paddings because there will be padding on the top and the bottom
+    }
+
+    /**
+     * This function is called when a pickup is happened at the location somewhere in this block
+     * @param x The x location of the pickup, should be relative to OUR block's 0, 0 point (top left)
+     * @param y The y location of the pickup, should be relative to OUR block's 0, 0 point (top left)
+     * @param text_paint The {@link Paint} used to draw the block text
+     * @return A pair of the pickup action, and a parameter element index. If we returned PICKUP_PARAMETER, the second pair will be used as an index of our {@link #parameters} attribute.
+     */
+    public Pair<SketchwareBlocksView.PickupAction, Integer> onPickup(int x, int y, Paint text_paint) {
+        // int x = left + text_padding;  // The initial x's text position
+
+        // int text_top = top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2);
+
+        int x_total = 0;
+        int x_before;
+
+        // This index indicates the position of the parameter (in variable parameters) we're in the loop
+        int index = 0;
+
+        // We're using a similar method of drawParameters
+        // Loop per each parameters
+        int last_substring_index = 0;
+        for (Object[] param: parsed_format) {
+            // Ik this looks stupid, but if i just pass in x_total, the x_before 's reference will attach to x_total's reference
+            // if x_total changed, x_before will change (which is the thing i don't want)
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            // Get the text between a field (should be 0 for the first time) and another field
+            String text = getFormat().substring(last_substring_index, (int) param[0]);
+            // canvas.drawText(text, x, block_text_location, text_paint);
+
+            // Check if the X is somewhere in this text
+            if (x > x_before && x < x_total) {
+                // Oop, then just pick ourself, i guess
+                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, -1); // -1 because the user didn't picked up any parameter
+            }
+
+            x_total += text_paint.measureText(text) + 5;
+
+            // Update the x_before to the text
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            last_substring_index = (int) param[1];
+
+            SketchwareField field = (SketchwareField) param[3];
+
+            // Check if X is somewhere in this field
+            if (x > x_before && x < x_total) {
+                // Yup, this the user is dragging a field, check if this is a block
+                if (field.is_block) {
+                    // Ohk this is a block, check if the parameter block has a parameter too
+                    if (field.block.parameters.size() == 0) {
+                        // Nop it doesn't have any, means we can pick this parameter!
+                        // FIXME: index can be different for different blocks
+                        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_PARAMETER, index);
+                    } else {
+                        // This block has a parameter, recursively call onPickup!
+                        // oh yeah don't forget to offset the x
+                        field.block.onPickup(x + x_before, y, text_paint);
+                    }
+                } else {
+                    // Oop, this is just a value parameter, just pick ourself, i guess
+                    return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, -1); // -1 because the user didn't picked up any parameter
+                }
+            }
+
+            x_total += field.getWidth(text_paint) + 5;
+        }
+
+        // Wat, nothing?
+        // This shouldn't happen but meh, let's just pick ourself
+        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, -1);
     }
     // Essential functions =========================================================================
 

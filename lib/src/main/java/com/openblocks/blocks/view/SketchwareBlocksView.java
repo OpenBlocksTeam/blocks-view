@@ -760,5 +760,21 @@ public class SketchwareBlocksView extends View {
             return new Vector2D(this.x, this.y);
         }
     }
+
+    /**
+     * This enum is used to indicate what should we pick up? ourself or a parameter of ourself?
+     */
+    public static enum PickupAction {
+        PICKUP_SELF,
+        PICKUP_PARAMETER
+    }
+
+    /**
+     * This enum is used to indicate what should we drop to? to a block? or to a parameter
+     */
+    public static enum DropAction {
+        DROP_SELF,
+        DROP_PARAMETER
+    }
     // Utility classes =============================================================================
 }

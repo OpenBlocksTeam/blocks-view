@@ -64,13 +64,13 @@ public class SketchwareBlock {
     }
 
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, boolean is_parameter) {
-        this.setFormat(format);
         this.id = id;
         this.next_block = next_block;
         this.parameters = parameters;
         this.color = color;
         this.color_dark = Utilities.manipulateColor(color, 0.7f);
         this.is_parameter = is_parameter;
+        this.setFormat(format);
 
         // next_block is -1 if there is nothing after it
         this.is_bottom = next_block == -1;

@@ -266,6 +266,11 @@ public class SketchwareBlocksView extends View {
 
         event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE65319));
 
+        ArrayList<SketchwareField> types_fields = new ArrayList<>();
+        types_fields.add(new SketchwareField("1945", SketchwareField.Type.INTEGER));
+
+        event.blocks.add(new SketchwareBlock("Oh yeah, integers %i", types_fields, 0xFF000000));
+
         ArrayList<SketchwareField> value_of_recursive = new ArrayList<>();
 
         ArrayList<SketchwareField> get_id_recursive = new ArrayList<>();

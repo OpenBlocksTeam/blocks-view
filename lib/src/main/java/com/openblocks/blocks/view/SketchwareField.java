@@ -31,6 +31,9 @@ public class SketchwareField {
     // This is the padding around the field
     int padding = 10;
 
+    // An extra padding for fields with the integer type
+    int integer_padding = 10;
+
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
      * @param block The block
@@ -88,7 +91,14 @@ public class SketchwareField {
     public int getWidth(Paint block_text_paint) {
         // Padding for the text should only be about 5
         if (!is_block) {
-            return (int) text_paint.measureText(value) + padding * 2;
+            int estimate_width = (int) text_paint.measureText(value) + padding * 2;
+
+            // Minimal width for Integer fields are 64
+            if (type == Type.INTEGER && estimate_width <= 64) {
+                return 64;
+            }
+
+            return estimate_width;
         } else {
             return block.getWidth(block_text_paint);
         }
@@ -140,16 +150,16 @@ public class SketchwareField {
 
                     // Draw the oval-ly background
                     // Draw the left circle
-                    canvas.drawCircle(padding + left, middle, top - bottom_background, rect_paint);
+                    canvas.drawCircle(integer_padding + padding + left, middle, radius, rect_paint);
 
                     // Draw the right circle
-                    canvas.drawCircle(padding + left + getWidth(block_text_paint), middle, radius, rect_paint);
+                    canvas.drawCircle(left + getWidth(block_text_paint) - padding - integer_padding, middle, radius, rect_paint);
 
                     // Draw a rectangle between the half part of the left circle to the half part of the right circle
-                    canvas.drawRect((radius >> 1) + left, top, left + getWidth(block_text_paint) - (radius >> 1), bottom_background, rect_paint);
+                    canvas.drawRect(integer_padding + (radius >> 1) + left, top, left + getWidth(block_text_paint) - (radius >> 1) - integer_padding, bottom_background, rect_paint);
 
                     // Draw the text / value
-                    canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
+                    canvas.drawText(value, left + padding, middle + padding, text_paint);
 
                     break;
 

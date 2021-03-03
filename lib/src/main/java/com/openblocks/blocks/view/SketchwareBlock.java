@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 public class SketchwareBlock {
 
     // Variables ===================================================================================
-    public String format;
+    private String format;
+    private ArrayList<Object[]> parsed_format;
     public String id;
     public ArrayList<SketchwareField> parameters;
 
@@ -63,7 +64,7 @@ public class SketchwareBlock {
     }
 
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, boolean is_parameter) {
-        this.format = format;
+        this.setFormat(format);
         this.id = id;
         this.next_block = next_block;
         this.parameters = parameters;
@@ -77,6 +78,20 @@ public class SketchwareBlock {
     // Constructors ================================================================================
 
 
+
+    // Getters and Setters =========================================================================
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+        parsed_format = parseFormat();
+    }
+    // Getters and Setters =========================================================================
+
+
+
     // Essential functions =========================================================================
     /**
      * This function parses the format
@@ -87,7 +102,7 @@ public class SketchwareBlock {
         ArrayList<Object[]> tmp = new ArrayList<>();
 
         Pattern pattern = Pattern.compile("%[a-z]\\.(\\w+)|%[a-z]");
-        Matcher matcher = pattern.matcher(format);
+        Matcher matcher = pattern.matcher(getFormat());
 
         int index = 0;
         while (matcher.find()) {
@@ -115,7 +130,7 @@ public class SketchwareBlock {
      */
     public int getWidth(Paint text_paint) {
         if (parameters.size() == 0)
-            return text_padding + (int) text_paint.measureText(format) + text_padding;
+            return text_padding + (int) text_paint.measureText(getFormat()) + text_padding;
 
         // Remove these
         ArrayList<Object[]> params = parseFormat();
@@ -126,7 +141,7 @@ public class SketchwareBlock {
 
         int last_num = 0;
         for (Object[] param: params) {
-            final_string.append(format.substring(last_num, (int) param[0]));
+            final_string.append(getFormat().substring(last_num, (int) param[0]));
             last_num = (int) param[1];
 
             SketchwareField field = (SketchwareField) param[3];
@@ -137,7 +152,7 @@ public class SketchwareBlock {
         }
 
         // Add the last string at the end
-        final_string.append(format.substring(last_num));
+        final_string.append(getFormat().substring(last_num));
 
         return text_padding + (int) text_paint.measureText(final_string.toString()) + text_padding + params_widths;
     }
@@ -253,8 +268,6 @@ public class SketchwareBlock {
     }
 
     public final void drawParameters(Context context, Canvas canvas, int left, int top, int block_text_location, int height, int shadow_height, Paint text_paint) {
-        ArrayList<Object[]> parsed_format = parseFormat();
-
         // Draw the parameters
         int x = left + text_padding;  // The initial x's text position
 
@@ -262,7 +275,7 @@ public class SketchwareBlock {
 
         int last_num = 0;
         for (Object[] param: parsed_format) {
-            String text = format.substring(last_num, (int) param[0]);
+            String text = getFormat().substring(last_num, (int) param[0]);
             canvas.drawText(text, x, block_text_location, text_paint);
 
             x += text_paint.measureText(text) + 5;
@@ -279,7 +292,7 @@ public class SketchwareBlock {
             x += field.getWidth(text_paint) + 5;
         }
 
-        String text = format.substring(last_num);
+        String text = getFormat().substring(last_num);
         canvas.drawText(text, x, block_text_location, text_paint);
     }
     // Draw functions ==============================================================================
@@ -290,7 +303,7 @@ public class SketchwareBlock {
     @Override
     public String toString() {
         return "SketchwareBlock{" +
-                "format='" + format + '\'' +
+                "format='" + getFormat() + '\'' +
                 ", id='" + id + '\'' +
                 ", parameters=" + parameters +
                 ", is_bottom=" + is_bottom +

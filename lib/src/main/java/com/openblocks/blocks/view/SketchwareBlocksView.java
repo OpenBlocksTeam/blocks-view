@@ -104,7 +104,10 @@ public class SketchwareBlocksView extends View {
     int picked_up_block = -1;
 
     /** This array list is used to store unconnected blocks with its real (not modified by movement) coordinates
-     *  then those real coordinates will be added with {@link #unconnected_left_offset} and {@link #unconnected_top_offset} */
+     *  then those real coordinates will be added with {@link #unconnected_left_offset} and {@link #unconnected_top_offset}
+     *
+     *  A Very Important Note: the Vector2D is in it's raw form (doesn't store offset-ed numbers), because most of the blocks are calculated on their raw form, and will be added with event_top and left_position at draw
+     *  */
     ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks = new ArrayList<>();
 
     /** This array list is used to indicate where the block should land on when dropped */

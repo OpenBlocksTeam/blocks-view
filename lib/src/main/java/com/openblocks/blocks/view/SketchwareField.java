@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 public class SketchwareField {
 
     /**
-     * This type enum is used to identify what this field really is
+     * This type enum is used to identify what this field's type is
      */
     public enum Type {
         STRING,     // Will look like block / rectangle, something like this [ ]

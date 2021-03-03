@@ -385,12 +385,14 @@ public class SketchwareBlocksView extends View {
                     // so the user is casually moving the view
 
                     // Set the offset for unconnected blocks
+                    /*
                     unconnected_top_offset = y - move_y_delta + event_top;
                     unconnected_left_offset = x - move_x_delta + left_position;
 
                     // and also for every blocks
                     event_top = y - move_y_delta;
                     left_position = x - move_x_delta;
+                     */
                 }
 
                 // Redraw

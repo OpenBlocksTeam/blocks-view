@@ -460,11 +460,12 @@ public class SketchwareBlocksView extends View {
             Vector2D picked_up_block_position = unconnected_blocks.get(picked_up_block).first;
 
             // Check if the picked up block position is inside the bounds of
+            // We must add these offsets because the top_positions are modified / offset-ed version of it
             if (
-                    picked_up_block_position.y > point - detection_distance_vertical &&
-                    picked_up_block_position.y < point + detection_distance_vertical &&
-                    picked_up_block_position.x > left_position &&
-                    picked_up_block_position.x < event.blocks.get(index).getWidth(text_paint)
+                    picked_up_block_position.y + event_top > point - detection_distance_vertical &&
+                    picked_up_block_position.y + event_top < point + detection_distance_vertical &&
+                    picked_up_block_position.x + left_position > left_position &&
+                    picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
             ) {
                 draw_line_at_pos = point;
                 Log.d(TAG, "predictDropLocation: top: " + point);
@@ -490,19 +491,17 @@ public class SketchwareBlocksView extends View {
         int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
             Vector2D block_position = block.first.clone();
-            //block_position.x += unconnected_left_offset;
-            //block_position.y += unconnected_top_offset;
 
             SketchwareBlock mBlock = block.second;
 
             RectF block_bounds = new RectF(
-                    block_position.x,
-                    block_position.y,
+                    block_position.x + left_position,
+                    block_position.y + event_top,
 
-                    block_position.x
+                    block_position.x + left_position
                             + mBlock.getWidth(text_paint),
 
-                    block_position.y
+                    block_position.y + event_top
                             + mBlock.getHeight(text_paint)
             );
 
@@ -553,7 +552,7 @@ public class SketchwareBlocksView extends View {
                 // then we're gonna add this block to the unconnected blocks
                 event.blocks.remove(i);
 
-                unconnected_blocks.add(0, new Pair<>(new Vector2D(x, y), current_block));
+                unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), current_block));
 
                 // Return the position of the unconnected block (it should be at the first item)
                 return 0;
@@ -701,6 +700,8 @@ public class SketchwareBlocksView extends View {
         int index = 0;
         for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
             Vector2D position = block.first.clone();
+            position.x += left_position;
+            position.y += event_top;
 
             // Important for certain APIs
             setLayerType(LAYER_TYPE_SOFTWARE, shadow_paint);

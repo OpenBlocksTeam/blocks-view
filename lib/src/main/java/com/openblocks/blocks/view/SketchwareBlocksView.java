@@ -264,12 +264,17 @@ public class SketchwareBlocksView extends View {
         fields.add(new SketchwareField("parameters"));
         fields.add(new SketchwareField("yeah"));
 
-        event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE65319));
+        event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE10C0C));
 
         ArrayList<SketchwareField> types_fields = new ArrayList<>();
         types_fields.add(new SketchwareField("1945", SketchwareField.Type.INTEGER));
 
-        event.blocks.add(new SketchwareBlock("Oh yeah, integers %i", types_fields, 0xFF000000));
+        event.blocks.add(new SketchwareBlock("Oh yeah, integers %i", types_fields, 0xFFE65319));
+
+        ArrayList<SketchwareField> booleans = new ArrayList<>();
+        booleans.add(new SketchwareField("false", SketchwareField.Type.BOOLEAN));
+
+        event.blocks.add(new SketchwareBlock("And booleans %b", booleans, 0xFF2115D1));
 
         ArrayList<SketchwareField> value_of_recursive = new ArrayList<>();
 

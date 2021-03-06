@@ -3,7 +3,7 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.AttributeSet;
+import android.graphics.Path;
 
 import androidx.annotation.NonNull;
 
@@ -29,10 +29,14 @@ public class SketchwareField {
     Paint rect_paint = new Paint();
 
     // This is the padding around the field
-    int padding = 10;
+    int text_padding = 10;
 
     // An extra padding for fields with the integer type
     int integer_padding = 10;
+
+    // The triangle width of both the left and the right triangle
+    // to simplify, it's basically the width of this "<"
+    int boolean_triangle_width = 20;
 
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
@@ -91,7 +95,8 @@ public class SketchwareField {
     public int getWidth(Paint block_text_paint) {
         // Padding for the text should only be about 5
         if (!is_block) {
-            int estimate_width = (int) text_paint.measureText(value) + padding * 2;
+            // If it's boolean, we don't need the padding, just measure the boolean triangle width
+            int estimate_width = (int) text_paint.measureText(value) + (type == Type.BOOLEAN ? boolean_triangle_width : text_padding) * 2;
 
             // Minimal width for Integer fields are 64
             if (type == Type.INTEGER && estimate_width <= 64) {
@@ -114,7 +119,7 @@ public class SketchwareField {
             Paint.FontMetrics fm = text_paint.getFontMetrics();
             float height = fm.descent - fm.ascent;
 
-            return (int) height + padding * 2;
+            return (int) height + text_padding * 2;
         } else {
             return block.getHeight(block_text_paint);
         }
@@ -122,7 +127,7 @@ public class SketchwareField {
 
 
     /**
-     * This function draws the field at the specified location (We won't add any paddings to it)
+     * This function draws the field at the specified location (We won't add any paddings to it, jokes on you, the left parameter is added with padding)
      * @param context The context
      * @param canvas The canvas
      * @param left The left position
@@ -131,39 +136,80 @@ public class SketchwareField {
      * @param parent_block_height The parent's block height, NOT THE BLOCK ON TOP OF THE FIELD
      */
     public void draw(Context context, Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height) {
+        // NOTE: top has been applied with the padding, you don't need to add padding yourself
+
         if (!is_block) {
-            int bottom_background = top + parent_block_height;
+            int bottom = top + parent_block_height;
+            int half_of_parent_height = parent_block_height / 2;
+            int middle = top + half_of_parent_height;
+
+            int width = getWidth(block_text_paint);
 
             switch (type) {
                 case STRING:
                     // Draw the white background
-                    canvas.drawRect(left, top, left + getWidth(block_text_paint), bottom_background, rect_paint);
+                    canvas.drawRect(left, top, left + width, bottom, rect_paint);
 
                     // Draw the text / value
-                    canvas.drawText(value, left + padding, top - ((top - bottom_background) / 2) + padding, text_paint);
+                    canvas.drawText(value, left + text_padding, top - ((top - bottom) / 2) + text_padding, text_paint);
                     break;
 
                 case INTEGER:
-                    // FIXME: UNTESTED
-                    int radius = parent_block_height / 2;
-                    int middle = top + radius;
-
                     // Draw the oval-ly background
                     // Draw the left circle
-                    canvas.drawCircle(integer_padding + padding + left, middle, radius, rect_paint);
+                    canvas.drawCircle(integer_padding + text_padding + left, middle, half_of_parent_height, rect_paint);
 
                     // Draw the right circle
-                    canvas.drawCircle(left + getWidth(block_text_paint) - padding - integer_padding, middle, radius, rect_paint);
+                    canvas.drawCircle(left + getWidth(block_text_paint) - text_padding - integer_padding, middle, half_of_parent_height, rect_paint);
 
                     // Draw a rectangle between the half part of the left circle to the half part of the right circle
-                    canvas.drawRect(integer_padding + (radius >> 1) + left, top, left + getWidth(block_text_paint) - (radius >> 1) - integer_padding, bottom_background, rect_paint);
+                    canvas.drawRect(integer_padding + (half_of_parent_height >> 1) + left, top, left + width - (half_of_parent_height >> 1) - integer_padding, bottom, rect_paint);
 
                     // Draw the text / value
-                    canvas.drawText(value, left + padding, middle + padding, text_paint);
+                    canvas.drawText(value, left + text_padding, middle + text_padding, text_paint);
 
                     break;
 
                 case BOOLEAN:
+                    Path path = new Path();
+                    path.setFillType(Path.FillType.EVEN_ODD);
+
+                    ////////////////////////////////////////////////////////////////////////////////
+
+                    // Draw the left triangle
+
+                    // Start from the bottom part of the triangle
+                    path.moveTo(left + boolean_triangle_width, bottom);
+
+                    // Then go to the sharp point (left) of the triangle
+                    path.lineTo(left, middle);
+
+                    // Then go to the top part of the left triangle
+                    path.lineTo(left + boolean_triangle_width, top);
+
+                    ////////////////////////////////////////////////////////////////////////////////
+
+                    // Draw the right triangle
+
+                    // Move to the right triangle's top part
+                    path.lineTo(left + width - text_padding * 2, top);
+
+                    // Then go to the sharp point (right) of the triangle
+                    path.lineTo(left + width - text_padding * 2 + boolean_triangle_width, middle);
+
+                    // Then go to the bottom part of the right triangle
+                    path.lineTo(left + width - text_padding * 2, bottom);
+
+                    ////////////////////////////////////////////////////////////////////////////////
+
+                    // Finally, go back to the previous bottom part of the left triangle to connect the lines
+                    path.moveTo(left + text_padding + boolean_triangle_width, bottom - text_padding);
+                    path.close();
+
+                    canvas.drawPath(path, rect_paint);
+
+                    canvas.drawText(value, left + boolean_triangle_width, middle + text_padding, text_paint);
+
                     break;
 
                 case OTHER:
@@ -171,7 +217,7 @@ public class SketchwareField {
             }
         } else {
             // Well, draw the block as the parameter, I guess
-            block.draw(context, canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, padding, false, 0x00000000);
+            block.draw(context, canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, text_padding, false, 0x00000000);
             //                                                                                                                        ^
                                                                                        /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
         }
@@ -186,7 +232,7 @@ public class SketchwareField {
                 ", block=" + block +
                 ", text_paint=" + text_paint +
                 ", rect_paint=" + rect_paint +
-                ", padding=" + padding +
+                ", padding=" + text_padding +
                 '}';
     }
 }

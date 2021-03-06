@@ -553,14 +553,37 @@ public class SketchwareBlocksView extends View {
             );
 
             if (bounds.contains(x, y)) {
-                // Ok, first, we're gonna pop out this block from the event.blocks
-                // then we're gonna add this block to the unconnected blocks
-                event.blocks.remove(i);
+                // Ohk, call onPickup of the block
+                Pair<SketchwareBlocksView.PickupAction, Integer> pickup = event.blocks.get(i).onPickup(x, y, text_paint);
 
-                unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), current_block));
+                switch (pickup.first) {
+                    case PICKUP_SELF:
+                        Log.d(TAG, "pickup_block: self");
 
-                // Return the position of the unconnected block (it should be at the first item)
-                return 0;
+                        // Ok, first, we're gonna pop out this block from the event.blocks
+                        // then we're gonna add this block to the unconnected blocks
+                        event.blocks.remove(i);
+
+                        unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), current_block));
+
+                        // Return the position of the unconnected block (it should be at the first item)
+                        return 0;
+
+                    case PICKUP_PARAMETER:
+                        Log.d(TAG, "pickup_block: parameter");
+
+                        // Ah, this guy is picking up a parameter, get the parameter
+                        SketchwareField param = event.blocks.get(i).parameters.get(pickup.second);
+
+                        // Add it to the unconnected blocks
+                        unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), param.block));
+
+                        // Remove the parameter
+                        event.blocks.get(i).parameters.remove(pickup.second);
+
+                        // Return the position of this parameter of unconnected_blocks
+                        return 0;
+                }
             }
         }
 

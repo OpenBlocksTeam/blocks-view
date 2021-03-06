@@ -553,6 +553,8 @@ public class SketchwareBlocksView extends View {
             );
 
             if (bounds.contains(x, y)) {
+                // FIXME: 3/6/21 This doesn't work
+
                 // Ohk, call onPickup of the block
                 Pair<SketchwareBlocksView.PickupAction, Integer> pickup = event.blocks.get(i).onPickup(x, y, text_paint);
 

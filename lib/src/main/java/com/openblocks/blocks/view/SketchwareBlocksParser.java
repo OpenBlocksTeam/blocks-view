@@ -18,6 +18,8 @@ public class SketchwareBlocksParser {
     String logic_data;
 
     private ArrayList<Integer> block_id_blacklist = new ArrayList<>();
+    // "id": JSONObject
+    private final HashMap<String, JSONObject> tmp_blocks = new HashMap<>();
 
     public SketchwareBlocksParser() { }
 
@@ -39,9 +41,6 @@ public class SketchwareBlocksParser {
             throw new IllegalStateException("logic_data hasn't been set!");
 
         ArrayList<SketchwareEvent> events = new ArrayList<>();
-
-        // "id": JSONObject
-        HashMap<String, JSONObject> tmp_blocks = new HashMap<>();
 
         // We need this so we can evaluate the blocks before we hit the end of the file
         logic_data += "\n";

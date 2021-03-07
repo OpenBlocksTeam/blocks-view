@@ -192,7 +192,7 @@ public class SketchwareBlock {
      * @param text_paint The {@link Paint} used to draw the block text
      * @return A pair of the pickup action, and a parameter element index. If we returned PICKUP_PARAMETER, the second pair will be used as an index of our {@link #parameters} attribute.
      */
-    public Pair<SketchwareBlocksView.PickupAction, Integer> onPickup(int x, int y, Paint text_paint) {
+    public Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
         // int x = left + text_padding;  // The initial x's text position
 
         // int text_top = top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2);
@@ -218,7 +218,7 @@ public class SketchwareBlock {
             // Check if the X is somewhere in this text
             if (x > x_before && x < x_total) {
                 // Oop, then just pick ourself, i guess
-                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, -1); // -1 because the user didn't picked up any parameter
+                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null); // null because the user didn't picked up any parameter
             }
 
             x_total += text_paint.measureText(text) + 5;
@@ -237,8 +237,11 @@ public class SketchwareBlock {
                     // Ohk this is a block, check if the parameter block has a parameter too
                     if (field.block.parameters.size() == 0) {
                         // Nop it doesn't have any, means we can pick this parameter!
-                        // FIXME: index can be different for different blocks
-                        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_PARAMETER, index);
+                        // Remove the field from parameters
+                        parameters.remove(index);
+
+                        // Then set the block
+                        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_PARAMETER, field.block);
                     } else {
                         // This block has a parameter, recursively call onPickup!
                         // oh yeah don't forget to offset the x
@@ -246,16 +249,18 @@ public class SketchwareBlock {
                     }
                 } else {
                     // Oop, this is just a value parameter, just pick ourself, i guess
-                    return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, -1); // -1 because the user didn't picked up any parameter
+                    return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
                 }
             }
 
             x_total += field.getWidth(text_paint) + 5;
+
+            index++;
         }
 
         // Wat, nothing?
         // This shouldn't happen but meh, let's just pick ourself
-        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, -1);
+        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
     }
     // Essential functions =========================================================================
 

@@ -556,7 +556,7 @@ public class SketchwareBlocksView extends View {
                 // FIXME: 3/6/21 This doesn't work
 
                 // Ohk, call onPickup of the block
-                Pair<SketchwareBlocksView.PickupAction, Integer> pickup = event.blocks.get(i).onPickup(x, y, text_paint);
+                Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> pickup = event.blocks.get(i).onPickup(x, y, text_paint);
 
                 switch (pickup.first) {
                     case PICKUP_SELF:
@@ -574,14 +574,11 @@ public class SketchwareBlocksView extends View {
                     case PICKUP_PARAMETER:
                         Log.d(TAG, "pickup_block: parameter");
 
-                        // Ah, this guy is picking up a parameter, get the parameter
-                        SketchwareField param = event.blocks.get(i).parameters.get(pickup.second);
+                        // Ah, this guy is picking up a parameter, anyway, because the parameter is
+                        // already removed on onPickup, we're just gonna add this to the unconnected blocks
 
                         // Add it to the unconnected blocks
-                        unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), param.block));
-
-                        // Remove the parameter
-                        event.blocks.get(i).parameters.remove(pickup.second);
+                        unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), pickup.second));
 
                         // Return the position of this parameter of unconnected_blocks
                         return 0;

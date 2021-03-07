@@ -1,7 +1,6 @@
 package com.openblocks.blocks.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Pair;
@@ -241,7 +240,7 @@ public class SketchwareBlock {
                         parameters.remove(index);
 
                         // Then set the block
-                        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_PARAMETER, field.block);
+                        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_OTHER_BLOCK, field.block);
                     } else {
                         // This block has a parameter, recursively call onPickup!
                         // oh yeah don't forget to offset the x

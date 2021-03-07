@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
+import android.util.Pair;
 
 import java.util.ArrayList;
 
@@ -52,6 +53,29 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         }
 
         return sum;
+    }
+
+    @Override
+    public Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
+        int y_start = getBlockHeight(text_paint);
+
+        int index = 0;
+        for (SketchwareBlock block : blocks) {
+
+            // Check if this pickup has a block under it
+            if (block.getBounds(0, y_start, text_paint).contains(x - indent_width, y)) {
+                // Ohk, remove and return the block
+                blocks.remove(index);
+                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_OTHER_BLOCK, block);
+            }
+
+            y_start += block.getHeight(text_paint);
+            index++;
+        }
+
+        // Ight, nothing, return our self instead
+        // TODO: Check each blocks so if the user picked up the white part inside our bounds we don't pickup
+        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -260,6 +261,22 @@ public class SketchwareBlock {
         // Wat, nothing?
         // This shouldn't happen but meh, let's just pick ourself
         return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
+    }
+
+    /**
+     * This function returns the bounds of this block in RectF
+     * @param x The x position of this block
+     * @param y The y position of this block
+     * @param text_paint The paint used to draw the block text
+     * @return This block's bounds
+     */
+    public RectF getBounds(int x, int y, Paint text_paint) {
+        return new RectF(
+                x,
+                y,
+                x + getWidth(text_paint),
+                y + getHeight(text_paint)
+        );
     }
     // Essential functions =========================================================================
 

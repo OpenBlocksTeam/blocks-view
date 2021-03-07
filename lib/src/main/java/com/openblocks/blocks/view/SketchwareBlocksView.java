@@ -580,6 +580,9 @@ public class SketchwareBlocksView extends View {
 
                         // Return the position of this parameter of unconnected_blocks
                         return 0;
+                    case PICKUP_NONE:
+                        // Nothing
+                        break;
                 }
             }
         }
@@ -791,7 +794,8 @@ public class SketchwareBlocksView extends View {
      */
     public static enum PickupAction {
         PICKUP_SELF,
-        PICKUP_OTHER_BLOCK
+        PICKUP_OTHER_BLOCK,
+        PICKUP_NONE
     }
 
     /**

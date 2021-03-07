@@ -34,10 +34,6 @@ public class SketchwareField {
     // An extra padding for fields with the integer type
     int integer_padding = 10;
 
-    // The triangle width of both the left and the right triangle
-    // to simplify, it's basically the width of this "<"
-    int boolean_triangle_width = 20;
-
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
      * @param block The block
@@ -95,8 +91,8 @@ public class SketchwareField {
     public int getWidth(Paint block_text_paint) {
         // Padding for the text should only be about 5
         if (!is_block) {
-            // If it's boolean, we don't need the padding, just measure the boolean triangle width
-            int estimate_width = (int) text_paint.measureText(value) + (type == Type.BOOLEAN ? boolean_triangle_width : text_padding) * 2;
+            // If it's boolean, we don't need the padding, just measure half of the parent's height
+            int estimate_width = (int) text_paint.measureText(value) + (type == Type.BOOLEAN ? getHeight(block_text_paint) / 2 : text_padding) * 2;
 
             // Minimal width for Integer fields are 64
             if (type == Type.INTEGER && estimate_width <= 64) {
@@ -155,15 +151,7 @@ public class SketchwareField {
                     break;
 
                 case INTEGER:
-                    // Draw the oval-ly background
-                    // Draw the left circle
-                    canvas.drawCircle(integer_padding + text_padding + left, middle, half_of_parent_height, rect_paint);
-
-                    // Draw the right circle
-                    canvas.drawCircle(left + getWidth(block_text_paint) - text_padding - integer_padding, middle, half_of_parent_height, rect_paint);
-
-                    // Draw a rectangle between the half part of the left circle to the half part of the right circle
-                    canvas.drawRect(integer_padding + (half_of_parent_height >> 1) + left, top, left + width - (half_of_parent_height >> 1) - integer_padding, bottom, rect_paint);
+                    DrawHelper.drawIntegerField(canvas, left, top, getWidth(block_text_paint), getHeight(block_text_paint), rect_paint);
 
                     // Draw the text / value
                     canvas.drawText(value, left + text_padding, middle + text_padding, text_paint);
@@ -171,44 +159,8 @@ public class SketchwareField {
                     break;
 
                 case BOOLEAN:
-                    Path path = new Path();
-                    path.setFillType(Path.FillType.EVEN_ODD);
-
-                    ////////////////////////////////////////////////////////////////////////////////
-
-                    // Draw the left triangle
-
-                    // Start from the bottom part of the triangle
-                    path.moveTo(left + boolean_triangle_width, bottom);
-
-                    // Then go to the sharp point (left) of the triangle
-                    path.lineTo(left, middle);
-
-                    // Then go to the top part of the left triangle
-                    path.lineTo(left + boolean_triangle_width, top);
-
-                    ////////////////////////////////////////////////////////////////////////////////
-
-                    // Draw the right triangle
-
-                    // Move to the right triangle's top part
-                    path.lineTo(left + width - text_padding * 2, top);
-
-                    // Then go to the sharp point (right) of the triangle
-                    path.lineTo(left + width - text_padding * 2 + boolean_triangle_width, middle);
-
-                    // Then go to the bottom part of the right triangle
-                    path.lineTo(left + width - text_padding * 2, bottom);
-
-                    ////////////////////////////////////////////////////////////////////////////////
-
-                    // Finally, go back to the previous bottom part of the left triangle to connect the lines
-                    path.moveTo(left + text_padding + boolean_triangle_width, bottom - text_padding);
-                    path.close();
-
-                    canvas.drawPath(path, rect_paint);
-
-                    canvas.drawText(value, left + boolean_triangle_width, middle + text_padding, text_paint);
+                    DrawHelper.drawBooleanField(canvas, left, top, getWidth(block_text_paint), getHeight(block_text_paint), rect_paint);
+                    canvas.drawText(value, left + half_of_parent_height, middle + text_padding, text_paint);
 
                     break;
 

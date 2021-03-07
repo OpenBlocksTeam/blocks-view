@@ -70,7 +70,7 @@ public class SketchwareBlock {
         this.next_block = next_block;
         this.parameters = parameters;
         this.color = color;
-        this.color_dark = Utilities.manipulateColor(color, 0.7f);
+        this.color_dark = DrawHelper.manipulateColor(color, 0.7f);
         this.is_parameter = is_parameter;
         this.setFormat(format);
 
@@ -331,7 +331,7 @@ public class SketchwareBlock {
             rect_paint.setColor(previous_block_color);
             canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height, rect_paint);
         } else {
-            rect_paint.setColor(Utilities.manipulateColor(previous_block_color, 0.7f));
+            rect_paint.setColor(DrawHelper.manipulateColor(previous_block_color, 0.7f));
             canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height, rect_paint);
 
             rect_paint.setColor(previous_block_color);

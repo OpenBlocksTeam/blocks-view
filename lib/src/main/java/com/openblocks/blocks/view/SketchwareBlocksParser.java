@@ -151,8 +151,6 @@ public class SketchwareBlocksParser {
                 // blacklist the id so we don't accidentally parse a return value block
                 block_id_blacklist.add(Integer.parseInt(block_reference));
 
-                Log.d(TAG, "parseParameter: this block references into " + m.group(1));
-
                 JSONObject parameter_block = tmp_blocks.get(block_reference);
 
                 params.add(

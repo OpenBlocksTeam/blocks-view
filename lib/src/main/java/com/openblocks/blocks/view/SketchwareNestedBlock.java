@@ -113,7 +113,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         int bottom_block_bottom_position = top + getHeight(text_paint);
 
         // draw the bottom part's shadow
-        extensions_paint.setColor(Utilities.manipulateColor(this.color, 0.7f));
+        extensions_paint.setColor(DrawHelper.manipulateColor(this.color, 0.7f));
         canvas.drawRect(left, bottom_block_top_position, left + getWidth(text_paint), bottom_block_bottom_position + shadow_height, extensions_paint);
 
         extensions_paint.setColor(this.color);

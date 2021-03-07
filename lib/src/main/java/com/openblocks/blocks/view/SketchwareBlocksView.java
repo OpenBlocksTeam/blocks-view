@@ -19,8 +19,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.w3c.dom.Attr;
-
 import java.util.ArrayList;
 
 /**
@@ -571,7 +569,7 @@ public class SketchwareBlocksView extends View {
                         // Return the position of the unconnected block (it should be at the first item)
                         return 0;
 
-                    case PICKUP_PARAMETER:
+                    case PICKUP_OTHER_BLOCK:
                         Log.d(TAG, "pickup_block: parameter");
 
                         // Ah, this guy is picking up a parameter, anyway, because the parameter is
@@ -793,7 +791,7 @@ public class SketchwareBlocksView extends View {
      */
     public static enum PickupAction {
         PICKUP_SELF,
-        PICKUP_PARAMETER
+        PICKUP_OTHER_BLOCK
     }
 
     /**

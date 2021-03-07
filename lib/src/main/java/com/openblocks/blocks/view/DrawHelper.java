@@ -110,7 +110,7 @@ public class DrawHelper {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(color);
 
-        canvas.drawRect(x, y, y + height, x + width, p);
+        canvas.drawRect(x, y, x + width, y + height, p);
     }
 
     /**

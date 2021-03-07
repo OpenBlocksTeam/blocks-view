@@ -7,6 +7,9 @@ import android.graphics.Path;
 
 import androidx.annotation.NonNull;
 
+/**
+ * A simple helper class used to draw stuff on the canvas
+ */
 public class DrawHelper {
 
     public static void drawBooleanField(Canvas canvas, int x, int y, int width, int height, int color) {
@@ -82,8 +85,13 @@ public class DrawHelper {
     }
 
 
+    // The shadow will be drawn inside the block
+    public static void drawRectSimpleInsideShadow(@NonNull Canvas canvas, int x, int y, int width, int height, int shadow_height, int color) {
+        drawRectSimpleOutsideShadow(canvas, x, y, width, height - shadow_height, shadow_height, color);
+    }
+
     // The shadow will be inside the block, not outside
-    public static void drawRectSimpleShadow(@NonNull Canvas canvas, int x, int y, int width, int height, int shadow_height, int color) {
+    public static void drawRectSimpleOutsideShadow(@NonNull Canvas canvas, int x, int y, int width, int height, int shadow_height, int color) {
         // Draw shadow
         drawRect(canvas, x, y, width, height, manipulateColor(color, 0.7f));
 

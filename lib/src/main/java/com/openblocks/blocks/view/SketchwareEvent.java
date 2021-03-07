@@ -16,7 +16,6 @@ public class SketchwareEvent {
     public String name;
 
     public int color = 0xFFF39B0E;
-    public int color_dark = 0xFFC8800E;
 
     public int text_padding = 10;
 
@@ -48,27 +47,18 @@ public class SketchwareEvent {
         String text = activity_name + ": " + name;
         int text_width = (int) text_paint.measureText(text) + text_padding * 2;
 
-        // Draw the "shadow"
-        rect_paint.setColor(color_dark);
-        canvas.drawRect(left_position, top_position, text_width + left_position, top_position + height + shadow_height, rect_paint);
+        // Draw the block's body
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position, text_width + text_padding, height + text_padding, shadow_height, color);
 
-        // The outset part
-        canvas.drawRect(left_position + outset_left_margin, top_position, left_position + outset_left_margin + outset_width, top_position + height + shadow_height + outset_height, rect_paint);
-
-
-        // Draw the actual block
-        rect_paint.setColor(color);
-        canvas.drawRect(left_position, top_position, text_width + left_position, top_position + height, rect_paint);
-
-        // top bump
-        canvas.drawRect(left_position, top_position - top_bump_height, left_position + 250, top_position + height, rect_paint);
+        // top bump, don't draw shadow
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position - top_bump_height, 250, height, 0, color);
 
         // outset
-        canvas.drawRect(left_position + outset_left_margin, top_position, left_position + outset_left_margin + outset_width, top_position + height + outset_height, rect_paint);
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position + outset_left_margin, top_position, outset_width, height + outset_height + outset_height, shadow_height, color);
 
 
         // Draw the text
-        canvas.drawText(text, left_position + text_padding, top_bump_height + top_position + (height) / 2, text_paint);
+        canvas.drawText(text, left_position + text_padding, top_bump_height + top_position + (height >> 1), text_paint);
     }
 
     @NonNull

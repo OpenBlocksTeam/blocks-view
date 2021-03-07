@@ -60,14 +60,14 @@ public class SketchwareNestedBlock extends SketchwareBlock {
         original_block_paint.setColor(rect_paint.getColor());
         original_block_paint.setTextSize(rect_paint.getTextSize());
 
-        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin + indent_width, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
 
         int block_outset_left = left + block_outset_left_margin;
 
         // Draw the childes! (similar to SketchwareBlocksView)
-        previous_block_color = 0;
+        previous_block_color = color;
         int block_height = getBlockHeight(text_paint);
-        int previous_top_position = top;
+        int previous_top_position = top + shadow_height;
         int previous_block_height = block_height - shadow_height;  // Because if not, the first block would get overlapped by the event
 
         for (int i = 0; i < blocks.size(); i++) {

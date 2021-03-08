@@ -93,7 +93,7 @@ public class DrawHelper {
     // The shadow will be inside the block, not outside
     public static void drawRectSimpleOutsideShadow(@NonNull Canvas canvas, int x, int y, int width, int height, int shadow_height, int color) {
         // Draw shadow
-        drawRect(canvas, x, y, width, height, manipulateColor(color, 0.7f));
+        drawRect(canvas, x, y, width, height, manipulateColor(color, 0.8f));
 
         // Draw the actual block
         drawRect(canvas, x, y, width, height - shadow_height, color);
@@ -111,6 +111,13 @@ public class DrawHelper {
         p.setColor(color);
 
         canvas.drawRect(x, y, x + width, y + height, p);
+    }
+
+    public static void drawRoundRect(@NonNull Canvas canvas, int x, int y, int width, int height, int radius, int color) {
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(color);
+
+        canvas.drawRoundRect(x, y, x + width, y + height, radius, radius, p);
     }
 
     /**

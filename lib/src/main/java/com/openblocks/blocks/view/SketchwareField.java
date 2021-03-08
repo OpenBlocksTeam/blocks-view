@@ -31,9 +31,6 @@ public class SketchwareField {
     // This is the padding around the field
     int text_padding = 10;
 
-    // An extra padding for fields with the integer type
-    int integer_padding = 10;
-
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
      * @param block The block

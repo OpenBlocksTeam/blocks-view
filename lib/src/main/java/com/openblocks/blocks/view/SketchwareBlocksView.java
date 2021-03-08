@@ -58,7 +58,7 @@ public class SketchwareBlocksView extends View {
     int block_height = 60;
     int event_top = 50;
 
-    int nested_bottom_margin = 30;
+    int nested_bottom_margin = 50;
 
     int event_height = 50;
 

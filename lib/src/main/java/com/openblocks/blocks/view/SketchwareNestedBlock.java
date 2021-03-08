@@ -15,7 +15,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
     public ArrayList<SketchwareBlock> blocks;
 
-    public int block_bottom_height = 40;
+    public int block_bottom_height = 50;
     public int indent_width = 40;
 
     public int bottom_margin = 20;
@@ -38,7 +38,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
     @Override
     public int getHeight(Paint text_paint) {
-        return calculateBlockHeights(text_paint) + getBlockHeight(text_paint) + block_bottom_height + bottom_margin;
+        return getBlockHeight(text_paint) + calculateBlockHeights(text_paint) + bottom_margin + block_bottom_height;
     }
 
     public int getBlockHeight(Paint text_paint) {

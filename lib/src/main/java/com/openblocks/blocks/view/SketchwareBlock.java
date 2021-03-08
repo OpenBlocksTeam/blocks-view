@@ -39,7 +39,6 @@ public class SketchwareBlock {
     int next_block;
 
     public int color;
-    public int color_dark;
 
     int text_padding = 10;
 
@@ -83,7 +82,6 @@ public class SketchwareBlock {
         this.next_block = next_block;
         this.parameters = parameters;
         this.color = color;
-        this.color_dark = DrawHelper.manipulateColor(color, 0.7f);
         this.is_parameter = is_parameter;
         this.parameter_type = parameter_type;
         this.setFormat(format);
@@ -409,37 +407,24 @@ public class SketchwareBlock {
         // int block_width = (int) text_paint.measureText(format) + 20;
         int block_width = getWidth(text_paint);
 
-        int bottom_position = top + height;
+        // FIXME: 3/8/21 Height shouldn't be added with the shadow height
+        // Draw the block body
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, color);
 
-        int block_outset_left = left + block_outset_left_margin;
-        int top_outset_left = left + top_block_outset_left_margin;
+        // Should the blocks overlap each other?
+        if (!is_overlapping) {
+            // Ohk no, draw the outset with shadow and the top block's outset
 
-        // Draw the block's shadow
-        rect_paint.setColor(color_dark);
-        canvas.drawRect(left, top, left + block_width, bottom_position + shadow_height, rect_paint);
+            // Draw the outset
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left + block_outset_left_margin, top, block_outset_width, height + block_outset_height + block_outset_height, shadow_height, color);
 
-        // This is the little bottom thing
-        if (!is_bottom)
-            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, bottom_position + shadow_height + block_outset_height, rect_paint);
-
-        // Draw the actual block
-        rect_paint.setColor(color);
-        canvas.drawRect(left, top, left + block_width, bottom_position, rect_paint);
-
-        // This is the little bottom thing
-        if (!is_bottom)
-            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, bottom_position + block_outset_height, rect_paint);
-
-        // Draw the previous block's outset (only if we're overlapping it)
-        if (is_overlapping) {
-            rect_paint.setColor(previous_block_color);
-            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height, rect_paint);
+            // Draw the top block's outset
+            DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, DrawHelper.manipulateColor(previous_block_color, 0.8f));
         } else {
-            rect_paint.setColor(DrawHelper.manipulateColor(previous_block_color, 0.7f));
-            canvas.drawRect(top_outset_left, top, top_outset_left + block_outset_width, top + block_outset_height, rect_paint);
+            // Yes, just draw the top block's outset
 
-            rect_paint.setColor(previous_block_color);
-            canvas.drawRect(block_outset_left, top, block_outset_left + block_outset_width, top + block_outset_height - shadow_height, rect_paint);
+            // Draw the top block's outset
+            DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, previous_block_color);
         }
 
         // Draw the block's text and parameters
@@ -466,7 +451,7 @@ public class SketchwareBlock {
             if (shadow_height == 0)
                 shadow_height = text_padding;
 
-            field.draw(context,canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height);
+            field.draw(context, canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height);
 
             x += field.getWidth(text_paint) + 5;
         }
@@ -488,7 +473,6 @@ public class SketchwareBlock {
                 ", is_bottom=" + is_bottom +
                 ", next_block=" + next_block +
                 ", color=" + color +
-                ", color_dark=" + color_dark +
                 ", text_padding=" + text_padding +
                 ", is_parameter=" + is_parameter +
                 ", default_height=" + default_height +

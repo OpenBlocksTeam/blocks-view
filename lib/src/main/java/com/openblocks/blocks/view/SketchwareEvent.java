@@ -51,7 +51,7 @@ public class SketchwareEvent {
         DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position, text_width + text_padding, height + text_padding, shadow_height, color);
 
         // top bump, don't draw shadow
-        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position - top_bump_height, 250, height, 0, color);
+        DrawHelper.drawRect(canvas, left_position, top_position - top_bump_height, 250, height, color);
 
         // outset
         DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position + outset_left_margin, top_position, outset_width, height + outset_height + outset_height, shadow_height, color);

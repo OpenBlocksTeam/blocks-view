@@ -7,13 +7,15 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
+/**
+ * This class is used to represent a collection of blocks and an event / orange-yellow thingy at the top
+ */
 public class SketchwareEvent {
 
     public String activity_name;
     public String name;
 
     public int color = 0xFFF39B0E;
-    public int color_dark = 0xFFC8800E;
 
     public int text_padding = 10;
 
@@ -37,7 +39,7 @@ public class SketchwareEvent {
      * @param rect_paint The paint that is used to draw the rect
      * @param text_paint The paint that is used to draw the text
      */
-    public void draw(Canvas canvas, int height, int outset_height, int left_position, int top_position, int top_bump_height, int shadow_height, Paint rect_paint, Paint text_paint) {
+    public void draw(Canvas canvas, int height, int outset_height, int left_position, int top_position, int top_bump_height, int outset_left_margin, int outset_width, int shadow_height, Paint rect_paint, Paint text_paint) {
 
 //        int height = 50;
 //        int outset_height = 10;
@@ -45,32 +47,31 @@ public class SketchwareEvent {
         String text = activity_name + ": " + name;
         int text_width = (int) text_paint.measureText(text) + text_padding * 2;
 
-        // Draw the "shadow"
-        rect_paint.setColor(color_dark);
-        canvas.drawRect(left_position, top_position, text_width + left_position, top_position + height + shadow_height, rect_paint);
+        // Draw the block's body
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position, text_width + text_padding, height + text_padding, shadow_height, color);
 
-        // The outset part
-        canvas.drawRect(left_position + 50, top_position, 175, top_position + height + shadow_height + outset_height, rect_paint);
-
-
-        // Draw the actual block
-        rect_paint.setColor(color);
-        canvas.drawRect(left_position, top_position, text_width + left_position, top_position + height, rect_paint);
-
-        // top bump
-        canvas.drawRect(left_position, top_position - top_bump_height, left_position + 250, top_position + height, rect_paint);
+        // top bump, don't draw shadow
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position - top_bump_height, 250, height, 0, color);
 
         // outset
-        canvas.drawRect(left_position + 50, top_position, 175, top_position + height + outset_height, rect_paint);
+        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position + outset_left_margin, top_position, outset_width, height + outset_height + outset_height, shadow_height, color);
 
 
         // Draw the text
-        canvas.drawText(text, 60, top_bump_height + top_position + (height) / 2, text_paint);
+        canvas.drawText(text, left_position + text_padding, top_bump_height + top_position + (height >> 1), text_paint);
     }
 
     @NonNull
     @Override
     public String toString() {
         return "Sketchware Event:\n\tActivityName:" + activity_name + "\n\tEventName: " + name + "\nBlocks:\n" + blocks.toString();
+    }
+
+    @NonNull
+    @Override
+    protected Object clone() {
+        SketchwareEvent clone_event = new SketchwareEvent(this.activity_name, this.name);
+        clone_event.blocks = (ArrayList<SketchwareBlock>) blocks.clone();
+        return clone_event;
     }
 }

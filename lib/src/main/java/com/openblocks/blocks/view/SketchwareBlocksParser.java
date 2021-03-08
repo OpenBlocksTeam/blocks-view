@@ -6,14 +6,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class is a parser that can be used to parse Sketchware's decrypted logic file
+ */
 public class SketchwareBlocksParser {
 
     String logic_data;
 
     private ArrayList<Integer> block_id_blacklist = new ArrayList<>();
+    // "id": JSONObject
+    private final HashMap<String, JSONObject> tmp_blocks = new HashMap<>();
 
     public SketchwareBlocksParser() { }
 
@@ -36,8 +42,8 @@ public class SketchwareBlocksParser {
 
         ArrayList<SketchwareEvent> events = new ArrayList<>();
 
-        // "id": JSONObject
-        HashMap<String, JSONObject> tmp_blocks = new HashMap<>();
+        // We need this so we can evaluate the blocks before we hit the end of the file
+        logic_data += "\n";
 
         String[] lines = logic_data.split("\n");
 
@@ -68,7 +74,7 @@ public class SketchwareBlocksParser {
                         event.blocks.add(new SketchwareBlock(
                                 /* Format:           */ block.getString("spec"),
                                 /* Block ID:         */ id,
-                                /* Next Block ID:    */ Integer.parseInt(block.getString("next_block")),
+                                /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
                                 /* Parameter:        */ parseParameter(block, id),
                                 /* Block color:      */ block.getInt("color")
                         ));
@@ -96,30 +102,29 @@ public class SketchwareBlocksParser {
             // If we're aren't in an event name
             if (event_name.equals("")) {
                 String header_regex = "@(\\w+).java_(.+)";
-                String var_header_regex = "@\\w+.java_var";
-                String func_header_regex = "@\\w+.java_func";
-
-                if (line.matches(var_header_regex) || line.matches(func_header_regex)) {
-                    skip_event = true;
-                    continue;
-                }
 
                 Pattern r = Pattern.compile(header_regex);
                 Matcher m = r.matcher(line);
 
                 if (m.find()) {
-                    activity_name = m.group(0);
-                    event_name = m.group(1);
+                    if (Objects.equals(m.group(2), "var") || Objects.equals(m.group(2), "func")) {
+                        skip_event = true;
+                        continue;
+                    }
+
+                    activity_name = m.group(1);
+                    event_name = m.group(2);
                 }
 
             } else {
-
                 // Fetch every blocks in this event into tmp_blocks
+
                 try {
                     JSONObject json = new JSONObject(line);
 
                     tmp_blocks.put(json.getString("id"), json);
                 } catch (JSONException e) {
+                    e.printStackTrace();
                     // Something is wrong
                 }
             }
@@ -140,17 +145,21 @@ public class SketchwareBlocksParser {
             Matcher m = r.matcher(params_.getString(index));
 
             if (m.find()) {
-                // Ah it references into m.group(0) block id
+                // Ah it references into m.group(1) block id
+                String block_reference = m.group(1);
+
                 // blacklist the id so we don't accidentally parse a return value block
-                block_id_blacklist.add(Integer.parseInt(m.group(0)));
+                block_id_blacklist.add(Integer.parseInt(block_reference));
+
+                JSONObject parameter_block = tmp_blocks.get(block_reference);
 
                 params.add(
                         new SketchwareField(
                                 new SketchwareBlock(
                                         /* Format:           */ block.getString("spec"),
                                         /* Block ID:         */ id,
-                                        /* Next Block ID:    */ Integer.parseInt(block.getString("next_block")),
-                                        /* Parameter:        */ parseParameter(block, id),
+                                        /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
+                                        /* Parameter:        */ parseParameter(parameter_block, block_reference),
                                         /* Block color:      */ block.getInt("color")
                                 )
                         )

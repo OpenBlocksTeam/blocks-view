@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/open_file"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:title="Open File"
+        android:icon="@drawable/ic_file" />
+
+    <item
+        android:id="@+id/open_event"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:title="Select Event"
+        android:icon="@drawable/ic_select_event" />
+</menu>

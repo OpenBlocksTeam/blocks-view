@@ -5,8 +5,13 @@
         <attr name="top_position" format="dimension"/>
         <attr name="shadow_height" format="dimension"/>
         <attr name="block_outset_height" format="dimension"/>
+        <attr name="block_outset_width" format="dimension"/>
+        <attr name="block_outset_left_margin" format="dimension"/>
         <attr name="block_height" format="dimension"/>
-        <attr name="event_offset" format="dimension"/>
+        <attr name="block_text_size" format="dimension"/>
+        <attr name="block_text_color" format="color"/>
+        <attr name="event_top" format="dimension"/>
+        <attr name="event_height" format="dimension"/>
         <attr name="is_overlapping" format="boolean"/>
         <attr name="nested_bottom_margin" format="dimension"/>
     </declare-styleable>

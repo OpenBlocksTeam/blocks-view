@@ -654,6 +654,12 @@ public class SketchwareBlocksView extends View {
         int previous_top_position = event_height;  // Start with event_offset
         int previous_block_height = event_top;  // Because if not, the first block would get overlapped by the event
 
+        // Are we overlapping?
+        if (is_overlapping) {
+            // If yes, then increase the top position, as the event can overlap our first block
+            previous_top_position += block_outset_height;
+        }
+
         // Loop per each block
         for (int i = 0; i < event.blocks.size(); i++) {
 

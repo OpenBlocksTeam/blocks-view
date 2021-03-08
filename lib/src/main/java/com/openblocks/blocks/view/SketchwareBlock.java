@@ -9,6 +9,7 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,16 @@ import java.util.regex.Pattern;
  */
 public class SketchwareBlock {
 
+    // TODO: 3/8/21 REMOVE next_block AND id
+
     // Variables ===================================================================================
+    /**
+     * This variable format is formatted in sketchware's way, example:
+     * <code>
+     *   Toast %s
+     * </code>
+     * the % indicates that this is a parameter, s means that it's a string parameter type
+     */
     private String format;
     private ArrayList<Object[]> parsed_format;
     public String id;
@@ -35,6 +45,9 @@ public class SketchwareBlock {
 
     // Indicates if this block is a parameter or not
     boolean is_parameter;
+
+    // Indicates this block's parameter type (if is_parameter is true)
+    SketchwareField.Type parameter_type;
 
     // Will be used in the overloaded draw function
     public int default_height = 60; // The same as in SketchwareBlocksView
@@ -54,7 +67,7 @@ public class SketchwareBlock {
     }
 
     public SketchwareBlock(String text, String id, int next_block, int color) {
-        this(text, id, next_block, new ArrayList<>(), color, false);
+        this(text, id, next_block, new ArrayList<>(), color, false, null);
     }
 
     public SketchwareBlock(String format, ArrayList<SketchwareField> parameters, int color) {
@@ -62,22 +75,72 @@ public class SketchwareBlock {
     }
 
     public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
-        this(format, id, next_block, parameters, color, false);
+        this(format, id, next_block, parameters, color, false, null);
     }
 
-    public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, boolean is_parameter) {
+    public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, boolean is_parameter, SketchwareField.Type parameter_type) {
         this.id = id;
         this.next_block = next_block;
         this.parameters = parameters;
         this.color = color;
         this.color_dark = DrawHelper.manipulateColor(color, 0.7f);
         this.is_parameter = is_parameter;
+        this.parameter_type = parameter_type;
         this.setFormat(format);
 
         // next_block is -1 if there is nothing after it
         this.is_bottom = next_block == -1;
     }
     // Constructors ================================================================================
+
+
+
+    // Factory constructors ========================================================================
+
+    /**
+     * Create a simple block
+     * @param text The text of the block
+     * @param color The color of the block
+     * @return The block according to the parameters given
+     */
+    public static SketchwareBlock newSimpleBlock(String text, int color) {
+        return new SketchwareBlock(text, color);
+    }
+
+    /**
+     * Create a simple block with parameters in it
+     * @param text The text of the block
+     * @param color The color of the block
+     * @param parameters The parameters of the block
+     * @return The block according to the parameters given
+     */
+    public static SketchwareBlock newBlockWithParameter(String text, int color, SketchwareField... parameters) {
+        return new SketchwareBlock(text, new ArrayList<>(Arrays.asList(parameters)), color);
+    }
+
+    /**
+     * Create a parameter block
+     * @param text The text of the block
+     * @param color The color of the block
+     * @param parameter_type The return type of the block
+     * @return The block according to the parameters given
+     */
+    public static SketchwareBlock newParameterBlock(String text, int color, SketchwareField.Type parameter_type) {
+        return new SketchwareBlock(text, "1", 2, new ArrayList<>(), color, true, parameter_type);
+    }
+
+    /**
+     * Create a parameter block that has parameters in it
+     * @param text The text of the block
+     * @param color The color of the block
+     * @param parameter_type The return type of the block
+     * @param parameters The parameters for this block
+     * @return The block according to the parameters given
+     */
+    public static SketchwareBlock newParamBlockWithParams(String text, int color, SketchwareField.Type parameter_type, SketchwareField... parameters) {
+        return new SketchwareBlock(text, "1", 2, new ArrayList<>(Arrays.asList(parameters)), color, true, parameter_type);
+    }
+    // Factory constructors ========================================================================
 
 
 

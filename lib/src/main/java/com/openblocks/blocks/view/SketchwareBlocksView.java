@@ -70,6 +70,9 @@ public class SketchwareBlocksView extends View {
 
     boolean is_overlapping = false;
 
+    boolean is_round = true;
+    int round_radius = 10;
+
     // Customizations variables ^ ==================================================================
 
 
@@ -704,7 +707,9 @@ public class SketchwareBlocksView extends View {
                         block_outset_width,
                         block_outset_height,
                         is_overlapping,
-                        previous_block_color
+                        previous_block_color,
+                        is_round,
+                        round_radius
                 );
 
             previous_block_color = current_block.color;
@@ -763,7 +768,9 @@ public class SketchwareBlocksView extends View {
                     block_outset_width,
                     block_outset_height,
                     is_overlapping,
-                    0x00000000
+                    0x00000000,
+                    is_round,
+                    round_radius
             );
 
             index++;

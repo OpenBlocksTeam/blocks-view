@@ -91,6 +91,15 @@ public class DrawHelper {
     }
 
     // The shadow will be inside the block, not outside
+    public static void drawRoundRectSimpleOutsideShadow(@NonNull Canvas canvas, int x, int y, int width, int height, int shadow_height, int radius, int color) {
+        // Draw shadow
+        drawRoundRect(canvas, x, y, width, height, radius, manipulateColor(color, 0.8f));
+
+        // Draw the actual block
+        drawRoundRect(canvas, x, y, width, height - shadow_height, radius, color);
+    }
+
+    // The shadow will be inside the block, not outside
     public static void drawRectSimpleOutsideShadow(@NonNull Canvas canvas, int x, int y, int width, int height, int shadow_height, int color) {
         // Draw shadow
         drawRect(canvas, x, y, width, height, manipulateColor(color, 0.8f));

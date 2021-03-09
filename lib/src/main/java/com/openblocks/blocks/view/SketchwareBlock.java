@@ -362,12 +362,8 @@ public class SketchwareBlock {
      * @param is_overlapping Do you want to overlap the block above's shadow?
      * @param previous_block_color The previous block's color, used to draw the outset of the block above
      */
-    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
-        draw(context, canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
-    }
-
-    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
-        draw(context, canvas, rect_paint, text_paint, top, left, height, shadow_height, block_outset_left_margin, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color, boolean is_round, int round_radius) {
+        draw(context, canvas, rect_paint, text_paint, top, left, getHeight(text_paint), shadow_height, block_outset_left_margin, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color, is_round, round_radius);
     }
 
     // TODO: Maybe at least reduce the parameters
@@ -402,14 +398,20 @@ public class SketchwareBlock {
                      int block_outset_width,
                      int block_outset_height,
                      boolean is_overlapping,
-                     int previous_block_color
+                     int previous_block_color,
+                     boolean is_round,
+                     int round_radius
     ) {
         // int block_width = (int) text_paint.measureText(format) + 20;
         int block_width = getWidth(text_paint);
 
         // FIXME: 3/8/21 Height shouldn't be added with the shadow height
         // Draw the block body
-        DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, color);
+        if (is_round) {
+            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, round_radius, color);
+        } else {
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, color);
+        }
 
         // Should the blocks overlap each other?
         if (!is_overlapping) {

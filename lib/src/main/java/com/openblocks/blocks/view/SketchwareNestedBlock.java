@@ -79,26 +79,12 @@ public class SketchwareNestedBlock extends SketchwareBlock {
     }
 
     @Override
-    public void draw(Context context,
-                     Canvas canvas,
-                     Paint rect_paint,
-                     Paint text_paint,
-                     int top,
-                     int left,
-                     int height,
-                     int shadow_height,
-                     int block_outset_left_margin,
-                     int top_block_outset_left_margin,
-                     int block_outset_width,
-                     int block_outset_height,
-                     boolean is_overlapping,
-                     int previous_block_color
-    ) {
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int top_block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color, boolean is_round, int round_radius) {
         Paint original_block_paint = new Paint();
         original_block_paint.setColor(rect_paint.getColor());
         original_block_paint.setTextSize(rect_paint.getTextSize());
 
-        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin + indent_width, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin + indent_width, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color, true, round_radius);
 
         int block_outset_left = left + block_outset_left_margin;
 
@@ -139,7 +125,9 @@ public class SketchwareNestedBlock extends SketchwareBlock {
                             block_outset_width,
                             block_outset_height,
                             is_overlapping,
-                            childes_previous_block_color
+                            childes_previous_block_color,
+                            is_round,
+                            round_radius
                     );
 
             childes_previous_block_color = current_block.color;

@@ -39,7 +39,7 @@ public class SketchwareEvent {
      * @param rect_paint The paint that is used to draw the rect
      * @param text_paint The paint that is used to draw the text
      */
-    public void draw(Canvas canvas, int height, int outset_height, int left_position, int top_position, int top_bump_height, int outset_left_margin, int outset_width, int shadow_height, Paint rect_paint, Paint text_paint) {
+    public void draw(Canvas canvas, int height, int outset_height, int left_position, int top_position, int top_bump_height, int outset_left_margin, int outset_width, int shadow_height, Paint rect_paint, Paint text_paint, boolean is_round, int round_radius) {
 
 //        int height = 50;
 //        int outset_height = 10;
@@ -47,14 +47,25 @@ public class SketchwareEvent {
         String text = activity_name + ": " + name;
         int text_width = (int) text_paint.measureText(text) + text_padding * 2;
 
-        // Draw the block's body
-        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position, text_width + text_padding, height + text_padding, shadow_height, color);
+        if (!is_round) {
+            // Draw the block's body
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position, top_position, text_width + text_padding, height + text_padding, shadow_height, color);
 
-        // top bump, don't draw shadow
-        DrawHelper.drawRect(canvas, left_position, top_position - top_bump_height, 250, height, color);
+            // top bump, don't draw shadow
+            DrawHelper.drawRect(canvas, left_position, top_position - top_bump_height, 250, height, color);
 
-        // outset
-        DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position + outset_left_margin, top_position, outset_width, height + outset_height + outset_height, shadow_height, color);
+            // outset
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position + outset_left_margin, top_position, outset_width, height + outset_height + outset_height, shadow_height, color);
+        } else {
+            // Draw the block's body
+            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left_position, top_position, text_width + text_padding, height + text_padding, shadow_height, round_radius, color);
+
+            // top bump, don't draw shadow
+            DrawHelper.drawRoundRect(canvas, left_position, top_position - top_bump_height, 250, height, round_radius, color);
+
+            // outset
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left_position + outset_left_margin, top_position, outset_width, height + outset_height + outset_height, shadow_height, color);
+        }
 
 
         // Draw the text

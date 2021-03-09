@@ -727,7 +727,9 @@ public class SketchwareBlocksView extends View {
                 block_outset_width,
                 shadow_height,
                 rect_paint,
-                text_paint
+                text_paint,
+                is_round,
+                round_radius
         );
 
 

@@ -135,7 +135,17 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         int bottom_block_top_position = top + getHeight(text_paint) + shadow_height - block_bottom_height;
 
-        DrawHelper.drawRectSimpleOutsideShadow(canvas, left, bottom_block_top_position, getWidth(text_paint), block_bottom_height, shadow_height, color);
+        if (is_round) {
+            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, bottom_block_top_position, getWidth(text_paint), block_bottom_height, shadow_height, round_radius, color);
+
+            // Ok, draw the "indent"
+            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, top, indent_width, getHeight(text_paint) + shadow_height, shadow_height, round_radius, color);
+        } else {
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left, bottom_block_top_position, getWidth(text_paint), block_bottom_height, shadow_height, color);
+
+            // Ok, draw the "indent"
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, indent_width, getHeight(text_paint) + shadow_height, shadow_height, color);
+        }
 
         if (!is_overlapping) {
             // Ohk no, draw the outset with shadow and the top block's outset
@@ -151,9 +161,6 @@ public class SketchwareNestedBlock extends SketchwareBlock {
             // Draw the top block's outset
             DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, previous_block_color);
         }
-
-        // Ok, draw the "indent"
-        DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, indent_width, getHeight(text_paint) + shadow_height, shadow_height, color);
 
         drawParameters(context,canvas, left, top, top + ((getBlockHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), getBlockHeight(text_paint), shadow_height, text_paint);
     }

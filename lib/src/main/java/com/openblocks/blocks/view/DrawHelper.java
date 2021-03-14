@@ -12,11 +12,17 @@ import androidx.annotation.NonNull;
  */
 public class DrawHelper {
 
-    public static void drawBooleanField(Canvas canvas, int x, int y, int width, int height, int color) {
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(color);
+    // There are basically no way except this
+    static Paint paint;
 
-        drawBooleanField(canvas, x, y, width, height, p);
+    public static void initialize() {
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    }
+
+    public static void drawBooleanField(Canvas canvas, int x, int y, int width, int height, int color) {
+        paint.setColor(color);
+
+        drawBooleanField(canvas, x, y, width, height, paint);
     }
 
     public static void drawBooleanField(Canvas canvas, int x, int y, int width, int height, Paint p) {
@@ -63,10 +69,9 @@ public class DrawHelper {
 
 
     public static void drawIntegerField(Canvas canvas, int x, int y, int width, int height, int color) {
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(color);
+        paint.setColor(color);
 
-        drawIntegerField(canvas, x, y, width, height, p);
+        drawIntegerField(canvas, x, y, width, height, paint);
     }
 
     public static void drawIntegerField(@NonNull Canvas canvas, int x, int y, int width, int height, Paint p) {
@@ -109,24 +114,21 @@ public class DrawHelper {
     }
 
     public static void drawRectAbsolute(@NonNull Canvas canvas, int x, int y, int x1, int y1, int color) {
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(color);
+        paint.setColor(color);
 
-        canvas.drawRect(x, y, x1, y1, p);
+        canvas.drawRect(x, y, x1, y1, paint);
     }
 
     public static void drawRect(@NonNull Canvas canvas, int x, int y, int width, int height, int color) {
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(color);
+        paint.setColor(color);
 
-        canvas.drawRect(x, y, x + width, y + height, p);
+        canvas.drawRect(x, y, x + width, y + height, paint);
     }
 
     public static void drawRoundRect(@NonNull Canvas canvas, int x, int y, int width, int height, int radius, int color) {
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(color);
+        paint.setColor(color);
 
-        canvas.drawRoundRect(x, y, x + width, y + height, radius, radius, p);
+        canvas.drawRoundRect(x, y, x + width, y + height, radius, radius, paint);
     }
 
     /**

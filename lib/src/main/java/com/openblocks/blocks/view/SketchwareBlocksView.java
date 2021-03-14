@@ -167,6 +167,9 @@ public class SketchwareBlocksView extends View {
      * @param attrs The attribute set
      */
     private void initialize(Context context, AttributeSet attrs) {
+        // Initialize DrawHelper
+        DrawHelper.initialize();
+
         // Set the context
         this.context = context;
 

@@ -452,7 +452,7 @@ public class SketchwareBlock {
         }
 
         // Should the blocks overlap each other?
-        if (!is_overlapping) {
+        if (!is_overlapping || is_parameter) {
             // Ohk no, draw the outset with shadow and the top block's outset
 
             // Draw the outset

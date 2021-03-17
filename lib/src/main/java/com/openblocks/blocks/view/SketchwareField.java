@@ -7,6 +7,8 @@ import android.graphics.Path;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class SketchwareField {
 
     /**
@@ -183,5 +185,25 @@ public class SketchwareField {
                 ", rect_paint=" + rect_paint +
                 ", padding=" + text_padding +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SketchwareField that = (SketchwareField) o;
+        return is_block == that.is_block &&
+                text_padding == that.text_padding &&
+                value.equals(that.value) &&
+                block.equals(that.block) &&
+                type == that.type &&
+                text_paint.equals(that.text_paint) &&
+                rect_paint.equals(that.rect_paint);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(is_block, value, block, type, text_paint, rect_paint, text_padding);
     }
 }

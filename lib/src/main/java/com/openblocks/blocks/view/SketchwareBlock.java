@@ -480,4 +480,28 @@ public class SketchwareBlock {
                 ", default_height=" + default_height +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SketchwareBlock that = (SketchwareBlock) o;
+        return is_bottom == that.is_bottom &&
+                next_block == that.next_block &&
+                color == that.color &&
+                text_padding == that.text_padding &&
+                is_parameter == that.is_parameter &&
+                default_height == that.default_height &&
+                format.equals(that.format) &&
+                parsed_format.equals(that.parsed_format) &&
+                id.equals(that.id) &&
+                parameters.equals(that.parameters) &&
+                parameter_type == that.parameter_type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(format, parsed_format, id, parameters, is_bottom, next_block, color, text_padding, is_parameter, parameter_type, default_height);
+    }
 }

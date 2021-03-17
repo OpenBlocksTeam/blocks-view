@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Vibrator;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class is the View that should be used inside your layout, Used to display blocks in an event
@@ -477,7 +479,7 @@ public class SketchwareBlocksView extends View {
                     picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
             ) {
                 draw_line_at_pos = point;
-                Log.d(TAG, "predictDropLocation: top: " + point);
+                // Log.d(TAG, "predictDropLocation: top: " + point);
                 return point;
             }
 
@@ -522,6 +524,8 @@ public class SketchwareBlocksView extends View {
             index++;
         }
 
+        Log.d(TAG, "pickup_block: Not picked, picking blocks");
+
         // Looks like it hasn't been dragged yet, let's just check each blocks
         // This code is almost the same as in the onDraw() method
         int previous_top_position = event_height;  // Start with event_offset
@@ -529,7 +533,6 @@ public class SketchwareBlocksView extends View {
 
         for (int i = 0; i < event.blocks.size(); i++) {
             SketchwareBlock current_block = event.blocks.get(i);
-            current_block.default_height = block_height;
 
             int top_position;
 
@@ -549,7 +552,7 @@ public class SketchwareBlocksView extends View {
                 ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
-            RectF bounds = new RectF(
+            Rect bounds = new Rect(
                     left_position,
                     top_position, // TODO: IMPLEMENT DRAGGING BLOCKS INSIDE A NESTED BLOCK, AND ALSO PARAMETER BLOCKS
                     left_position + current_block.getWidth(text_paint),
@@ -557,11 +560,29 @@ public class SketchwareBlocksView extends View {
             );
 
             if (bounds.contains(x, y)) {
-                // FIXME: 3/6/21 This doesn't work
-
+                Log.d(TAG, "pickup_block: x: " + x + " y: " + y);
+                Log.d(TAG, "pickup_block: block bounds: " + bounds);
+                Log.d(TAG, "pickup_block: Inside the block " + top_position);
+                
                 // Ohk, call onPickup of the block
-                Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> pickup = event.blocks.get(i).onPickup(x, y, text_paint);
+                Pair<Boolean, SketchwareBlock> pickup = event.blocks.get(i).onPickup(x - left_position, y - top_position, text_paint);
 
+                // The first pair is to determine if we should remove the block or not?
+                if (pickup.first) {
+                    // Yup, remove it
+
+                    try {
+                        event.blocks.remove(pickup.second);
+                    } catch (Exception ignored) { }
+                }
+
+                // Add it to the unconnected blocks (picking it up)
+                unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), pickup.second));
+
+                // And returning it's position
+                return 0;
+
+                /*
                 switch (pickup.first) {
                     case PICKUP_SELF:
                         Log.d(TAG, "pickup_block: self");
@@ -587,13 +608,16 @@ public class SketchwareBlocksView extends View {
                         // Return the position of this parameter of unconnected_blocks
                         return 0;
                     case PICKUP_NONE:
+                        Log.d(TAG, "pickup_block: Pickup none");
                         // Nothing
                         break;
                 }
+                 */
             }
         }
 
         // Ok, this guy is just clicking nothing
+        Log.d(TAG, "pickup_block: meh, nothing");
         return -1;
     }
     // Pickup, drop blocks utilities ===============================================================
@@ -805,23 +829,6 @@ public class SketchwareBlocksView extends View {
         protected Vector2D clone() {
             return new Vector2D(this.x, this.y);
         }
-    }
-
-    /**
-     * This enum is used to indicate what should we pick up? ourself or a parameter of ourself?
-     */
-    public static enum PickupAction {
-        PICKUP_SELF,
-        PICKUP_OTHER_BLOCK,
-        PICKUP_NONE
-    }
-
-    /**
-     * This enum is used to indicate what should we drop to? to a block? or to a parameter
-     */
-    public static enum DropAction {
-        DROP_SELF,
-        DROP_PARAMETER
     }
     // Utility classes =============================================================================
 }

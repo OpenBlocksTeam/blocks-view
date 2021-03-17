@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,8 @@ import java.util.regex.Pattern;
  * This class is a model used to represent a block
  */
 public class SketchwareBlock {
+
+    private static final String TAG = "SketchwareBlock";
 
     // TODO: 3/8/21 REMOVE next_block AND id
 
@@ -251,10 +255,12 @@ public class SketchwareBlock {
      * @param x The x location of the pickup, should be relative to OUR block's 0, 0 point (top left)
      * @param y The y location of the pickup, should be relative to OUR block's 0, 0 point (top left)
      * @param text_paint The {@link Paint} used to draw the block text
-     * @return A pair of the pickup action, and a parameter element index. If we returned PICKUP_PARAMETER, the second pair will be used as an index of our {@link #parameters} attribute.
+     * @return Pair of "Should we remove this block from the block list" and the block that is picked up
      */
-    public Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
+    public Pair<Boolean, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
         // int x = left + text_padding;  // The initial x's text position
+
+        Log.d(TAG, "onPickup: x: " + x + " y: " + y);
 
         // int text_top = top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2);
 
@@ -272,17 +278,22 @@ public class SketchwareBlock {
             // if x_total changed, x_before will change (which is the thing i don't want)
             x_before = Integer.parseInt(String.valueOf(x_total));
 
+            Log.d(TAG, "onPickup: [Init] before: " + x_before + " total: " + x_total);
+
             // Get the text between a field (should be 0 for the first time) and another field
             String text = getFormat().substring(last_substring_index, (int) param[0]);
-            // canvas.drawText(text, x, block_text_location, text_paint);
+
+            x_total += text_paint.measureText(text) + 5;
+
+            Log.d(TAG, "onPickup: [Text Check] before: " + x_before + " total: " + x_total);
 
             // Check if the X is somewhere in this text
             if (x > x_before && x < x_total) {
-                // Oop, then just pick ourself, i guess
-                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null); // null because the user didn't picked up any parameter
-            }
+                Log.d(TAG, "onPickup: Somewhere in text, self");
 
-            x_total += text_paint.measureText(text) + 5;
+                // Oop, then just pick ourself, i guess
+                return new Pair<>(true, this);
+            }
 
             // Update the x_before to the text
             x_before = Integer.parseInt(String.valueOf(x_total));
@@ -291,37 +302,64 @@ public class SketchwareBlock {
 
             SketchwareField field = (SketchwareField) param[3];
 
+            x_total += field.getWidth(text_paint) + 5;
+
+            Log.d(TAG, "onPickup: [Field Check] before: " + x_before + " total: " + x_total);
+
             // Check if X is somewhere in this field
             if (x > x_before && x < x_total) {
+                Log.d(TAG, "onPickup: Dragging a field");
+
                 // Yup, this the user is dragging a field, check if this is a block
                 if (field.is_block) {
+                    Log.d(TAG, "onPickup: Is a block");
+
                     // Ohk this is a block, check if the parameter block has a parameter too
                     if (field.block.parameters.size() == 0) {
+                        Log.d(TAG, "onPickup: No parameters, pick up ourself");
+
                         // Nop it doesn't have any, means we can pick this parameter!
                         // Remove the field from parameters
-                        parameters.remove(index);
+                        parameters.set(index, new SketchwareField("Picked Up"));
+
+                        parsed_format.get(index)[3] = new SketchwareField("Picked Up");
 
                         // Then set the block
-                        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_OTHER_BLOCK, field.block);
+                        return new Pair<>(false, field.block);
                     } else {
+                        Log.d(TAG, "onPickup: Has parameter, recursive call");
+
                         // This block has a parameter, recursively call onPickup!
                         // oh yeah don't forget to offset the x
-                        field.block.onPickup(x + x_before, y, text_paint);
+                        Pair<Boolean, SketchwareBlock> pickup_block = field.block.onPickup(x - x_before, y, text_paint);
+
+                        // Should we remove this block?
+                        if (pickup_block.first) {
+                            // Yep, we should, for now, it will just be a text, nothing fancy
+                            // TODO: 3/17/21 Make this FANCY
+                            parameters.set(index, new SketchwareField("Picked Up"));
+
+                            parsed_format.get(index)[3] = new SketchwareField("Picked Up");
+                        }
+
+                        return new Pair<>(false, pickup_block.second);
                     }
                 } else {
+                    Log.d(TAG, "onPickup: Value parameter, self");
+
                     // Oop, this is just a value parameter, just pick ourself, i guess
-                    return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
+                    return new Pair<>(true, this);
                 }
             }
-
-            x_total += field.getWidth(text_paint) + 5;
 
             index++;
         }
 
         // Wat, nothing?
+        Log.d(TAG, "onPickup: Weird, nothing");
+
         // This shouldn't happen but meh, let's just pick ourself
-        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
+        return new Pair<>(true, this);
     }
 
     /**

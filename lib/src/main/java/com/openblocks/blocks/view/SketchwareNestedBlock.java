@@ -56,9 +56,11 @@ public class SketchwareNestedBlock extends SketchwareBlock {
     }
 
     @Override
-    public Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
+    public Pair<Boolean, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
         int y_start = getBlockHeight(text_paint);
 
+        // TODO: 3/17/21 optimize this
+        
         int index = 0;
         for (SketchwareBlock block : blocks) {
 
@@ -66,7 +68,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
             if (block.getBounds(0, y_start, text_paint).contains(x - indent_width, y)) {
                 // Ohk, remove and return the block
                 blocks.remove(index);
-                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_OTHER_BLOCK, block);
+                return new Pair<>(true, block);
             }
 
             y_start += block.getHeight(text_paint);
@@ -75,7 +77,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         // Ight, nothing, return our self instead
         // TODO: Check each blocks so if the user picked up the white part inside our bounds we don't pickup
-        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
+        return new Pair<>(true, this);
     }
 
     @Override

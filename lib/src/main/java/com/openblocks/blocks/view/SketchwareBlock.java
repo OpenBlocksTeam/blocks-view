@@ -470,20 +470,24 @@ public class SketchwareBlock {
             }
         }
 
-        // Should the blocks overlap each other?
-        if (!is_overlapping || is_return_block) {
-            // Ohk no, draw the outset with shadow and the top block's outset
+        // If this is a return block, don't draw the outset
+        // return blocks doesn't have an outset cheems
+        if (!is_return_block) {
+            // Should the blocks overlap each other?
+            if (!is_overlapping) {
+                // Ohk no, draw the outset with shadow and the top block's outset
 
-            // Draw the outset
-            DrawHelper.drawRectSimpleOutsideShadow(canvas, left + block_outset_left_margin, top, block_outset_width, height + block_outset_height + block_outset_height, shadow_height, color);
+                // Draw the outset
+                DrawHelper.drawRectSimpleOutsideShadow(canvas, left + block_outset_left_margin, top, block_outset_width, height + block_outset_height + block_outset_height, shadow_height, color);
 
-            // Draw the top block's outset
-            DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, DrawHelper.manipulateColor(previous_block_color, 0.8f));
-        } else {
-            // Yes, just draw the top block's outset
+                // Draw the top block's outset
+                DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, DrawHelper.manipulateColor(previous_block_color, 0.8f));
+            } else {
+                // Yes, just draw the top block's outset
 
-            // Draw the top block's outset
-            DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, previous_block_color);
+                // Draw the top block's outset
+                DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, previous_block_color);
+            }
         }
 
         // Draw the block's text and parameters

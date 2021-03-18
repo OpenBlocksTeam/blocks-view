@@ -445,7 +445,7 @@ public class SketchwareBlock {
 
         // FIXME: 3/8/21 Height shouldn't be added with the shadow height
         // Draw the block body
-        if (!is_return_block) {
+        if (is_return_block) {
             switch (return_type) {
                 case STRING:
                     DrawHelper.drawRect(canvas, left, top, block_width, height + shadow_height, color);

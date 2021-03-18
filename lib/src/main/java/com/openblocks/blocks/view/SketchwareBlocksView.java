@@ -288,9 +288,9 @@ public class SketchwareBlocksView extends View {
         get_id_recursive.add(new SketchwareField("Hello World"));
 
         ArrayList<SketchwareField> recursive_fields_root = new ArrayList<>();
-        recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF)));
+        recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF), SketchwareField.Type.INTEGER));
 
-        value_of_recursive.add(new SketchwareField(new SketchwareBlock("value of %s", "10", -1, recursive_fields_root, 0xFF15D807)));
+        value_of_recursive.add(new SketchwareField(new SketchwareBlock("value of %s", "10", -1, recursive_fields_root, 0xFF15D807), SketchwareField.Type.BOOLEAN));
 
         event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
 

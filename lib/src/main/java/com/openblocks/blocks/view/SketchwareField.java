@@ -41,9 +41,10 @@ public class SketchwareField {
      * This will initialize this class as a SketchwareBlock (return value block)
      * @param block The block
      */
-    public SketchwareField(SketchwareBlock block) {
+    public SketchwareField(SketchwareBlock block, Type return_type) {
         this.block = block;
         this.block.is_return_block = true;
+        this.block.return_type = return_type;
         is_block = true;
         init();
     }

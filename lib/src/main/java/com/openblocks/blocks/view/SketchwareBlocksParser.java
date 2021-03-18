@@ -161,7 +161,10 @@ public class SketchwareBlocksParser {
                                         /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
                                         /* Parameter:        */ parseParameter(parameter_block, block_reference),
                                         /* Block color:      */ block.getInt("color")
-                                )
+                                ),
+                                // TODO: 3/18/21 This needs a database of blocks, we can't determine a block's return type with the block information
+                                //               what if we check the parameter wildcard to determine it?
+                                SketchwareField.Type.STRING
                         )
                 );
             } else {

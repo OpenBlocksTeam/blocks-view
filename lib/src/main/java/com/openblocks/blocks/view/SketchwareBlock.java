@@ -46,11 +46,11 @@ public class SketchwareBlock {
 
     int text_padding = 10;
 
-    // Indicates if this block is a parameter or not
-    boolean is_parameter;
+    // Indicates if this block returns a value or not
+    boolean is_return_block;
 
-    // Indicates this block's parameter type (if is_parameter is true)
-    SketchwareField.Type parameter_type;
+    // Indicates this block's return type (if is_return_block is true)
+    SketchwareField.Type return_type;
 
     // Will be used in the overloaded draw function
     public int default_height = 60; // The same as in SketchwareBlocksView
@@ -86,8 +86,8 @@ public class SketchwareBlock {
         this.next_block = next_block;
         this.parameters = parameters;
         this.color = color;
-        this.is_parameter = is_parameter;
-        this.parameter_type = parameter_type;
+        this.is_return_block = is_parameter;
+        this.return_type = parameter_type;
         this.setFormat(format);
 
         // next_block is -1 if there is nothing after it
@@ -116,7 +116,7 @@ public class SketchwareBlock {
      * @param parameters The parameters of the block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newBlockWithParameter(String text, int color, SketchwareField... parameters) {
+    public static SketchwareBlock newBlockWithParameters(String text, int color, SketchwareField... parameters) {
         return new SketchwareBlock(text, new ArrayList<>(Arrays.asList(parameters)), color);
     }
 
@@ -124,23 +124,23 @@ public class SketchwareBlock {
      * Create a parameter block
      * @param text The text of the block
      * @param color The color of the block
-     * @param parameter_type The return type of the block
+     * @param return_type The return type of the block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newParameterBlock(String text, int color, SketchwareField.Type parameter_type) {
-        return new SketchwareBlock(text, "1", 2, new ArrayList<>(), color, true, parameter_type);
+    public static SketchwareBlock newReturnBlock(String text, int color, SketchwareField.Type return_type) {
+        return new SketchwareBlock(text, "1", 2, new ArrayList<>(), color, true, return_type);
     }
 
     /**
      * Create a parameter block that has parameters in it
      * @param text The text of the block
      * @param color The color of the block
-     * @param parameter_type The return type of the block
+     * @param return_type The return type of the block
      * @param parameters The parameters for this block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newParamBlockWithParams(String text, int color, SketchwareField.Type parameter_type, SketchwareField... parameters) {
-        return new SketchwareBlock(text, "1", 2, new ArrayList<>(Arrays.asList(parameters)), color, true, parameter_type);
+    public static SketchwareBlock newReturnBlockWithParams(String text, int color, SketchwareField.Type return_type, SketchwareField... parameters) {
+        return new SketchwareBlock(text, "1", 2, new ArrayList<>(Arrays.asList(parameters)), color, true, return_type);
     }
     // Factory constructors ========================================================================
 
@@ -226,7 +226,7 @@ public class SketchwareBlock {
 
     public int getHeight(Paint text_paint) {
         // Return the default height if this is a parameter and it has no other parameters
-        if (is_parameter && parameters.size() == 0)
+        if (is_return_block && parameters.size() == 0)
             return default_height;
 
         // If there aren't any parameters, and this isn't a parameter block, this means that this
@@ -445,14 +445,34 @@ public class SketchwareBlock {
 
         // FIXME: 3/8/21 Height shouldn't be added with the shadow height
         // Draw the block body
-        if (is_round) {
-            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, round_radius, color);
+        if (!is_return_block) {
+            switch (return_type) {
+                case STRING:
+                    DrawHelper.drawRect(canvas, left, top, block_width, height + shadow_height, color);
+                    break;
+
+                case INTEGER:
+                    DrawHelper.drawIntegerField(canvas, left, top, block_width, height + shadow_height, color);
+                    break;
+
+                case BOOLEAN:
+                    DrawHelper.drawBooleanField(canvas, left, top, block_width, height + shadow_height, color);
+                    break;
+
+                case OTHER:
+                    DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, color);
+                    break;
+            }
         } else {
-            DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, color);
+            if (is_round) {
+                DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, round_radius, color);
+            } else {
+                DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, block_width, height + shadow_height, shadow_height, color);
+            }
         }
 
         // Should the blocks overlap each other?
-        if (!is_overlapping || is_parameter) {
+        if (!is_overlapping || is_return_block) {
             // Ohk no, draw the outset with shadow and the top block's outset
 
             // Draw the outset
@@ -491,7 +511,7 @@ public class SketchwareBlock {
             if (shadow_height == 0)
                 shadow_height = text_padding;
 
-            field.draw(context, canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height);
+            field.draw(context, canvas, x, top + text_padding, text_paint, height - text_padding - shadow_height, DrawHelper.manipulateColor(color, .8f));
 
             x += field.getWidth(text_paint) + 5;
         }
@@ -514,7 +534,7 @@ public class SketchwareBlock {
                 ", next_block=" + next_block +
                 ", color=" + color +
                 ", text_padding=" + text_padding +
-                ", is_parameter=" + is_parameter +
+                ", is_parameter=" + is_return_block +
                 ", default_height=" + default_height +
                 '}';
     }
@@ -529,17 +549,17 @@ public class SketchwareBlock {
                 next_block == that.next_block &&
                 color == that.color &&
                 text_padding == that.text_padding &&
-                is_parameter == that.is_parameter &&
+                is_return_block == that.is_return_block &&
                 default_height == that.default_height &&
                 format.equals(that.format) &&
                 parsed_format.equals(that.parsed_format) &&
                 id.equals(that.id) &&
                 parameters.equals(that.parameters) &&
-                parameter_type == that.parameter_type;
+                return_type == that.return_type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(format, parsed_format, id, parameters, is_bottom, next_block, color, text_padding, is_parameter, parameter_type, default_height);
+        return Objects.hash(format, parsed_format, id, parameters, is_bottom, next_block, color, text_padding, is_return_block, return_type, default_height);
     }
 }

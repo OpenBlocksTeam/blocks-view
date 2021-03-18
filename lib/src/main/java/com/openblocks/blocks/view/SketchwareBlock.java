@@ -320,9 +320,9 @@ public class SketchwareBlock {
 
                         // Nop it doesn't have any, means we can pick this parameter!
                         // Remove the field from parameters
-                        parameters.set(index, new SketchwareField("Picked Up"));
+                        parameters.set(index, new SketchwareField("", field.block.return_type, field.other_type));
 
-                        parsed_format.get(index)[3] = new SketchwareField("Picked Up");
+                        parsed_format.get(index)[3] = new SketchwareField("", field.block.return_type, field.other_type);
 
                         // Then set the block
                         return new Pair<>(false, field.block);
@@ -336,10 +336,9 @@ public class SketchwareBlock {
                         // Should we remove this block?
                         if (pickup_block.first) {
                             // Yep, we should, for now, it will just be a text, nothing fancy
-                            // TODO: 3/17/21 Make this FANCY
-                            parameters.set(index, new SketchwareField("Picked Up"));
+                            parameters.set(index, new SketchwareField("", field.block.return_type, field.other_type));
 
-                            parsed_format.get(index)[3] = new SketchwareField("Picked Up");
+                            parsed_format.get(index)[3] = new SketchwareField("", field.block.return_type, field.other_type);
                         }
 
                         return new Pair<>(false, pickup_block.second);

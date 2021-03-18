@@ -395,8 +395,14 @@ public class SketchwareBlocksView extends View {
                     unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
                     unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
 
-                    // Predict the drop location of where the block should be dropped to
-                    drop_location = predictDropLocation();
+                    // Check if this block is a return block
+                    // Return block cannot be dropped into the block collection, they can only be dropped into a parameter
+                    if (!unconnected_blocks.get(picked_up_block).second.is_return_block) {
+                        // Predict the drop location of where the block should be dropped to
+                        drop_location = predictDropLocation();
+                    } else {
+                        // TODO: 3/18/21 this
+                    }
                 } else {
                     // so the user is casually moving the view
 

@@ -91,7 +91,7 @@ public class SketchwareField {
 
         other_paint.setStyle(Paint.Style.FILL);
         other_paint.setColor(0xFFFFFFFF);
-        other_paint.setTextSize(14f);
+        other_paint.setTextSize(18f);
         other_paint.setAntiAlias(true);
     }
 
@@ -196,7 +196,7 @@ public class SketchwareField {
                     break;
 
                 case OTHER:
-                    DrawHelper.drawRect(canvas, left, top + parent_block_height / 2 - height / 2, width, height + text_padding, parent_block_dark_color);
+                    DrawHelper.drawRect(canvas, left, top + (parent_block_height / 2 - height / 2) + text_padding / 2, width, height, parent_block_dark_color);
 
                     canvas.drawText(other_type + ": " + value, left + text_padding, middle + text_padding, other_paint);
                     break;

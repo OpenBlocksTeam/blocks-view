@@ -730,6 +730,15 @@ public class SketchwareBlocksView extends View {
                 ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
+            // To optimize the drawing, check if this block is actually visible to the user
+            if (previous_top_position + previous_block_height < 0) {
+                // no, this block isn't visible, skip this
+                continue;
+            } else if (previous_top_position + previous_block_height > getHeight()) {
+                // this block is too far down, skip this
+                continue;
+            }
+
             // Oh yeah add the top_position to our top_positions array list
             top_positions.add(top_position);
 

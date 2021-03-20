@@ -121,7 +121,7 @@ public class SketchwareField {
             estimate_width += height / 2;
         }
 
-        if (type == Type.BOOLEAN) {
+        if (type == Type.BOOLEAN && is_block) {
             estimate_width += height / 2;
         }
 

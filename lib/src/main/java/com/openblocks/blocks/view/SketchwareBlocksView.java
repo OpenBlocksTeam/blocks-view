@@ -145,7 +145,7 @@ public class SketchwareBlocksView extends View {
 
 
 
-    // Variable setters ============================================================================
+    // Useful functions ============================================================================
     /**
      * Set the event (collection of blocks) that is to be displayed
      * @param event The event / collection of blocks
@@ -157,7 +157,28 @@ public class SketchwareBlocksView extends View {
 
         initialize(this.context, null);
     }
-    // Variable setters ============================================================================
+
+    /**
+     * This method adds a floating block into the editor
+     * @param block The block that is to be added
+     * @param x The x position
+     * @param y The y position
+     */
+    public void addBlock(SketchwareBlock block, int x, int y) {
+        unconnected_blocks.add(new Pair<>(
+                new Vector2D(x, y),
+                block
+        ));
+    }
+
+    /**
+     * This function checks if the user is dragging a block
+     * @return Is the user dragging a block?
+     */
+    public boolean isDraggingBlock() {
+        return picked_up_block != -1;
+    }
+    // Useful functions ============================================================================
 
 
 

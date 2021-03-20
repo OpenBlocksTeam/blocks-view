@@ -3,9 +3,11 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.Objects;
 
 public class SketchwareField {
 
@@ -25,22 +27,24 @@ public class SketchwareField {
     public SketchwareBlock block;
     public Type type;
 
+    // Indicates the return type if type is OTHER
+    public String other_type;
+
     Paint text_paint = new Paint();
     Paint rect_paint = new Paint();
+    Paint other_paint = new Paint(); // This paint is used to draw text if type is OTHER
 
     // This is the padding around the field
     int text_padding = 10;
-
-    // An extra padding for fields with the integer type
-    int integer_padding = 10;
 
     /**
      * This will initialize this class as a SketchwareBlock (return value block)
      * @param block The block
      */
-    public SketchwareField(SketchwareBlock block) {
+    public SketchwareField(SketchwareBlock block, Type return_type) {
         this.block = block;
-        this.block.is_parameter = true;
+        this.block.is_return_block = true;
+        this.block.return_type = return_type;
         is_block = true;
         init();
     }
@@ -60,10 +64,13 @@ public class SketchwareField {
      * This constructor initializes this class as a fixed value
      * @param value The value
      * @param type The type of this field
+     * @param other_type The custom type if {@param type} is OTHER, set to null if otherwise
      */
-    public SketchwareField(String value, Type type) {
+    public SketchwareField(String value, Type type, @Nullable String other_type) {
         this.value = value;
         this.type = type;
+        this.other_type = other_type;
+
         is_block = false;
         init();
     }
@@ -81,6 +88,11 @@ public class SketchwareField {
         rect_paint.setStyle(Paint.Style.FILL);
         rect_paint.setColor(0xFFFFFFFF);
         rect_paint.setAntiAlias(true);
+
+        other_paint.setStyle(Paint.Style.FILL);
+        other_paint.setColor(0xFFFFFFFF);
+        other_paint.setTextSize(18f);
+        other_paint.setAntiAlias(true);
     }
 
     /**
@@ -89,20 +101,31 @@ public class SketchwareField {
      * @return The width of this field
      */
     public int getWidth(Paint block_text_paint) {
-        // Padding for the text should only be about 5
-        if (!is_block) {
-            // If it's boolean, we don't need the padding, just measure half of the parent's height
-            int estimate_width = (int) text_paint.measureText(value) + (type == Type.BOOLEAN ? getHeight(block_text_paint) / 2 : text_padding) * 2;
+        int height = getHeight(block_text_paint);
 
-            // Minimal width for Integer fields are 64
-            if (type == Type.INTEGER && estimate_width <= 64) {
-                return 64;
-            }
+        int initial_width = is_block ? block.getWidth(block_text_paint) : (int) text_paint.measureText(value);
 
-            return estimate_width;
-        } else {
-            return block.getWidth(block_text_paint);
+        if (type == Type.OTHER) {
+            return (int) other_paint.measureText(other_type + ": " + value) + text_padding * 2;
         }
+
+        // If it's boolean, we don't need the padding, just measure half of the parent's height
+        int estimate_width = initial_width + (type == Type.BOOLEAN ? getHeight(block_text_paint) / 2 : text_padding) * 2;
+
+        // Minimal width for Integer fields are 64
+        if (type == Type.INTEGER && estimate_width <= 64) {
+            return 64;
+        }
+
+        if (type == Type.INTEGER) {
+            estimate_width += height / 2;
+        }
+
+        if (type == Type.BOOLEAN && is_block) {
+            estimate_width += height / 2;
+        }
+
+        return estimate_width;
     }
 
     /**
@@ -112,7 +135,14 @@ public class SketchwareField {
      */
     public int getHeight(Paint block_text_paint) {
         if (!is_block) {
-            Paint.FontMetrics fm = text_paint.getFontMetrics();
+            Paint.FontMetrics fm;
+
+            if (type == Type.OTHER) {
+                fm = other_paint.getFontMetrics();
+            } else {
+                fm = text_paint.getFontMetrics();
+            }
+
             float height = fm.descent - fm.ascent;
 
             return (int) height + text_padding * 2;
@@ -131,7 +161,7 @@ public class SketchwareField {
      * @param block_text_paint The paint used for blocks, if you're sure that this isn't a block field, set this to null
      * @param parent_block_height The parent's block height, NOT THE BLOCK ON TOP OF THE FIELD
      */
-    public void draw(Context context, Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height) {
+    public void draw(Context context, Canvas canvas, int left, int top, Paint block_text_paint, int parent_block_height, int parent_block_dark_color) {
         // NOTE: top has been applied with the padding, you don't need to add padding yourself
 
         if (!is_block) {
@@ -139,6 +169,7 @@ public class SketchwareField {
             int half_of_parent_height = parent_block_height / 2;
             int middle = top + half_of_parent_height;
 
+            int height = getHeight(block_text_paint);
             int width = getWidth(block_text_paint);
 
             switch (type) {
@@ -165,11 +196,14 @@ public class SketchwareField {
                     break;
 
                 case OTHER:
+                    DrawHelper.drawRect(canvas, left, top + (parent_block_height / 2 - height / 2) + text_padding / 2, width, height, parent_block_dark_color);
+
+                    canvas.drawText(other_type + ": " + value, left + text_padding, middle + text_padding, other_paint);
                     break;
             }
         } else {
             // Well, draw the block as the parameter, I guess
-            block.draw(context, canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, text_padding, false, 0x00000000);
+            block.draw(context, canvas, rect_paint, block_text_paint, top, left, 0, 0, 0, text_padding, false, 0x00000000, false, 0);
             //                                                                                                                        ^
                                                                                        /* we're setting the outset_height to add a padding to the text, this shouldn't be a thing TODO */
         }
@@ -186,5 +220,25 @@ public class SketchwareField {
                 ", rect_paint=" + rect_paint +
                 ", padding=" + text_padding +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SketchwareField that = (SketchwareField) o;
+        return is_block == that.is_block &&
+                text_padding == that.text_padding &&
+                value.equals(that.value) &&
+                block.equals(that.block) &&
+                type == that.type &&
+                text_paint.equals(that.text_paint) &&
+                rect_paint.equals(that.rect_paint);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(is_block, value, block, type, text_paint, rect_paint, text_padding);
     }
 }

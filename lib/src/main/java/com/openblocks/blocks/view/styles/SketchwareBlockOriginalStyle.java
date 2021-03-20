@@ -19,8 +19,8 @@ public class SketchwareBlockOriginalStyle extends SketchwareBlock {
     }
 
     @Override
-    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
-        // super.draw(canvas, rect_paint, text_paint, top, left, height, shadow_height, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int top_block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color, boolean is_round, int round_radius) {
+        // super.draw(context, canvas, rect_paint, text_paint, top, left, height, shadow_height, block_outset_left_margin, top_block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color, is_round, round_radius);
 
         NinePatchDrawable sketchwareBlock = (NinePatchDrawable) ResourcesCompat.getDrawable(context.getResources(), R.drawable.sketchware_block, context.getTheme());
         if (sketchwareBlock != null) {

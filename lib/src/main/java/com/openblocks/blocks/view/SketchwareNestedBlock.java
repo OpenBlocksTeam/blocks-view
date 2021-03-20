@@ -15,7 +15,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
     public ArrayList<SketchwareBlock> blocks;
 
-    public int block_bottom_height = 40;
+    public int block_bottom_height = 50;
     public int indent_width = 40;
 
     public int bottom_margin = 20;
@@ -38,7 +38,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
     @Override
     public int getHeight(Paint text_paint) {
-        return calculateBlockHeights(text_paint) + getBlockHeight(text_paint) + block_bottom_height + bottom_margin;
+        return getBlockHeight(text_paint) + calculateBlockHeights(text_paint) + bottom_margin + block_bottom_height;
     }
 
     public int getBlockHeight(Paint text_paint) {
@@ -56,9 +56,11 @@ public class SketchwareNestedBlock extends SketchwareBlock {
     }
 
     @Override
-    public Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
+    public Pair<Boolean, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
         int y_start = getBlockHeight(text_paint);
 
+        // TODO: 3/17/21 optimize this
+        
         int index = 0;
         for (SketchwareBlock block : blocks) {
 
@@ -66,7 +68,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
             if (block.getBounds(0, y_start, text_paint).contains(x - indent_width, y)) {
                 // Ohk, remove and return the block
                 blocks.remove(index);
-                return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_OTHER_BLOCK, block);
+                return new Pair<>(true, block);
             }
 
             y_start += block.getHeight(text_paint);
@@ -75,21 +77,21 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         // Ight, nothing, return our self instead
         // TODO: Check each blocks so if the user picked up the white part inside our bounds we don't pickup
-        return new Pair<>(SketchwareBlocksView.PickupAction.PICKUP_SELF, null);
+        return new Pair<>(true, this);
     }
 
     @Override
-    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color) {
+    public void draw(Context context, Canvas canvas, Paint rect_paint, Paint text_paint, int top, int left, int height, int shadow_height, int block_outset_left_margin, int top_block_outset_left_margin, int block_outset_width, int block_outset_height, boolean is_overlapping, int previous_block_color, boolean is_round, int round_radius) {
         Paint original_block_paint = new Paint();
         original_block_paint.setColor(rect_paint.getColor());
         original_block_paint.setTextSize(rect_paint.getTextSize());
 
-        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin + indent_width, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color);
+        super.draw(context, canvas, rect_paint, text_paint, top, left, getBlockHeight(text_paint), shadow_height, block_outset_left_margin + indent_width, block_outset_left_margin, block_outset_width, block_outset_height, is_overlapping, previous_block_color, true, round_radius);
 
         int block_outset_left = left + block_outset_left_margin;
 
         // Draw the childes! (similar to SketchwareBlocksView)
-        previous_block_color = color;
+        int childes_previous_block_color = color;
         int block_height = getBlockHeight(text_paint);
         int previous_top_position = top + shadow_height;
         int previous_block_height = block_height - shadow_height;  // Because if not, the first block would get overlapped by the event
@@ -125,35 +127,42 @@ public class SketchwareNestedBlock extends SketchwareBlock {
                             block_outset_width,
                             block_outset_height,
                             is_overlapping,
-                            previous_block_color
+                            childes_previous_block_color,
+                            is_round,
+                            round_radius
                     );
 
-            previous_block_color = current_block.color;
+            childes_previous_block_color = current_block.color;
         }
-
-        Paint extensions_paint = new Paint(rect_paint);
 
         int bottom_block_top_position = top + getHeight(text_paint) + shadow_height - block_bottom_height;
-        int bottom_block_bottom_position = top + getHeight(text_paint);
 
-        // draw the bottom part's shadow
-        extensions_paint.setColor(DrawHelper.manipulateColor(this.color, 0.7f));
-        canvas.drawRect(left, bottom_block_top_position, left + getWidth(text_paint), bottom_block_bottom_position + shadow_height, extensions_paint);
+        if (is_round) {
+            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, bottom_block_top_position, getWidth(text_paint), block_bottom_height, shadow_height, round_radius, color);
 
-        extensions_paint.setColor(this.color);
-        // Then draw the bottom part
-        canvas.drawRect(left, bottom_block_top_position, left + getWidth(text_paint), bottom_block_bottom_position, extensions_paint);
-
-        // Don't forget the outset
-        if (is_overlapping) {
-            canvas.drawRect(block_outset_left, bottom_block_top_position, block_outset_left + block_outset_width, bottom_block_bottom_position + block_outset_height, extensions_paint);
+            // Ok, draw the "indent"
+            DrawHelper.drawRoundRectSimpleOutsideShadow(canvas, left, top, indent_width, getHeight(text_paint) + shadow_height, shadow_height, round_radius, color);
         } else {
-            canvas.drawRect(block_outset_left, bottom_block_top_position, block_outset_left + block_outset_width, bottom_block_bottom_position + block_outset_height, extensions_paint);
-            canvas.drawRect(block_outset_left, bottom_block_top_position, block_outset_left + block_outset_width, bottom_block_bottom_position + block_outset_height - shadow_height, extensions_paint);
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left, bottom_block_top_position, getWidth(text_paint), block_bottom_height, shadow_height, color);
+
+            // Ok, draw the "indent"
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left, top, indent_width, getHeight(text_paint) + shadow_height, shadow_height, color);
         }
 
-        // Ok, draw the "indent"
-        canvas.drawRect(left, top + block_height, left + indent_width, bottom_block_bottom_position, extensions_paint);
+        if (!is_overlapping) {
+            // Ohk no, draw the outset with shadow and the top block's outset
+
+            // Draw the outset
+            DrawHelper.drawRectSimpleOutsideShadow(canvas, left + block_outset_left_margin, top + getHeight(text_paint), block_outset_width, block_outset_height + shadow_height, shadow_height, color);
+
+            // Draw the top block's outset
+            DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, DrawHelper.manipulateColor(previous_block_color, 0.8f));
+        } else {
+            // Yes, just draw the top block's outset
+
+            // Draw the top block's outset
+            DrawHelper.drawRect(canvas, left + top_block_outset_left_margin, top, block_outset_width, block_outset_height, previous_block_color);
+        }
 
         drawParameters(context,canvas, left, top, top + ((getBlockHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), getBlockHeight(text_paint), shadow_height, text_paint);
     }

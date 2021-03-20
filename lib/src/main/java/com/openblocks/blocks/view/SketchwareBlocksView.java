@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Vibrator;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class is the View that should be used inside your layout, Used to display blocks in an event
@@ -58,7 +60,7 @@ public class SketchwareBlocksView extends View {
     int block_height = 60;
     int event_top = 50;
 
-    int nested_bottom_margin = 30;
+    int nested_bottom_margin = 50;
 
     int event_height = 50;
 
@@ -69,6 +71,9 @@ public class SketchwareBlocksView extends View {
     int block_text_color = 0xFFFFFFFF;
 
     boolean is_overlapping = false;
+
+    boolean is_round = true;
+    int round_radius = 10;
 
     // Customizations variables ^ ==================================================================
 
@@ -140,7 +145,7 @@ public class SketchwareBlocksView extends View {
 
 
 
-    // Variable setters ============================================================================
+    // Useful functions ============================================================================
     /**
      * Set the event (collection of blocks) that is to be displayed
      * @param event The event / collection of blocks
@@ -152,7 +157,28 @@ public class SketchwareBlocksView extends View {
 
         initialize(this.context, null);
     }
-    // Variable setters ============================================================================
+
+    /**
+     * This method adds a floating block into the editor
+     * @param block The block that is to be added
+     * @param x The x position
+     * @param y The y position
+     */
+    public void addBlock(SketchwareBlock block, int x, int y) {
+        unconnected_blocks.add(new Pair<>(
+                new Vector2D(x, y),
+                block
+        ));
+    }
+
+    /**
+     * This function checks if the user is dragging a block
+     * @return Is the user dragging a block?
+     */
+    public boolean isDraggingBlock() {
+        return picked_up_block != -1;
+    }
+    // Useful functions ============================================================================
 
 
 
@@ -164,6 +190,9 @@ public class SketchwareBlocksView extends View {
      * @param attrs The attribute set
      */
     private void initialize(Context context, AttributeSet attrs) {
+        // Initialize DrawHelper
+        DrawHelper.initialize();
+
         // Set the context
         this.context = context;
 
@@ -265,12 +294,12 @@ public class SketchwareBlocksView extends View {
         event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE10C0C));
 
         ArrayList<SketchwareField> types_fields = new ArrayList<>();
-        types_fields.add(new SketchwareField("1945", SketchwareField.Type.INTEGER));
+        types_fields.add(new SketchwareField("1945", SketchwareField.Type.INTEGER, null));
 
         event.blocks.add(new SketchwareBlock("Oh yeah, integers %i", types_fields, 0xFFE65319));
 
         ArrayList<SketchwareField> booleans = new ArrayList<>();
-        booleans.add(new SketchwareField("false", SketchwareField.Type.BOOLEAN));
+        booleans.add(new SketchwareField("false", SketchwareField.Type.BOOLEAN, null));
 
         event.blocks.add(new SketchwareBlock("And booleans %b", booleans, 0xFF2115D1));
 
@@ -280,23 +309,30 @@ public class SketchwareBlocksView extends View {
         get_id_recursive.add(new SketchwareField("Hello World"));
 
         ArrayList<SketchwareField> recursive_fields_root = new ArrayList<>();
-        recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF)));
+        recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF), SketchwareField.Type.INTEGER));
 
-        value_of_recursive.add(new SketchwareField(new SketchwareBlock("value of %s", "10", -1, recursive_fields_root, 0xFF15D807)));
+        value_of_recursive.add(new SketchwareField(new SketchwareBlock("Is empty %s", "10", -1, recursive_fields_root, 0xFF15D807), SketchwareField.Type.BOOLEAN));
 
         event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
 
-        event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
-        event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "8", 8, new ArrayList<>(), 0xFFE10C0C));
-
         ArrayList<SketchwareBlock> bloks = new ArrayList<>();
         bloks.add(new SketchwareBlock("Yeah, nested blocks!", "1", 2, new ArrayList<>(), 0xFFE10C0C));
-        bloks.add(new SketchwareBlock("Very cool, right?", "2", -1, new ArrayList<>(), 0xFFE65319));
+        bloks.add(new SketchwareBlock("Very cool, right?", "2", 3, new ArrayList<>(), 0xFFE65319));
+
+        ArrayList<SketchwareField> imageview_set_image = new ArrayList<>();
+
+        imageview_set_image.add(new SketchwareField("imageView1", SketchwareField.Type.OTHER, "ImageView"));
+        imageview_set_image.add(new SketchwareField("image_file", SketchwareField.Type.OTHER, "File"));
+
+        bloks.add(new SketchwareBlock("%m.img Set image to PNG %o.file", "3", -1, imageview_set_image, 0xFFE65319));
 
         ArrayList<SketchwareField> a = new ArrayList<>();
         a.add(new SketchwareField("oh god"));
 
-        event.blocks.add(new SketchwareNestedBlock("Did i say nested? %a", "9", 10, a, 0xFF21167B, bloks)); //0xFFE10C0C
+        event.blocks.add(new SketchwareNestedBlock("Did i say nested? %a", "7", 8, a, 0xFF21167B, bloks)); //0xFFE10C0C
+
+        event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "8", 9, new ArrayList<>(), 0xFF2115D1));
+        event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "9", 10, new ArrayList<>(), 0xFFE10C0C));
 
         event.blocks.add(new SketchwareBlock("Finish Activity", "10", -1, new ArrayList<>(), 0xFF1173E4));
     }
@@ -387,8 +423,14 @@ public class SketchwareBlocksView extends View {
                     unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
                     unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
 
-                    // Predict the drop location of where the block should be dropped to
-                    drop_location = predictDropLocation();
+                    // Check if this block is a return block
+                    // Return block cannot be dropped into the block collection, they can only be dropped into a parameter
+                    if (!unconnected_blocks.get(picked_up_block).second.is_return_block) {
+                        // Predict the drop location of where the block should be dropped to
+                        drop_location = predictDropLocation();
+                    } else {
+                        // TODO: 3/18/21 this
+                    }
                 } else {
                     // so the user is casually moving the view
 
@@ -471,7 +513,7 @@ public class SketchwareBlocksView extends View {
                     picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
             ) {
                 draw_line_at_pos = point;
-                Log.d(TAG, "predictDropLocation: top: " + point);
+                // Log.d(TAG, "predictDropLocation: top: " + point);
                 return point;
             }
 
@@ -516,6 +558,8 @@ public class SketchwareBlocksView extends View {
             index++;
         }
 
+        Log.d(TAG, "pickup_block: Not picked, picking blocks");
+
         // Looks like it hasn't been dragged yet, let's just check each blocks
         // This code is almost the same as in the onDraw() method
         int previous_top_position = event_height;  // Start with event_offset
@@ -523,7 +567,6 @@ public class SketchwareBlocksView extends View {
 
         for (int i = 0; i < event.blocks.size(); i++) {
             SketchwareBlock current_block = event.blocks.get(i);
-            current_block.default_height = block_height;
 
             int top_position;
 
@@ -543,7 +586,7 @@ public class SketchwareBlocksView extends View {
                 ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
-            RectF bounds = new RectF(
+            Rect bounds = new Rect(
                     left_position,
                     top_position, // TODO: IMPLEMENT DRAGGING BLOCKS INSIDE A NESTED BLOCK, AND ALSO PARAMETER BLOCKS
                     left_position + current_block.getWidth(text_paint),
@@ -551,11 +594,29 @@ public class SketchwareBlocksView extends View {
             );
 
             if (bounds.contains(x, y)) {
-                // FIXME: 3/6/21 This doesn't work
-
+                Log.d(TAG, "pickup_block: x: " + x + " y: " + y);
+                Log.d(TAG, "pickup_block: block bounds: " + bounds);
+                Log.d(TAG, "pickup_block: Inside the block " + top_position);
+                
                 // Ohk, call onPickup of the block
-                Pair<SketchwareBlocksView.PickupAction, SketchwareBlock> pickup = event.blocks.get(i).onPickup(x, y, text_paint);
+                Pair<Boolean, SketchwareBlock> pickup = event.blocks.get(i).onPickup(x - left_position, y - top_position, text_paint);
 
+                // The first pair is to determine if we should remove the block or not?
+                if (pickup.first) {
+                    // Yup, remove it
+
+                    try {
+                        event.blocks.remove(pickup.second);
+                    } catch (Exception ignored) { }
+                }
+
+                // Add it to the unconnected blocks (picking it up)
+                unconnected_blocks.add(0, new Pair<>(new Vector2D(x - left_position, y - event_top), pickup.second));
+
+                // And returning it's position
+                return 0;
+
+                /*
                 switch (pickup.first) {
                     case PICKUP_SELF:
                         Log.d(TAG, "pickup_block: self");
@@ -581,13 +642,16 @@ public class SketchwareBlocksView extends View {
                         // Return the position of this parameter of unconnected_blocks
                         return 0;
                     case PICKUP_NONE:
+                        Log.d(TAG, "pickup_block: Pickup none");
                         // Nothing
                         break;
                 }
+                 */
             }
         }
 
         // Ok, this guy is just clicking nothing
+        Log.d(TAG, "pickup_block: meh, nothing");
         return -1;
     }
     // Pickup, drop blocks utilities ===============================================================
@@ -654,6 +718,12 @@ public class SketchwareBlocksView extends View {
         int previous_top_position = event_height;  // Start with event_offset
         int previous_block_height = event_top;  // Because if not, the first block would get overlapped by the event
 
+        // Are we overlapping?
+        if (is_overlapping) {
+            // If yes, then increase the top position, as the event can overlap our first block
+            previous_top_position += block_outset_height;
+        }
+
         // Loop per each block
         for (int i = 0; i < event.blocks.size(); i++) {
 
@@ -681,6 +751,15 @@ public class SketchwareBlocksView extends View {
                 ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
+            // To optimize the drawing, check if this block is actually visible to the user
+            if (previous_top_position + previous_block_height < 0) {
+                // no, this block isn't visible, skip this
+                continue;
+            } else if (previous_top_position + previous_block_height > getHeight()) {
+                // this block is too far down, skip this
+                continue;
+            }
+
             // Oh yeah add the top_position to our top_positions array list
             top_positions.add(top_position);
 
@@ -698,7 +777,9 @@ public class SketchwareBlocksView extends View {
                         block_outset_width,
                         block_outset_height,
                         is_overlapping,
-                        previous_block_color
+                        previous_block_color,
+                        is_round,
+                        round_radius
                 );
 
             previous_block_color = current_block.color;
@@ -716,7 +797,9 @@ public class SketchwareBlocksView extends View {
                 block_outset_width,
                 shadow_height,
                 rect_paint,
-                text_paint
+                text_paint,
+                is_round,
+                round_radius
         );
 
 
@@ -757,7 +840,9 @@ public class SketchwareBlocksView extends View {
                     block_outset_width,
                     block_outset_height,
                     is_overlapping,
-                    0x00000000
+                    0x00000000,
+                    is_round,
+                    round_radius
             );
 
             index++;
@@ -787,23 +872,6 @@ public class SketchwareBlocksView extends View {
         protected Vector2D clone() {
             return new Vector2D(this.x, this.y);
         }
-    }
-
-    /**
-     * This enum is used to indicate what should we pick up? ourself or a parameter of ourself?
-     */
-    public static enum PickupAction {
-        PICKUP_SELF,
-        PICKUP_OTHER_BLOCK,
-        PICKUP_NONE
-    }
-
-    /**
-     * This enum is used to indicate what should we drop to? to a block? or to a parameter
-     */
-    public static enum DropAction {
-        DROP_SELF,
-        DROP_PARAMETER
     }
     // Utility classes =============================================================================
 }

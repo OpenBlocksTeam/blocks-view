@@ -291,8 +291,9 @@ public class SketchwareBlocksView extends View {
         recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF), SketchwareField.Type.INTEGER));
 
         value_of_recursive.add(new SketchwareField(new SketchwareBlock("value of %s", "10", -1, recursive_fields_root, 0xFF15D807), SketchwareField.Type.BOOLEAN));
+        value_of_recursive.add(new SketchwareField("", SketchwareField.Type.OTHER, "ImageView"));
 
-        event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
+        event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view %p", "6", 7, value_of_recursive, 0xFFE65319));
 
         event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "7", 8, new ArrayList<>(), 0xFF2115D1));
         event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "8", 8, new ArrayList<>(), 0xFFE10C0C));

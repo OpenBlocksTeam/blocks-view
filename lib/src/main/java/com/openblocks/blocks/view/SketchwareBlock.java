@@ -442,6 +442,8 @@ public class SketchwareBlock {
         // int block_width = (int) text_paint.measureText(format) + 20;
         int block_width = getWidth(text_paint);
 
+        int left_parameter = left;
+
         // FIXME: 3/8/21 Height shouldn't be added with the shadow height
         // Draw the block body
         if (is_return_block) {
@@ -451,11 +453,15 @@ public class SketchwareBlock {
                     break;
 
                 case INTEGER:
-                    DrawHelper.drawIntegerField(canvas, left, top, block_width, height + shadow_height, color);
+                    DrawHelper.drawIntegerField(canvas, left, top, block_width + height / 5, height + shadow_height, color);
+
+                    left_parameter += 5;
                     break;
 
                 case BOOLEAN:
-                    DrawHelper.drawBooleanField(canvas, left, top, block_width, height + shadow_height, color);
+                    DrawHelper.drawBooleanField(canvas, left, top, block_width + height / 5, height + shadow_height, color);
+
+                    left_parameter += height / 5;
                     break;
 
                 case OTHER:
@@ -491,7 +497,7 @@ public class SketchwareBlock {
         }
 
         // Draw the block's text and parameters
-        drawParameters(context, canvas, left, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), height, shadow_height, text_paint);
+        drawParameters(context, canvas, left_parameter, top, top + ((getHeight(text_paint) + shadow_height + block_outset_height + text_padding) / 2), height, shadow_height, text_paint);
     }
 
     public final void drawParameters(Context context, Canvas canvas, int left, int top, int block_text_location, int height, int shadow_height, Paint text_paint) {

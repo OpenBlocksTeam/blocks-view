@@ -90,7 +90,7 @@ public class SketchwareField {
         rect_paint.setAntiAlias(true);
 
         other_paint.setStyle(Paint.Style.FILL);
-        other_paint.setColor(0xFF000000);
+        other_paint.setColor(0xFFFFFFFF);
         other_paint.setTextSize(14f);
         other_paint.setAntiAlias(true);
     }
@@ -101,20 +101,31 @@ public class SketchwareField {
      * @return The width of this field
      */
     public int getWidth(Paint block_text_paint) {
-        // Padding for the text should only be about 5
-        if (!is_block) {
-            // If it's boolean, we don't need the padding, just measure half of the parent's height
-            int estimate_width = (int) text_paint.measureText(value) + (type == Type.BOOLEAN ? getHeight(block_text_paint) / 2 : text_padding) * 2;
+        int height = getHeight(block_text_paint);
 
-            // Minimal width for Integer fields are 64
-            if (type == Type.INTEGER && estimate_width <= 64) {
-                return 64;
-            }
+        int initial_width = is_block ? block.getWidth(block_text_paint) : (int) text_paint.measureText(value);
 
-            return estimate_width;
-        } else {
-            return block.getWidth(block_text_paint);
+        if (type == Type.OTHER) {
+            return (int) other_paint.measureText(other_type + ": " + value) + text_padding * 2;
         }
+
+        // If it's boolean, we don't need the padding, just measure half of the parent's height
+        int estimate_width = initial_width + (type == Type.BOOLEAN ? getHeight(block_text_paint) / 2 : text_padding) * 2;
+
+        // Minimal width for Integer fields are 64
+        if (type == Type.INTEGER && estimate_width <= 64) {
+            return 64;
+        }
+
+        if (type == Type.INTEGER) {
+            estimate_width += height / 2;
+        }
+
+        if (type == Type.BOOLEAN) {
+            estimate_width += height / 2;
+        }
+
+        return estimate_width;
     }
 
     /**
@@ -158,6 +169,7 @@ public class SketchwareField {
             int half_of_parent_height = parent_block_height / 2;
             int middle = top + half_of_parent_height;
 
+            int height = getHeight(block_text_paint);
             int width = getWidth(block_text_paint);
 
             switch (type) {
@@ -184,9 +196,9 @@ public class SketchwareField {
                     break;
 
                 case OTHER:
-                    DrawHelper.drawRect(canvas, left, top, left + width, bottom, parent_block_dark_color);
+                    DrawHelper.drawRect(canvas, left, top + parent_block_height / 2 - height / 2, width, height + text_padding, parent_block_dark_color);
 
-                    canvas.drawText(other_type + ":", left + half_of_parent_height, middle + text_padding, other_paint);
+                    canvas.drawText(other_type + ": " + value, left + text_padding, middle + text_padding, other_paint);
                     break;
             }
         } else {

@@ -16,12 +16,12 @@ import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 /**
  * This class is the View that should be used inside your layout, Used to display blocks in an event
@@ -104,7 +104,7 @@ public class SketchwareBlocksView extends View {
     int unconnected_left_offset = 0;
 
     /** The index of the block we picked inside {@link #unconnected_blocks} */
-    int picked_up_block = -1;
+    int picked_up_block_index = -1;
 
     /** This array list is used to store unconnected blocks with its real (not modified by movement) coordinates
      *  then those real coordinates will be added with {@link #unconnected_left_offset} and {@link #unconnected_top_offset}
@@ -153,7 +153,7 @@ public class SketchwareBlocksView extends View {
     public void setEvent(SketchwareEvent event) {
         this.event = (SketchwareEvent) event.clone();
         unconnected_blocks.clear();
-        picked_up_block = -1;
+        picked_up_block_index = -1;
 
         initialize(this.context, null);
     }
@@ -176,7 +176,7 @@ public class SketchwareBlocksView extends View {
      * @return Is the user dragging a block?
      */
     public boolean isDraggingBlock() {
-        return picked_up_block != -1;
+        return picked_up_block_index != -1;
     }
     // Useful functions ============================================================================
 
@@ -240,6 +240,26 @@ public class SketchwareBlocksView extends View {
         // shadow_paint is used to draw the shadow when we picked up a block
         shadow_paint = new Paint();
         shadow_paint.setShadowLayer(16, 0, 0, Color.BLACK);
+
+        // black_rect is used to draw a "block drop to field" indicator
+        black_rect = new Paint();
+        black_rect.setColor(0x88000000);
+        black_rect.setStyle(Paint.Style.FILL);
+
+        // Get fields (used to drop returns blocks into a field)
+        int y_position = event_height + event_top;
+        for (SketchwareBlock block : event.blocks) {
+            fields.add(new Pair<>(
+                    new Vector2D(
+                            left_position,
+                            y_position
+                    ),
+                    block.getFields(text_paint)
+            ));
+
+            y_position += block.getHeight(text_paint) + shadow_height;
+            Log.d(TAG, "initialize: position: " + y_position);
+        }
 
         // Initialize our gesture detector
         initGestureDetector();
@@ -354,15 +374,15 @@ public class SketchwareBlocksView extends View {
                 int y = (int) e.getY();
 
                 // Pick up the block
-                picked_up_block = pickup_block(x, y);
+                picked_up_block_index = pickup_block(x, y);
 
                 // Check if there isn't any blocks below us
-                if (picked_up_block == -1)
+                if (picked_up_block_index == -1)
                     // Meh, nothing, just return
                     return;
 
                 // If no, get the block, and pick it up!
-                Pair<Vector2D, SketchwareBlock> block = unconnected_blocks.get(picked_up_block);
+                Pair<Vector2D, SketchwareBlock> block = unconnected_blocks.get(picked_up_block_index);
                 picked_up_x_offset = block.first.x - x;
                 picked_up_y_offset = block.first.y - y;
 
@@ -393,7 +413,7 @@ public class SketchwareBlocksView extends View {
                 Log.d(TAG, "onTouchEvent: DOWN");
 
                 // If we didn't picked up anything, and we're just touching the canvas
-                if (picked_up_block == -1) {
+                if (picked_up_block_index == -1) {
                     // The user is moving the canvas!
                     // Set the delta / differences
                     move_x_delta = (int) mot_event.getX() - left_position;
@@ -414,23 +434,17 @@ public class SketchwareBlocksView extends View {
                     // Move the block to the designated location
 
                     // Check if we picked up a block
-                    if (picked_up_block == -1) {
+                    if (picked_up_block_index == -1) {
                         // We didn't picked anything, just quit
                         break;
                     }
 
                     // K, let's move the block
-                    unconnected_blocks.get(picked_up_block).first.x = x + picked_up_x_offset;
-                    unconnected_blocks.get(picked_up_block).first.y = y + picked_up_y_offset;
+                    unconnected_blocks.get(picked_up_block_index).first.x = x + picked_up_x_offset;
+                    unconnected_blocks.get(picked_up_block_index).first.y = y + picked_up_y_offset;
 
-                    // Check if this block is a return block
-                    // Return block cannot be dropped into the block collection, they can only be dropped into a parameter
-                    if (!unconnected_blocks.get(picked_up_block).second.is_return_block) {
-                        // Predict the drop location of where the block should be dropped to
-                        drop_location = predictDropLocation();
-                    } else {
-                        // TODO: 3/18/21 this
-                    }
+                    // Predict the drop location of where the block should be dropped to
+                    drop_location = predictDropLocation();
                 } else {
                     // so the user is casually moving the view
 
@@ -456,18 +470,20 @@ public class SketchwareBlocksView extends View {
                 // Check if we have a relevant drop location below us
                 if (drop_location != -1) {
                     // Ohh ok, let's add the block into the block collection, at the specified index
-                    event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block).second);
+                    event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block_index).second);
 
                     // Then remove it from the unconnected blocks
-                    unconnected_blocks.remove(picked_up_block);
+                    unconnected_blocks.remove(picked_up_block_index);
                 }
 
                 // Reset values
                 isHolding = false;
-                picked_up_block = -1;
+                picked_up_block_index = -1;
 
                 draw_line_at_pos = -1;
                 drop_location = -1;
+
+                // predicted_drop_field = null;
 
                 move_y_delta = 0;
                 move_x_delta = 0;
@@ -483,6 +499,19 @@ public class SketchwareBlocksView extends View {
 
     // Pickup, drop blocks utilities ===============================================================
 
+    ArrayList< // List of
+            Pair< // Pair of
+                    Vector2D, // Block offset relative to the canvas
+                    ArrayList<   // List of
+                            Pair<    // Pair of
+                                    Rect, // Field location relative to the block
+                                    SketchwareField // The field
+                                >
+                        >
+                >
+        >
+    fields = new ArrayList<>();
+
     // The bounds where of how big we should detect if the user wants to drop a block
     int detection_distance_vertical = 20;
     int detection_distance_right = 400;
@@ -493,31 +522,86 @@ public class SketchwareBlocksView extends View {
     // The paint used to draw the line that indicates where the block should be placed / dropped
     Paint line_paint;
 
+    // This rect is used to draw a basic black rectangle in the canvas if the picked up block is hovering over a field
+    Rect predicted_drop_field = null;
+    Paint black_rect; // This paint is used to draw the rect above
+
     /**
      * This function predicts the location of where the picked up block will be dropped
      * @return The index element of where the block will be dropped in {@link #top_positions}, returns -1 if the block is dropped on nothing
      */
     private int predictDropLocation() {
-        int index = 0;
+        Pair<Vector2D, SketchwareBlock> picked_up_block = unconnected_blocks.get(picked_up_block_index);
+        // The picked up block's position
+        Vector2D picked_up_block_position = picked_up_block.first;
 
-        for (Integer point: top_positions) {
-            // The picked up block's position
-            Vector2D picked_up_block_position = unconnected_blocks.get(picked_up_block).first;
+        SketchwareBlock picked_up_block_block = picked_up_block.second;
 
-            // Check if the picked up block position is inside the bounds of
-            // We must add these offsets because the top_positions are modified / offset-ed version of it
-            if (
-                    picked_up_block_position.y + event_top > point - detection_distance_vertical &&
-                    picked_up_block_position.y + event_top < point + detection_distance_vertical &&
-                    picked_up_block_position.x + left_position > left_position &&
-                    picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
-            ) {
-                draw_line_at_pos = point;
-                // Log.d(TAG, "predictDropLocation: top: " + point);
-                return point;
+        if (!picked_up_block_block.is_return_block) {
+            int index = 0;
+
+            for (Integer point : top_positions) {
+                // Check if the picked up block position is inside the bounds of
+                // We must add these offsets because the top_positions are modified / offset-ed version of it
+                if (
+                        picked_up_block_position.y + event_top > point - detection_distance_vertical &&
+                                picked_up_block_position.y + event_top < point + detection_distance_vertical &&
+                                picked_up_block_position.x + left_position > left_position &&
+                                picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
+                ) {
+                    draw_line_at_pos = point;
+                    // Log.d(TAG, "predictDropLocation: top: " + point);
+                    return point;
+                }
+
+                index++;
             }
+        } else {
+            // FIXME: 3/21/21 Use a recursive method instead (where the block itself that should detect the hovering, like pickup)
+            //                with this, we can combine the drop block into just one short function!
 
-            index++;
+            // Now if there isn't any place we can insert this block
+            // we're gonna check for each fields
+            for (Pair<Vector2D, ArrayList<Pair<Rect, SketchwareField>>> fields_per_block : fields) {
+                // lmao look at this crap ^
+
+                Vector2D offset = fields_per_block.first;
+                ArrayList<Pair<Rect, SketchwareField>> fields = fields_per_block.second;
+
+                for (Pair<Rect, SketchwareField> field : fields) {
+                    
+                    // To optimize this, we need to check if the picked up block has the same type
+                    // as the parameter
+                    if (field.second.type == picked_up_block_block.return_type) continue;
+                    
+                    // Apply the offset
+                    Rect position = new Rect(field.first);
+
+                    position.top += offset.y;
+                    position.left += left_position;
+
+                    Rect picked_up_block_bounds = picked_up_block_block.getBounds(
+                            picked_up_block_position.x,
+                            picked_up_block_position.y,
+                            text_paint
+                    );
+
+                    if (
+                            picked_up_block_bounds.left < position.right ||
+                            picked_up_block_bounds.top < position.bottom ||
+                            picked_up_block_bounds.right > position.left ||
+                            picked_up_block_bounds.bottom > position.top
+                    ) {
+                        // Yep, this is the field where the block is hovering at
+                        // Draw a black box for proof-of-concept
+                        predicted_drop_field = picked_up_block_bounds;
+
+                        // End this function
+                        draw_line_at_pos = -1;
+                        return -1;
+                    }
+                }
+            }
         }
 
         draw_line_at_pos = -1;
@@ -819,7 +903,7 @@ public class SketchwareBlocksView extends View {
             // Important for certain APIs
             setLayerType(LAYER_TYPE_SOFTWARE, shadow_paint);
 
-            if (index == picked_up_block) {
+            if (index == picked_up_block_index) {
                 canvas.drawRect(
                         position.x,
                         position.y,
@@ -853,6 +937,11 @@ public class SketchwareBlocksView extends View {
         // Draw the line where it indicates if we're dropping a block into the collection
         if (draw_line_at_pos != -1) {
             canvas.drawRect(left_position, draw_line_at_pos - 5, left_position + detection_distance_right, draw_line_at_pos + 5, line_paint);
+        }
+
+        // Draw the rect where it indicates if we're dropping a block into a field
+        if (predicted_drop_field != null) {
+            canvas.drawRect(predicted_drop_field, black_rect);
         }
     }
 

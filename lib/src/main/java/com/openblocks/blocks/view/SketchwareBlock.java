@@ -3,6 +3,7 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 import android.util.Pair;
@@ -154,6 +155,47 @@ public class SketchwareBlock {
     public void setFormat(String format) {
         this.format = format;
         parsed_format = parseFormat();
+    }
+
+    /**
+     * This function returns every fields that is in this block
+     * and it's position relative to the block
+     * @return A list of a pair of the position and the field
+     */
+    public ArrayList<Pair<Rect, SketchwareField>> getFields(Paint block_text_paint) {
+
+        int block_height = getHeight(block_text_paint);
+
+        ArrayList<Pair<Rect, SketchwareField>> result = new ArrayList<>();
+
+        int x_before;
+        int x_total = 0;
+        int last_substring_index = 0;
+
+        for (Object[] param: parsed_format) {
+            String text = getFormat().substring(last_substring_index, (int) param[0]);
+            x_total += block_text_paint.measureText(text) + 5;
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            last_substring_index = (int) param[1];
+            SketchwareField field = (SketchwareField) param[3];
+
+            int field_width = field.getWidth(block_text_paint) + 5;
+
+            result.add(new Pair<>(
+                    new Rect(
+                            x_before,
+                            text_padding,
+                            x_before + field_width,
+                            block_height - text_padding
+                    ),
+                    field
+            ));
+
+            x_total += field_width;
+        }
+
+        return result;
     }
     // Getters and Setters =========================================================================
 
@@ -368,8 +410,8 @@ public class SketchwareBlock {
      * @param text_paint The paint used to draw the block text
      * @return This block's bounds
      */
-    public RectF getBounds(int x, int y, Paint text_paint) {
-        return new RectF(
+    public Rect getBounds(int x, int y, Paint text_paint) {
+        return new Rect(
                 x,
                 y,
                 x + getWidth(text_paint),

@@ -742,9 +742,11 @@ public class SketchwareBlocksView extends View {
                 top_position -= shadow_height;
             }
 
+            int current_block_height = current_block.getHeight(text_paint);
+
             // Set the previous stuff to this stuff, will be used later
             previous_top_position = top_position;
-            previous_block_height = current_block.getHeight(text_paint);
+            previous_block_height = current_block_height;
 
             // Apply the bottom margin if this is a nested block
             if (current_block instanceof SketchwareNestedBlock) {
@@ -752,10 +754,10 @@ public class SketchwareBlocksView extends View {
             }
 
             // To optimize the drawing, check if this block is actually visible to the user
-            if (previous_top_position + previous_block_height < 0) {
+            if (top_position + current_block_height < 0) {
                 // no, this block isn't visible, skip this
                 continue;
-            } else if (previous_top_position + previous_block_height > getHeight()) {
+            } else if (top_position > getHeight()) {
                 // this block is too far down, skip this
                 continue;
             }

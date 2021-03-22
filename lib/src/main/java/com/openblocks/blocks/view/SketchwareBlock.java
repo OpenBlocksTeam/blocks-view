@@ -156,47 +156,6 @@ public class SketchwareBlock {
         this.format = format;
         parsed_format = parseFormat();
     }
-
-    /**
-     * This function returns every fields that is in this block
-     * and it's position relative to the block
-     * @return A list of a pair of the position and the field
-     */
-    public ArrayList<Pair<Rect, SketchwareField>> getFields(Paint block_text_paint) {
-
-        int block_height = getHeight(block_text_paint);
-
-        ArrayList<Pair<Rect, SketchwareField>> result = new ArrayList<>();
-
-        int x_before;
-        int x_total = 0;
-        int last_substring_index = 0;
-
-        for (Object[] param: parsed_format) {
-            String text = getFormat().substring(last_substring_index, (int) param[0]);
-            x_total += block_text_paint.measureText(text) + 5;
-            x_before = Integer.parseInt(String.valueOf(x_total));
-
-            last_substring_index = (int) param[1];
-            SketchwareField field = (SketchwareField) param[3];
-
-            int field_width = field.getWidth(block_text_paint) + 5;
-
-            result.add(new Pair<>(
-                    new Rect(
-                            x_before,
-                            text_padding,
-                            x_before + field_width,
-                            block_height - text_padding
-                    ),
-                    field
-            ));
-
-            x_total += field_width;
-        }
-
-        return result;
-    }
     // Getters and Setters =========================================================================
 
 
@@ -290,6 +249,105 @@ public class SketchwareBlock {
         }
 
         return Math.max(default_height, max_height + text_padding * 2); // 2 paddings because there will be padding on the top and the bottom
+    }
+
+    /**
+     * This function is called when the user hovers a return block on top of this block
+     * @param x The x location of the hover, should be relative to OUR block's 0, 0 point (top left)
+     * @param y The y location of the hover, should be relative to OUR block's 0, 0 point (top left)
+     * @param block The block that is hovered
+     * @param drop Should we drop this block to this parameter?
+     * @param text_paint The {@link Paint} used to draw the block text
+     * @return The bounds of the field that this block is hovering relative to the canvas, null if it's not hovering a field
+     */
+    public Rect onHover(int x, int y, SketchwareBlock block, boolean drop, Paint text_paint) {
+        int x_total = 0;
+        int x_before;
+
+        // This index indicates the position of the parameter (in variable parameters) we're in the loop
+        int index = 0;
+
+        // We're using a similar method of drawParameters
+        // Loop per each parameters
+        int last_substring_index = 0;
+        for (Object[] param: parsed_format) {
+            // Ik this looks stupid, but if i just pass in x_total, the x_before 's reference will attach to x_total's reference
+            // if x_total changed, x_before will change (which is the thing i don't want)
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            Log.d(TAG, "onHover: [Init] before: " + x_before + " total: " + x_total);
+
+            // Get the text between a field (should be 0 for the first time) and another field
+            String text = getFormat().substring(last_substring_index, (int) param[0]);
+
+            x_total += text_paint.measureText(text) + 5;
+
+            Log.d(TAG, "onHover: [Text Check] before: " + x_before + " total: " + x_total);
+
+            // Check if the X is somewhere in this text
+            if (x > x_before && x < x_total) {
+                Log.d(TAG, "onHover: Somewhere in text, nope");
+
+                // User is hovering this block on the text, nothing
+                // To optimize this, return null
+                return null;
+            }
+
+            // Update the x_before to the text
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            last_substring_index = (int) param[1];
+
+            SketchwareField field = (SketchwareField) param[3];
+
+            x_total += field.getWidth(text_paint) + 5;
+
+            if (!field.type.equals(block.return_type)) {
+                // This the field and the block doesn't have the same type, skip this
+                index++; // To not break the index
+
+                continue;
+            }
+
+            Log.d(TAG, "onHover: [Field Check] before: " + x_before + " total: " + x_total);
+
+            // Check if X is somewhere in this field
+            if (x > x_before && x < x_total) {
+                Log.d(TAG, "onHover: Dragging a field");
+
+                // Yup, this the user is dragging a field, check if this is a block
+                if (field.is_block) {
+                    Log.d(TAG, "onHover: Is a block");
+
+                    // Ohk this is a block, check if the parameter block has a parameter too
+                    if (field.block.parameters.size() == 0) {
+                        Log.d(TAG, "onHover: No parameters, this is it!");
+
+                        return field.block.getBounds(x, y, text_paint);
+
+                    } else {
+                        Log.d(TAG, "onHover: Has parameter, recursive call");
+
+                        // This block has a parameter, recursively call onHover!
+                        // oh yeah don't forget to offset the x
+
+                        return field.block.onHover(x - x_before, y, block, drop, text_paint);
+                    }
+                } else {
+                    Log.d(TAG, "onHover: Value parameter, this is it!");
+
+                    return field.block.getBounds(x, y, text_paint);
+                }
+            }
+
+            index++;
+        }
+
+        // Wat, nothing?
+        Log.d(TAG, "onHover: Weird, nothing");
+
+        // This shouldn't happen but meh
+        return null;
     }
 
     /**

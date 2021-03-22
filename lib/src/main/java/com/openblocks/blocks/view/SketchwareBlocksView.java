@@ -246,21 +246,6 @@ public class SketchwareBlocksView extends View {
         black_rect.setColor(0x88000000);
         black_rect.setStyle(Paint.Style.FILL);
 
-        // Get fields (used to drop returns blocks into a field)
-        int y_position = event_height + event_top;
-        for (SketchwareBlock block : event.blocks) {
-            fields.add(new Pair<>(
-                    new Vector2D(
-                            left_position,
-                            y_position
-                    ),
-                    block.getFields(text_paint)
-            ));
-
-            y_position += block.getHeight(text_paint) + shadow_height;
-            Log.d(TAG, "initialize: position: " + y_position);
-        }
-
         // Initialize our gesture detector
         initGestureDetector();
     }
@@ -499,19 +484,6 @@ public class SketchwareBlocksView extends View {
 
     // Pickup, drop blocks utilities ===============================================================
 
-    ArrayList< // List of
-            Pair< // Pair of
-                    Vector2D, // Block offset relative to the canvas
-                    ArrayList<   // List of
-                            Pair<    // Pair of
-                                    Rect, // Field location relative to the block
-                                    SketchwareField // The field
-                                >
-                        >
-                >
-        >
-    fields = new ArrayList<>();
-
     // The bounds where of how big we should detect if the user wants to drop a block
     int detection_distance_vertical = 20;
     int detection_distance_right = 400;
@@ -534,7 +506,6 @@ public class SketchwareBlocksView extends View {
         Pair<Vector2D, SketchwareBlock> picked_up_block = unconnected_blocks.get(picked_up_block_index);
         // The picked up block's position
         Vector2D picked_up_block_position = picked_up_block.first;
-
         SketchwareBlock picked_up_block_block = picked_up_block.second;
 
         if (!picked_up_block_block.is_return_block) {
@@ -545,9 +516,9 @@ public class SketchwareBlocksView extends View {
                 // We must add these offsets because the top_positions are modified / offset-ed version of it
                 if (
                         picked_up_block_position.y + event_top > point - detection_distance_vertical &&
-                                picked_up_block_position.y + event_top < point + detection_distance_vertical &&
-                                picked_up_block_position.x + left_position > left_position &&
-                                picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
+                        picked_up_block_position.y + event_top < point + detection_distance_vertical &&
+                        picked_up_block_position.x + left_position > left_position &&
+                        picked_up_block_position.x + left_position < event.blocks.get(index).getWidth(text_paint)
                 ) {
                     draw_line_at_pos = point;
                     // Log.d(TAG, "predictDropLocation: top: " + point);
@@ -557,50 +528,22 @@ public class SketchwareBlocksView extends View {
                 index++;
             }
         } else {
-            // FIXME: 3/21/21 Use a recursive method instead (where the block itself that should detect the hovering, like pickup)
-            //                with this, we can combine the drop block into just one short function!
 
-            // Now if there isn't any place we can insert this block
-            // we're gonna check for each fields
-            for (Pair<Vector2D, ArrayList<Pair<Rect, SketchwareField>>> fields_per_block : fields) {
-                // lmao look at this crap ^
+            int index = 0;
+            for (Integer block_top : top_positions) {
+                // Check if this block is in the bounds of the drag position
+                if (!(picked_up_block_position.y + event_top > block_top && picked_up_block_position.y + event_top < top_positions.get(index - 1)))
+                    continue;
 
-                Vector2D offset = fields_per_block.first;
-                ArrayList<Pair<Rect, SketchwareField>> fields = fields_per_block.second;
+                // do onHover
 
-                for (Pair<Rect, SketchwareField> field : fields) {
-                    
-                    // To optimize this, we need to check if the picked up block has the same type
-                    // as the parameter
-                    if (field.second.type == picked_up_block_block.return_type) continue;
-                    
-                    // Apply the offset
-                    Rect position = new Rect(field.first);
+                Rect field_bounds = event.blocks.get(index).onHover(picked_up_block_position.x, picked_up_block_position.y, event.blocks.get(index), false, text_paint);
 
-                    position.top += offset.y;
-                    position.left += left_position;
-
-                    Rect picked_up_block_bounds = picked_up_block_block.getBounds(
-                            picked_up_block_position.x,
-                            picked_up_block_position.y,
-                            text_paint
-                    );
-
-                    if (
-                            picked_up_block_bounds.left < position.right ||
-                            picked_up_block_bounds.top < position.bottom ||
-                            picked_up_block_bounds.right > position.left ||
-                            picked_up_block_bounds.bottom > position.top
-                    ) {
-                        // Yep, this is the field where the block is hovering at
-                        // Draw a black box for proof-of-concept
-                        predicted_drop_field = picked_up_block_bounds;
-
-                        // End this function
-                        draw_line_at_pos = -1;
-                        return -1;
-                    }
+                if (field_bounds != null) {
+                    predicted_drop_field = field_bounds;
                 }
+
+                index++;
             }
         }
 

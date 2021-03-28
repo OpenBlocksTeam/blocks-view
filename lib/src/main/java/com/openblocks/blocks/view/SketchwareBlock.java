@@ -252,6 +252,89 @@ public class SketchwareBlock {
     }
 
     /**
+     * This function is used to get / grab a field when the user clicked at a specific location
+     * @param x The x position
+     * @param y The y position
+     * @return The field the user clicked
+     */
+    public SketchwareField onClick(int x, int y, Paint text_paint) {
+        int x_total = 0;
+        int x_before;
+
+        // We're using a similar method of drawParameters
+        // Loop per each parameters
+        int last_substring_index = 0;
+        for (Object[] param: parsed_format) {
+            // Ik this looks stupid, but if i just pass in x_total, the x_before 's reference will attach to x_total's reference
+            // if x_total changed, x_before will change (which is the thing i don't want)
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            Log.d(TAG, "onClick: [Init] before: " + x_before + " total: " + x_total);
+
+            // Get the text between a field (should be 0 for the first time) and another field
+            String text = getFormat().substring(last_substring_index, (int) param[0]);
+
+            x_total += text_paint.measureText(text) + 5;
+
+            Log.d(TAG, "onClick: [Text Check] before: " + x_before + " total: " + x_total);
+
+            // Check if the X is somewhere in this text
+            if (x > x_before && x < x_total) {
+                Log.d(TAG, "onClick: Somewhere in text, nope");
+
+                // User is clicking on this block on the text, nothing
+                // To optimize this, return null
+                return null;
+            }
+
+            // Update the x_before to the text
+            x_before = Integer.parseInt(String.valueOf(x_total));
+
+            last_substring_index = (int) param[1];
+
+            SketchwareField field = (SketchwareField) param[3];
+
+            x_total += field.getWidth(text_paint) + 5;
+
+            Log.d(TAG, "onClick: [Field Check] before: " + x_before + " total: " + x_total);
+
+            // Check if X is somewhere in this field
+            if (x > x_before && x < x_total) {
+                Log.d(TAG, "onClick: Dragging a field");
+
+                // Yup, this the user is dragging a field, check if this is a block
+                if (field.is_block) {
+                    Log.d(TAG, "onClick: Is a block");
+
+                    // Ohk this is a block, check if the parameter block has a parameter too
+                    if (field.block.parameters.size() == 0) {
+                        Log.d(TAG, "onClick: No parameters, not this one");
+
+                        return null;
+                    } else {
+                        Log.d(TAG, "onClick: Has parameter, recursive call");
+
+                        // This block has a parameter, recursively call onHover!
+                        // oh yeah don't forget to offset the x
+
+                        return field.block.onClick(x - x_before, y, text_paint);
+                    }
+                } else {
+                    Log.d(TAG, "onClick: Value parameter, this is it!");
+
+                    return field;
+                }
+            }
+        }
+
+        // Wat, nothing?
+        Log.d(TAG, "onClick: Weird, nothing");
+
+        // This shouldn't happen but meh
+        return null;
+    }
+
+    /**
      * This function is called when the user hovers a return block on top of this block
      * @param x The x location of the hover, should be relative to OUR block's 0, 0 point (top left)
      * @param y The y location of the hover, should be relative to OUR block's 0, 0 point (top left)

@@ -117,6 +117,24 @@ public class SketchwareBlocksView extends View {
     // Important note: top_positions are also modified when the view is moved / free move
     ArrayList<Integer> top_positions = new ArrayList<>();
 
+    /**
+     * This array list contains "optimized" blocks (blocks that are visible in the canvas)
+     * Use this list if you're in need of looping each blocks to respond to user interaction
+     */
+    ArrayList<SketchwareBlock> optimized_blocks = new ArrayList<>();
+
+    /**
+     * This variable is used to determine how many blocks from the top that got
+     * optimized / removed when drawing (blocks that are visible in the canvas)
+     */
+    int top_optimize_cut = 0;
+
+    /**
+     * This variable is used to determine how many blocks from the bottom that got
+     * optimized / removed when drawing (blocks that are visible in the canvas)
+     */
+    int bottom_optimize_cut = 0;
+
     // Other variables =============================================================================
 
 
@@ -783,10 +801,15 @@ public class SketchwareBlocksView extends View {
             // To optimize the drawing, check if this block is actually visible to the user
             if (top_position + current_block_height < 0) {
                 // no, this block isn't visible, skip this
+                top_optimize_cut++;
                 continue;
             } else if (top_position > getHeight()) {
                 // this block is too far down, skip this
+                bottom_optimize_cut++;
                 continue;
+            } else {
+                // This block is visible / being drawn, add this to the optimized blocks
+                optimized_blocks.add(current_block);
             }
 
             // Oh yeah add the top_position to our top_positions array list

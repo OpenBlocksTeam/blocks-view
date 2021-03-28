@@ -423,6 +423,9 @@ public class SketchwareBlocksView extends View {
                     move_y_delta = (int) mot_event.getY() - event_top;
                 }
 
+                x_down = (int) mot_event.getX();
+                y_down = (int) mot_event.getX();
+
                 // We handled the ACTION_DOWN, return true!
                 return true;
 
@@ -470,13 +473,20 @@ public class SketchwareBlocksView extends View {
             case MotionEvent.ACTION_UP:
                 Log.d(TAG, "onTouchEvent: UP");
 
-                // Check if we have a relevant drop location below us
-                if (drop_location != -1) {
-                    // Ohh ok, let's add the block into the block collection, at the specified index
-                    event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block_index).second);
+                // Check if that was a click
+                if (isAClick(x_down, mot_event.getX(), y_down, mot_event.getY())) {
+                    // This is just a click, check if there is any field below us
+                    checkFieldClick((int) mot_event.getX(), (int) mot_event.getY());
 
-                    // Then remove it from the unconnected blocks
-                    unconnected_blocks.remove(picked_up_block_index);
+                } else {
+                    // Check if we have a relevant drop location below us
+                    if (drop_location != -1) {
+                        // Ohh ok, let's add the block into the block collection, at the specified index
+                        event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block_index).second);
+
+                        // Then remove it from the unconnected blocks
+                        unconnected_blocks.remove(picked_up_block_index);
+                    }
                 }
 
                 // Reset values
@@ -495,6 +505,18 @@ public class SketchwareBlocksView extends View {
         }
 
         return false;
+    }
+
+    int x_down = 0;
+    int y_down = 0;
+
+    // https://stackoverflow.com/questions/17831395/how-can-i-detect-a-click-in-an-ontouch-listener/17836095
+    private final int CLICK_ACTION_THRESHOLD = 200;
+
+    private boolean isAClick(float startX, float endX, float startY, float endY) {
+        float differenceX = Math.abs(startX - endX);
+        float differenceY = Math.abs(startY - endY);
+        return !(differenceX > CLICK_ACTION_THRESHOLD /* =5 */ || differenceY > CLICK_ACTION_THRESHOLD);
     }
     // Touch detectors =============================================================================
 
@@ -698,6 +720,43 @@ public class SketchwareBlocksView extends View {
         // Ok, this guy is just clicking nothing
         Log.d(TAG, "pickup_block: meh, nothing");
         return -1;
+    }
+
+    FieldClick fieldClick = null;
+
+    /**
+     * This function sets the field click
+     * @param fieldClick The field click listener
+     */
+    public void setFieldClick(FieldClick fieldClick) {
+        this.fieldClick = fieldClick;
+    }
+
+    /**
+     * This function is used to check if a click clicks a field
+     */
+    private void checkFieldClick(int x, int y) {
+        if (fieldClick == null)
+            return;
+
+        int top = event_top + event_height;
+        int previous_height = event_height;
+
+        for (SketchwareBlock block : optimized_blocks) {
+            int current_block_height = block.getHeight(text_paint);
+
+            // Only check if the top is lower than the y - previous block height
+            if (top < y - previous_height) {
+                SketchwareField field = block.onClick(x, y, text_paint);
+
+                if (field != null) {
+                    fieldClick.onFieldClick(field);
+                }
+            }
+
+            previous_height = current_block_height;
+            top += current_block_height;
+        }
     }
     // Pickup, drop blocks utilities ===============================================================
 
@@ -931,4 +990,12 @@ public class SketchwareBlocksView extends View {
         }
     }
     // Utility classes =============================================================================
+
+
+
+    // Interfaces ==================================================================================
+    public interface FieldClick {
+        void onFieldClick(SketchwareField field);
+    }
+    // Interfaces ==================================================================================
 }

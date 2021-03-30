@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SketchwareBlocksView">
+    <declare-styleable name="BlocksView">
         <attr name="left_position" format="dimension"/>
         <attr name="top_position" format="dimension"/>
         <attr name="shadow_height" format="dimension"/>

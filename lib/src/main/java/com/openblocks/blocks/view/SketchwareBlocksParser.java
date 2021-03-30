@@ -36,11 +36,11 @@ public class SketchwareBlocksParser {
      * Parses the logic_data string into an array of SketchwareEvents
      * @return Parsed data
      */
-    public ArrayList<SketchwareEvent> parse() {
+    public ArrayList<BlocksViewEvent> parse() {
         if (logic_data == null)
             throw new IllegalStateException("logic_data hasn't been set!");
 
-        ArrayList<SketchwareEvent> events = new ArrayList<>();
+        ArrayList<BlocksViewEvent> events = new ArrayList<>();
 
         // We need this so we can evaluate the blocks before we hit the end of the file
         logic_data += "\n";
@@ -60,7 +60,7 @@ public class SketchwareBlocksParser {
                 skip_event = false;
 
                 // Okay, Let's do the sorting here
-                SketchwareEvent event = new SketchwareEvent(activity_name, event_name);
+                BlocksViewEvent event = new BlocksViewEvent(activity_name, event_name);
 
                 // Loop for every blocks
                 for (String id: tmp_blocks.keySet()) {
@@ -71,7 +71,7 @@ public class SketchwareBlocksParser {
                     JSONObject block = tmp_blocks.get(id);
 
                     try {
-                        event.blocks.add(new SketchwareBlock(
+                        event.blocks.add(new Block(
                                 /* Format:           */ block.getString("spec"),
                                 /* Block ID:         */ id,
                                 /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
@@ -133,8 +133,8 @@ public class SketchwareBlocksParser {
         return events;
     }
 
-    private ArrayList<SketchwareField> parseParameter(JSONObject block, String id) throws JSONException {
-        ArrayList<SketchwareField> params = new ArrayList<>();
+    private ArrayList<BlockField> parseParameter(JSONObject block, String id) throws JSONException {
+        ArrayList<BlockField> params = new ArrayList<>();
 
         JSONArray params_ = block.getJSONArray("parameters");
 
@@ -154,8 +154,8 @@ public class SketchwareBlocksParser {
                 JSONObject parameter_block = tmp_blocks.get(block_reference);
 
                 params.add(
-                        new SketchwareField(
-                                new SketchwareBlock(
+                        new BlockField(
+                                new Block(
                                         /* Format:           */ block.getString("spec"),
                                         /* Block ID:         */ id,
                                         /* Next Block ID:    */ Integer.parseInt(block.getString("nextBlock")),
@@ -164,12 +164,12 @@ public class SketchwareBlocksParser {
                                 ),
                                 // TODO: 3/18/21 This needs a database of blocks, we can't determine a block's return type with the block information
                                 //               what if we check the parameter wildcard to determine it?
-                                SketchwareField.Type.STRING
+                                BlockField.Type.STRING
                         )
                 );
             } else {
                 params.add(
-                        new SketchwareField(
+                        new BlockField(
                                 (String) params_.get(index)
                         )
                 );

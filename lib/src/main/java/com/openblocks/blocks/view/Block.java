@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.util.Log;
 import android.util.Pair;
 
@@ -19,9 +18,9 @@ import java.util.regex.Pattern;
 /**
  * This class is a model used to represent a block
  */
-public class SketchwareBlock {
+public class Block {
 
-    private static final String TAG = "SketchwareBlock";
+    private static final String TAG = "Block";
 
     // TODO: 3/8/21 REMOVE next_block AND id
 
@@ -36,7 +35,7 @@ public class SketchwareBlock {
     private String format;
     private ArrayList<Object[]> parsed_format;
     public String id;
-    public ArrayList<SketchwareField> parameters;
+    public ArrayList<BlockField> parameters;
 
     // Indicates if this block can't have a next_block, e.g. Finish Activity block
     public boolean is_bottom;
@@ -51,38 +50,38 @@ public class SketchwareBlock {
     boolean is_return_block;
 
     // Indicates this block's return type (if is_return_block is true)
-    SketchwareField.Type return_type;
+    BlockField.Type return_type;
 
     // Will be used in the overloaded draw function
-    public int default_height = 60; // The same as in SketchwareBlocksView
+    public int default_height = 60; // The same as in BlocksView
     // Variables ===================================================================================
 
 
 
     // Constructors ================================================================================
     /**
-     * Constructs a simple SketchwareBlocks with just a text and a color
+     * Constructs a simple block with just a text and a color
      *
      * @param text The text of the block
      * @param color The color of the block
      */
-    public SketchwareBlock(String text, int color) {
+    public Block(String text, int color) {
         this(text, "1", 2, color);
     }
 
-    public SketchwareBlock(String text, String id, int next_block, int color) {
+    public Block(String text, String id, int next_block, int color) {
         this(text, id, next_block, new ArrayList<>(), color, false, null);
     }
 
-    public SketchwareBlock(String format, ArrayList<SketchwareField> parameters, int color) {
+    public Block(String format, ArrayList<BlockField> parameters, int color) {
         this(format, "1", 2, parameters, color);
     }
 
-    public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color) {
+    public Block(String format, String id, int next_block, ArrayList<BlockField> parameters, int color) {
         this(format, id, next_block, parameters, color, false, null);
     }
 
-    public SketchwareBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, boolean is_parameter, SketchwareField.Type parameter_type) {
+    public Block(String format, String id, int next_block, ArrayList<BlockField> parameters, int color, boolean is_parameter, BlockField.Type parameter_type) {
         this.id = id;
         this.next_block = next_block;
         this.parameters = parameters;
@@ -106,8 +105,8 @@ public class SketchwareBlock {
      * @param color The color of the block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newSimpleBlock(String text, int color) {
-        return new SketchwareBlock(text, color);
+    public static Block newSimpleBlock(String text, int color) {
+        return new Block(text, color);
     }
 
     /**
@@ -117,8 +116,8 @@ public class SketchwareBlock {
      * @param parameters The parameters of the block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newBlockWithParameters(String text, int color, SketchwareField... parameters) {
-        return new SketchwareBlock(text, new ArrayList<>(Arrays.asList(parameters)), color);
+    public static Block newBlockWithParameters(String text, int color, BlockField... parameters) {
+        return new Block(text, new ArrayList<>(Arrays.asList(parameters)), color);
     }
 
     /**
@@ -128,8 +127,8 @@ public class SketchwareBlock {
      * @param return_type The return type of the block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newReturnBlock(String text, int color, SketchwareField.Type return_type) {
-        return new SketchwareBlock(text, "1", 2, new ArrayList<>(), color, true, return_type);
+    public static Block newReturnBlock(String text, int color, BlockField.Type return_type) {
+        return new Block(text, "1", 2, new ArrayList<>(), color, true, return_type);
     }
 
     /**
@@ -140,8 +139,8 @@ public class SketchwareBlock {
      * @param parameters The parameters for this block
      * @return The block according to the parameters given
      */
-    public static SketchwareBlock newReturnBlockWithParams(String text, int color, SketchwareField.Type return_type, SketchwareField... parameters) {
-        return new SketchwareBlock(text, "1", 2, new ArrayList<>(Arrays.asList(parameters)), color, true, return_type);
+    public static Block newReturnBlockWithParams(String text, int color, BlockField.Type return_type, BlockField... parameters) {
+        return new Block(text, "1", 2, new ArrayList<>(Arrays.asList(parameters)), color, true, return_type);
     }
     // Factory constructors ========================================================================
 
@@ -164,7 +163,7 @@ public class SketchwareBlock {
     /**
      * This function parses the format
      *
-     * @return Returns ArrayList of [start_pos, end_pos, name, SketchwareField]
+     * @return Returns ArrayList of [start_pos, end_pos, name, BlocksViewField]
      */
     public ArrayList<Object[]> parseFormat() {
         ArrayList<Object[]> tmp = new ArrayList<>();
@@ -212,7 +211,7 @@ public class SketchwareBlock {
             final_string.append(getFormat().substring(last_num, (int) param[0]));
             last_num = (int) param[1];
 
-            SketchwareField field = (SketchwareField) param[3];
+            BlockField field = (BlockField) param[3];
 
             params_widths +=
                             field.getWidth(text_paint) +
@@ -238,7 +237,7 @@ public class SketchwareBlock {
         // Let's calculate the height
         // Quite easy, just loop per every parameters and get the maximum height
         int max_height = 0;
-        for (SketchwareField parameter : parameters) {
+        for (BlockField parameter : parameters) {
             if (parameter.is_block) {
                 // This is a block!
                 // We can just call the getHeight of that block recursively
@@ -257,7 +256,7 @@ public class SketchwareBlock {
      * @param y The y position
      * @return The field the user clicked
      */
-    public SketchwareField onClick(int x, int y, Paint text_paint) {
+    public BlockField onClick(int x, int y, Paint text_paint) {
         int x_total = 0;
         int x_before;
 
@@ -292,7 +291,7 @@ public class SketchwareBlock {
 
             last_substring_index = (int) param[1];
 
-            SketchwareField field = (SketchwareField) param[3];
+            BlockField field = (BlockField) param[3];
 
             x_total += field.getWidth(text_paint) + 5;
 
@@ -343,7 +342,7 @@ public class SketchwareBlock {
      * @param text_paint The {@link Paint} used to draw the block text
      * @return The bounds of the field that this block is hovering relative to the canvas, null if it's not hovering a field
      */
-    public Rect onHover(int x, int y, SketchwareBlock block, boolean drop, Paint text_paint) {
+    public Rect onHover(int x, int y, Block block, boolean drop, Paint text_paint) {
         int x_total = 0;
         int x_before;
 
@@ -381,7 +380,7 @@ public class SketchwareBlock {
 
             last_substring_index = (int) param[1];
 
-            SketchwareField field = (SketchwareField) param[3];
+            BlockField field = (BlockField) param[3];
 
             x_total += field.getWidth(text_paint) + 5;
 
@@ -440,7 +439,7 @@ public class SketchwareBlock {
      * @param text_paint The {@link Paint} used to draw the block text
      * @return Pair of "Should we remove this block from the block list" and the block that is picked up
      */
-    public Pair<Boolean, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
+    public Pair<Boolean, Block> onPickup(int x, int y, Paint text_paint) {
         // int x = left + text_padding;  // The initial x's text position
 
         Log.d(TAG, "onPickup: x: " + x + " y: " + y);
@@ -483,7 +482,7 @@ public class SketchwareBlock {
 
             last_substring_index = (int) param[1];
 
-            SketchwareField field = (SketchwareField) param[3];
+            BlockField field = (BlockField) param[3];
 
             x_total += field.getWidth(text_paint) + 5;
 
@@ -503,9 +502,9 @@ public class SketchwareBlock {
 
                         // Nop it doesn't have any, means we can pick this parameter!
                         // Remove the field from parameters
-                        parameters.set(index, new SketchwareField("", field.block.return_type, field.other_type));
+                        parameters.set(index, new BlockField("", field.block.return_type, field.other_type));
 
-                        parsed_format.get(index)[3] = new SketchwareField("", field.block.return_type, field.other_type);
+                        parsed_format.get(index)[3] = new BlockField("", field.block.return_type, field.other_type);
 
                         // Then set the block
                         return new Pair<>(false, field.block);
@@ -514,14 +513,14 @@ public class SketchwareBlock {
 
                         // This block has a parameter, recursively call onPickup!
                         // oh yeah don't forget to offset the x
-                        Pair<Boolean, SketchwareBlock> pickup_block = field.block.onPickup(x - x_before, y, text_paint);
+                        Pair<Boolean, Block> pickup_block = field.block.onPickup(x - x_before, y, text_paint);
 
                         // Should we remove this block?
                         if (pickup_block.first) {
                             // Yep, we should, for now, it will just be a text, nothing fancy
-                            parameters.set(index, new SketchwareField("", field.block.return_type, field.other_type));
+                            parameters.set(index, new BlockField("", field.block.return_type, field.other_type));
 
-                            parsed_format.get(index)[3] = new SketchwareField("", field.block.return_type, field.other_type);
+                            parsed_format.get(index)[3] = new BlockField("", field.block.return_type, field.other_type);
                         }
 
                         return new Pair<>(false, pickup_block.second);
@@ -698,7 +697,7 @@ public class SketchwareBlock {
 
             last_num = (int) param[1];
 
-            SketchwareField field = (SketchwareField) param[3];
+            BlockField field = (BlockField) param[3];
 
             if (shadow_height == 0)
                 shadow_height = text_padding;
@@ -718,7 +717,7 @@ public class SketchwareBlock {
     @NonNull
     @Override
     public String toString() {
-        return "SketchwareBlock{" +
+        return "Block{" +
                 "format='" + getFormat() + '\'' +
                 ", id='" + id + '\'' +
                 ", parameters=" + parameters +
@@ -736,7 +735,7 @@ public class SketchwareBlock {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SketchwareBlock that = (SketchwareBlock) o;
+        Block that = (Block) o;
         return is_bottom == that.is_bottom &&
                 next_block == that.next_block &&
                 color == that.color &&

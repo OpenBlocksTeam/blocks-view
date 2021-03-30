@@ -3,7 +3,6 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 import android.util.Pair;
 
 import java.util.ArrayList;
@@ -11,16 +10,16 @@ import java.util.ArrayList;
 /**
  * This class is used to represent a nested block, where it can contain a collection of blocks inside itself
  */
-public class SketchwareNestedBlock extends SketchwareBlock {
+public class NestedBlock extends Block {
 
-    public ArrayList<SketchwareBlock> blocks;
+    public ArrayList<Block> blocks;
 
     public int block_bottom_height = 50;
     public int indent_width = 40;
 
     public int bottom_margin = 20;
 
-    public SketchwareNestedBlock(String format, String id, int next_block, ArrayList<SketchwareField> parameters, int color, ArrayList<SketchwareBlock> blocks_inside) {
+    public NestedBlock(String format, String id, int next_block, ArrayList<BlockField> parameters, int color, ArrayList<Block> blocks_inside) {
         super(format, id, next_block, parameters, color);
         blocks = blocks_inside;
     }
@@ -48,7 +47,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
     private int calculateBlockHeights(Paint block_text_paint) {
         int sum = 0;
 
-        for (SketchwareBlock block : blocks) {
+        for (Block block : blocks) {
             sum += block.getHeight(block_text_paint);
         }
 
@@ -56,13 +55,13 @@ public class SketchwareNestedBlock extends SketchwareBlock {
     }
 
     @Override
-    public Pair<Boolean, SketchwareBlock> onPickup(int x, int y, Paint text_paint) {
+    public Pair<Boolean, Block> onPickup(int x, int y, Paint text_paint) {
         int y_start = getBlockHeight(text_paint);
 
         // TODO: 3/17/21 optimize this
         
         int index = 0;
-        for (SketchwareBlock block : blocks) {
+        for (Block block : blocks) {
 
             // Check if this pickup has a block under it
             if (block.getBounds(0, y_start, text_paint).contains(x - indent_width, y)) {
@@ -90,7 +89,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         int block_outset_left = left + block_outset_left_margin;
 
-        // Draw the childes! (similar to SketchwareBlocksView)
+        // Draw the childs! (similar to BlocksView)
         int childes_previous_block_color = color;
         int block_height = getBlockHeight(text_paint);
         int previous_top_position = top + shadow_height;
@@ -98,7 +97,7 @@ public class SketchwareNestedBlock extends SketchwareBlock {
 
         for (int i = 0; i < blocks.size(); i++) {
 
-            SketchwareBlock current_block = blocks.get(i);
+            Block current_block = blocks.get(i);
             current_block.default_height = block_height;
 
             int top_position;

@@ -1,5 +1,5 @@
-# Sketchware Blocks View
-A very simple custom widget for android used to display blocks of codes similar to Sketchware and Scratch.
+# Blocks View
+A custom widget library for android used to display blocks of codes similar to Sketchware and Scratch.
 
 This project is very experimental, and is not suitable for production usage.
 
@@ -20,7 +20,7 @@ We currently haven't published this library into any platforms yet because it's 
 
 ### Basic usage:
 ```
-<com.openblocks.blocks.view.SketchwareBlocksView
+<com.openblocks.blocks.view.BlocksView
     android:id="@+id/blocks_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

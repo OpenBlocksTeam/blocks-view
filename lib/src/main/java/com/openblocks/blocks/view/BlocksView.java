@@ -16,7 +16,6 @@ import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,12 +25,12 @@ import java.util.ArrayList;
 /**
  * This class is the View that should be used inside your layout, Used to display blocks in an event
  */
-public class SketchwareBlocksView extends View {
+public class BlocksView extends View {
 
     /**
      * TAG is used to call logging functions, (e.g. <code>Log.d(TAG, "Hello World!");</code>)
      */
-    private static final String TAG = "SketchwareBlocksView";
+    private static final String TAG = "BlocksView";
 
     /**
      * rect_paint is a {@link Paint} that will be used to draw blocks
@@ -81,7 +80,7 @@ public class SketchwareBlocksView extends View {
     // Other variables =============================================================================
 
     /** This variable is used to store blocks of collections */
-    SketchwareEvent event;
+    BlocksViewEvent event;
 
     /** This variable is used to detect long presses */
     GestureDetector gestureDetector;
@@ -111,7 +110,7 @@ public class SketchwareBlocksView extends View {
      *
      *  A Very Important Note: the Vector2D is in it's raw form (doesn't store offset-ed numbers), because most of the blocks are calculated on their raw form, and will be added with event_top and left_position at draw
      *  */
-    ArrayList<Pair<Vector2D, SketchwareBlock>> unconnected_blocks = new ArrayList<>();
+    ArrayList<Pair<Vector2D, Block>> unconnected_blocks = new ArrayList<>();
 
     /** This array list is used to indicate where the block should land on when dropped */
     // Important note: top_positions are also modified when the view is moved / free move
@@ -121,7 +120,7 @@ public class SketchwareBlocksView extends View {
      * This array list contains "optimized" blocks (blocks that are visible in the canvas)
      * Use this list if you're in need of looping each blocks to respond to user interaction
      */
-    ArrayList<SketchwareBlock> optimized_blocks = new ArrayList<>();
+    ArrayList<Block> optimized_blocks = new ArrayList<>();
 
     /**
      * This variable is used to determine how many blocks from the top that got
@@ -140,22 +139,22 @@ public class SketchwareBlocksView extends View {
 
 
     // Constructors ================================================================================
-    public SketchwareBlocksView(Context context) {
+    public BlocksView(Context context) {
         super(context);
         initialize(context, null);
     }
 
-    public SketchwareBlocksView(Context context, @Nullable AttributeSet attrs) {
+    public BlocksView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialize(context, attrs);
     }
 
-    public SketchwareBlocksView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BlocksView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialize(context, attrs);
     }
 
-    public SketchwareBlocksView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public BlocksView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initialize(context, attrs);
     }
@@ -168,8 +167,8 @@ public class SketchwareBlocksView extends View {
      * Set the event (collection of blocks) that is to be displayed
      * @param event The event / collection of blocks
      */
-    public void setEvent(SketchwareEvent event) {
-        this.event = (SketchwareEvent) event.clone();
+    public void setEvent(BlocksViewEvent event) {
+        this.event = (BlocksViewEvent) event.clone();
         unconnected_blocks.clear();
         picked_up_block_index = -1;
 
@@ -182,7 +181,7 @@ public class SketchwareBlocksView extends View {
      * @param x The x position
      * @param y The y position
      */
-    public void addBlock(SketchwareBlock block, int x, int y) {
+    public void addBlock(Block block, int x, int y) {
         unconnected_blocks.add(new Pair<>(
                 new Vector2D(x, y),
                 block
@@ -274,27 +273,27 @@ public class SketchwareBlocksView extends View {
      * @param attrs The attribute set
      */
     private void initializeAttributes(@NonNull AttributeSet attrs) {
-        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.SketchwareBlocksView);
+        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.BlocksView);
 
-        left_position = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_left_position, left_position);
-        top_position = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_top_position, top_position);
+        left_position = attributes.getDimensionPixelSize(R.styleable.BlocksView_left_position, left_position);
+        top_position = attributes.getDimensionPixelSize(R.styleable.BlocksView_top_position, top_position);
 
-        shadow_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_shadow_height, shadow_height);
+        shadow_height = attributes.getDimensionPixelSize(R.styleable.BlocksView_shadow_height, shadow_height);
 
-        block_outset_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_height, block_outset_height);
-        block_outset_width = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_width, block_outset_width);
-        block_outset_left_margin = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_outset_left_margin, block_outset_left_margin);
-        block_text_size = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_text_size, (int) block_text_size);
-        block_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_block_height, block_height);
+        block_outset_height = attributes.getDimensionPixelSize(R.styleable.BlocksView_block_outset_height, block_outset_height);
+        block_outset_width = attributes.getDimensionPixelSize(R.styleable.BlocksView_block_outset_width, block_outset_width);
+        block_outset_left_margin = attributes.getDimensionPixelSize(R.styleable.BlocksView_block_outset_left_margin, block_outset_left_margin);
+        block_text_size = attributes.getDimensionPixelSize(R.styleable.BlocksView_block_text_size, (int) block_text_size);
+        block_height = attributes.getDimensionPixelSize(R.styleable.BlocksView_block_height, block_height);
 
-        block_text_color = attributes.getColor(R.styleable.SketchwareBlocksView_block_text_color, block_text_color);
+        block_text_color = attributes.getColor(R.styleable.BlocksView_block_text_color, block_text_color);
 
-        event_top = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_top, event_top);
-        event_height = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_event_height, event_height);
+        event_top = attributes.getDimensionPixelSize(R.styleable.BlocksView_event_top, event_top);
+        event_height = attributes.getDimensionPixelSize(R.styleable.BlocksView_event_height, event_height);
 
-        is_overlapping = attributes.getBoolean(R.styleable.SketchwareBlocksView_is_overlapping, is_overlapping);
+        is_overlapping = attributes.getBoolean(R.styleable.BlocksView_is_overlapping, is_overlapping);
 
-        nested_bottom_margin = attributes.getDimensionPixelSize(R.styleable.SketchwareBlocksView_nested_bottom_margin, nested_bottom_margin);
+        nested_bottom_margin = attributes.getDimensionPixelSize(R.styleable.BlocksView_nested_bottom_margin, nested_bottom_margin);
 
         attributes.recycle();
     }
@@ -303,61 +302,61 @@ public class SketchwareBlocksView extends View {
      * This method adds blocks used to demonstration into our block collection ({@link #event})
      */
     private void demoBlocks() {
-        event = new SketchwareEvent("MainActivity", "onCreate");
+        event = new BlocksViewEvent("MainActivity", "onCreate");
 
-        event.blocks.add(new SketchwareBlock("Hello World", "1", 2, new ArrayList<>(), 0xFFE10C0C));
-        event.blocks.add(new SketchwareBlock("This is SketchwareBlocksView", "2", 3, new ArrayList<>(), 0xFFD1159C));
-        event.blocks.add(new SketchwareBlock("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
-        event.blocks.add(new SketchwareBlock("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
+        event.blocks.add(new Block("Hello World", "1", 2, new ArrayList<>(), 0xFFE10C0C));
+        event.blocks.add(new Block("This is BlocksView", "2", 3, new ArrayList<>(), 0xFFD1159C));
+        event.blocks.add(new Block("This block resizes", "3", 4, new ArrayList<>(), 0xFF14D231));
+        event.blocks.add(new Block("According to the text's width", "4", 5, new ArrayList<>(), 0xFF2115D1));
 
-        ArrayList<SketchwareField> fields = new ArrayList<>();
-        fields.add(new SketchwareField("parameters"));
-        fields.add(new SketchwareField("yeah"));
+        ArrayList<BlockField> fields = new ArrayList<>();
+        fields.add(new BlockField("parameters"));
+        fields.add(new BlockField("yeah"));
 
-        event.blocks.add(new SketchwareBlock("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE10C0C));
+        event.blocks.add(new Block("This block has %s cool right? %s.kek", "5", 6, fields, 0xFFE10C0C));
 
-        ArrayList<SketchwareField> types_fields = new ArrayList<>();
-        types_fields.add(new SketchwareField("1945", SketchwareField.Type.INTEGER, null));
+        ArrayList<BlockField> types_fields = new ArrayList<>();
+        types_fields.add(new BlockField("1945", BlockField.Type.INTEGER, null));
 
-        event.blocks.add(new SketchwareBlock("Oh yeah, integers %i", types_fields, 0xFFE65319));
+        event.blocks.add(new Block("Oh yeah, integers %i", types_fields, 0xFFE65319));
 
-        ArrayList<SketchwareField> booleans = new ArrayList<>();
-        booleans.add(new SketchwareField("false", SketchwareField.Type.BOOLEAN, null));
+        ArrayList<BlockField> booleans = new ArrayList<>();
+        booleans.add(new BlockField("false", BlockField.Type.BOOLEAN, null));
 
-        event.blocks.add(new SketchwareBlock("And booleans %b", booleans, 0xFF2115D1));
+        event.blocks.add(new Block("And booleans %b", booleans, 0xFF2115D1));
 
-        ArrayList<SketchwareField> value_of_recursive = new ArrayList<>();
+        ArrayList<BlockField> value_of_recursive = new ArrayList<>();
 
-        ArrayList<SketchwareField> get_id_recursive = new ArrayList<>();
-        get_id_recursive.add(new SketchwareField("Hello World"));
+        ArrayList<BlockField> get_id_recursive = new ArrayList<>();
+        get_id_recursive.add(new BlockField("Hello World"));
 
-        ArrayList<SketchwareField> recursive_fields_root = new ArrayList<>();
-        recursive_fields_root.add(new SketchwareField(new SketchwareBlock("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF), SketchwareField.Type.INTEGER));
+        ArrayList<BlockField> recursive_fields_root = new ArrayList<>();
+        recursive_fields_root.add(new BlockField(new Block("get ID %s", "10", -1, get_id_recursive, 0xFF0000FF), BlockField.Type.INTEGER));
 
-        value_of_recursive.add(new SketchwareField(new SketchwareBlock("Is empty %s", "10", -1, recursive_fields_root, 0xFF15D807), SketchwareField.Type.BOOLEAN));
+        value_of_recursive.add(new BlockField(new Block("Is empty %s", "10", -1, recursive_fields_root, 0xFF15D807), BlockField.Type.BOOLEAN));
 
-        event.blocks.add(new SketchwareBlock("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
+        event.blocks.add(new Block("Also, recursive fields! %m.view", "6", 7, value_of_recursive, 0xFFE65319));
 
-        ArrayList<SketchwareBlock> bloks = new ArrayList<>();
-        bloks.add(new SketchwareBlock("Yeah, nested blocks!", "1", 2, new ArrayList<>(), 0xFFE10C0C));
-        bloks.add(new SketchwareBlock("Very cool, right?", "2", 3, new ArrayList<>(), 0xFFE65319));
+        ArrayList<Block> bloks = new ArrayList<>();
+        bloks.add(new Block("Yeah, nested blocks!", "1", 2, new ArrayList<>(), 0xFFE10C0C));
+        bloks.add(new Block("Very cool, right?", "2", 3, new ArrayList<>(), 0xFFE65319));
 
-        ArrayList<SketchwareField> imageview_set_image = new ArrayList<>();
+        ArrayList<BlockField> imageview_set_image = new ArrayList<>();
 
-        imageview_set_image.add(new SketchwareField("imageView1", SketchwareField.Type.OTHER, "ImageView"));
-        imageview_set_image.add(new SketchwareField("image_file", SketchwareField.Type.OTHER, "File"));
+        imageview_set_image.add(new BlockField("imageView1", BlockField.Type.OTHER, "ImageView"));
+        imageview_set_image.add(new BlockField("image_file", BlockField.Type.OTHER, "File"));
 
-        bloks.add(new SketchwareBlock("%m.img Set image to PNG %o.file", "3", -1, imageview_set_image, 0xFFE65319));
+        bloks.add(new Block("%m.img Set image to PNG %o.file", "3", -1, imageview_set_image, 0xFFE65319));
 
-        ArrayList<SketchwareField> a = new ArrayList<>();
-        a.add(new SketchwareField("oh god"));
+        ArrayList<BlockField> a = new ArrayList<>();
+        a.add(new BlockField("oh god"));
 
-        event.blocks.add(new SketchwareNestedBlock("Did i say nested? %a", "7", 8, a, 0xFF21167B, bloks)); //0xFFE10C0C
+        event.blocks.add(new NestedBlock("Did i say nested? %a", "7", 8, a, 0xFF21167B, bloks)); //0xFFE10C0C
 
-        event.blocks.add(new SketchwareBlock("Originally Made by Iyxan23 (github.com/Iyxan23)", "8", 9, new ArrayList<>(), 0xFF2115D1));
-        event.blocks.add(new SketchwareBlock("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "9", 10, new ArrayList<>(), 0xFFE10C0C));
+        event.blocks.add(new Block("Originally Made by Iyxan23 (github.com/Iyxan23)", "8", 9, new ArrayList<>(), 0xFF2115D1));
+        event.blocks.add(new Block("Repository transferred to OpenBlocksTeam (github.com/OpenBlocksTeam)", "9", 10, new ArrayList<>(), 0xFFE10C0C));
 
-        event.blocks.add(new SketchwareBlock("Finish Activity", "10", -1, new ArrayList<>(), 0xFF1173E4));
+        event.blocks.add(new Block("Finish Activity", "10", -1, new ArrayList<>(), 0xFF1173E4));
     }
     // Initializers ================================================================================
 
@@ -385,7 +384,7 @@ public class SketchwareBlocksView extends View {
                     return;
 
                 // If no, get the block, and pick it up!
-                Pair<Vector2D, SketchwareBlock> block = unconnected_blocks.get(picked_up_block_index);
+                Pair<Vector2D, Block> block = unconnected_blocks.get(picked_up_block_index);
                 picked_up_x_offset = block.first.x - x;
                 picked_up_y_offset = block.first.y - y;
 
@@ -543,10 +542,10 @@ public class SketchwareBlocksView extends View {
      * @return The index element of where the block will be dropped in {@link #top_positions}, returns -1 if the block is dropped on nothing
      */
     private int predictDropLocation() {
-        Pair<Vector2D, SketchwareBlock> picked_up_block = unconnected_blocks.get(picked_up_block_index);
+        Pair<Vector2D, Block> picked_up_block = unconnected_blocks.get(picked_up_block_index);
         // The picked up block's position
         Vector2D picked_up_block_position = picked_up_block.first;
-        SketchwareBlock picked_up_block_block = picked_up_block.second;
+        Block picked_up_block_block = picked_up_block.second;
 
         if (!picked_up_block_block.is_return_block) {
             int index = 0;
@@ -601,10 +600,10 @@ public class SketchwareBlocksView extends View {
     private int pickup_block(int x, int y) {
         // Check if a block already exists in the unconnected_blocks
         int index = 0;
-        for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
+        for (Pair<Vector2D, Block> block : unconnected_blocks) {
             Vector2D block_position = block.first.clone();
 
-            SketchwareBlock mBlock = block.second;
+            Block mBlock = block.second;
 
             RectF block_bounds = new RectF(
                     block_position.x + left_position,
@@ -633,7 +632,7 @@ public class SketchwareBlocksView extends View {
         int previous_block_height = event_top;  // Because if not, the first block would get overlapped by the event
 
         for (int i = 0; i < event.blocks.size(); i++) {
-            SketchwareBlock current_block = event.blocks.get(i);
+            Block current_block = event.blocks.get(i);
 
             int top_position;
 
@@ -649,8 +648,8 @@ public class SketchwareBlocksView extends View {
             previous_block_height = current_block.getHeight(text_paint);
 
             // Apply the bottom margin if this is a nested block
-            if (current_block instanceof SketchwareNestedBlock) {
-                ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
+            if (current_block instanceof NestedBlock) {
+                ((NestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
             Rect bounds = new Rect(
@@ -666,7 +665,7 @@ public class SketchwareBlocksView extends View {
                 Log.d(TAG, "pickup_block: Inside the block " + top_position);
                 
                 // Ohk, call onPickup of the block
-                Pair<Boolean, SketchwareBlock> pickup = event.blocks.get(i).onPickup(x - left_position, y - top_position, text_paint);
+                Pair<Boolean, Block> pickup = event.blocks.get(i).onPickup(x - left_position, y - top_position, text_paint);
 
                 // The first pair is to determine if we should remove the block or not?
                 if (pickup.first) {
@@ -742,12 +741,12 @@ public class SketchwareBlocksView extends View {
         int top = event_top + event_height;
         int previous_height = event_height;
 
-        for (SketchwareBlock block : optimized_blocks) {
+        for (Block block : optimized_blocks) {
             int current_block_height = block.getHeight(text_paint);
 
             // Only check if the top is lower than the y - previous block height
             if (top < y - previous_height) {
-                SketchwareField field = block.onClick(x, y, text_paint);
+                BlockField field = block.onClick(x, y, text_paint);
 
                 if (field != null) {
                     fieldClick.onFieldClick(field);
@@ -770,7 +769,7 @@ public class SketchwareBlocksView extends View {
 
         int largest_width = 0;
         int blocks_height_sum = 0;
-        for (SketchwareBlock block : event.blocks) {
+        for (Block block : event.blocks) {
             largest_width = Math.max(block.getWidth(text_paint), largest_width);
 
             blocks_height_sum += block.getHeight(text_paint) + shadow_height;
@@ -799,7 +798,7 @@ public class SketchwareBlocksView extends View {
         }
 
         if (result < desiredSize){
-            Log.w("SketchwareBlocksView", "The view is too small, the content might get cut");
+            Log.w("BlocksView", "The view is too small, the content might get cut");
         }
 
         return result;
@@ -832,7 +831,7 @@ public class SketchwareBlocksView extends View {
         for (int i = 0; i < event.blocks.size(); i++) {
 
             // get the current block
-            SketchwareBlock current_block = event.blocks.get(i);
+            Block current_block = event.blocks.get(i);
 
             // Set the height to the defined height
             current_block.default_height = block_height;
@@ -853,8 +852,8 @@ public class SketchwareBlocksView extends View {
             previous_block_height = current_block_height;
 
             // Apply the bottom margin if this is a nested block
-            if (current_block instanceof SketchwareNestedBlock) {
-                ((SketchwareNestedBlock) current_block).bottom_margin = nested_bottom_margin;
+            if (current_block instanceof NestedBlock) {
+                ((NestedBlock) current_block).bottom_margin = nested_bottom_margin;
             }
 
             // To optimize the drawing, check if this block is actually visible to the user
@@ -920,7 +919,7 @@ public class SketchwareBlocksView extends View {
 
         // Draw the unconnected blocks
         int index = 0;
-        for (Pair<Vector2D, SketchwareBlock> block : unconnected_blocks) {
+        for (Pair<Vector2D, Block> block : unconnected_blocks) {
             Vector2D position = block.first.clone();
             position.x += left_position;
             position.y += event_top;
@@ -995,7 +994,7 @@ public class SketchwareBlocksView extends View {
 
     // Interfaces ==================================================================================
     public interface FieldClick {
-        void onFieldClick(SketchwareField field);
+        void onFieldClick(BlockField field);
     }
     // Interfaces ==================================================================================
 }

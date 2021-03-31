@@ -16,6 +16,7 @@ import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -213,6 +214,11 @@ public class BlocksView extends View {
         // Set the context
         this.context = context;
 
+        fieldClick = field -> {
+            Toast.makeText(context, field.value, Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "onFieldClick: " + field.toString());
+        };
+
         // Get the vibrator system service
         try {
             vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
@@ -262,6 +268,9 @@ public class BlocksView extends View {
         black_rect = new Paint();
         black_rect.setColor(0x88000000);
         black_rect.setStyle(Paint.Style.FILL);
+
+        // Set our click listener (to detect field clicks etc)
+        setOnClickListener(clickListener);
 
         // Initialize our gesture detector
         initGestureDetector();
@@ -471,21 +480,13 @@ public class BlocksView extends View {
 
             case MotionEvent.ACTION_UP:
                 Log.d(TAG, "onTouchEvent: UP");
+                // Check if we have a relevant drop location below us
+                if (drop_location != -1) {
+                    // Ohh ok, let's add the block into the block collection, at the specified index
+                    event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block_index).second);
 
-                // Check if that was a click
-                if (isAClick(x_down, mot_event.getX(), y_down, mot_event.getY())) {
-                    // This is just a click, check if there is any field below us
-                    checkFieldClick((int) mot_event.getX(), (int) mot_event.getY());
-
-                } else {
-                    // Check if we have a relevant drop location below us
-                    if (drop_location != -1) {
-                        // Ohh ok, let's add the block into the block collection, at the specified index
-                        event.blocks.add(top_positions.indexOf(drop_location), unconnected_blocks.get(picked_up_block_index).second);
-
-                        // Then remove it from the unconnected blocks
-                        unconnected_blocks.remove(picked_up_block_index);
-                    }
+                    // Then remove it from the unconnected blocks
+                    unconnected_blocks.remove(picked_up_block_index);
                 }
 
                 // Reset values
@@ -509,14 +510,12 @@ public class BlocksView extends View {
     int x_down = 0;
     int y_down = 0;
 
-    // https://stackoverflow.com/questions/17831395/how-can-i-detect-a-click-in-an-ontouch-listener/17836095
-    private final int CLICK_ACTION_THRESHOLD = 200;
+    OnClickListener clickListener = v -> {
+        Log.d(TAG, "onTouchEvent: a click");
 
-    private boolean isAClick(float startX, float endX, float startY, float endY) {
-        float differenceX = Math.abs(startX - endX);
-        float differenceY = Math.abs(startY - endY);
-        return !(differenceX > CLICK_ACTION_THRESHOLD /* =5 */ || differenceY > CLICK_ACTION_THRESHOLD);
-    }
+        // This is a click, check if there is any field below us
+        checkFieldClick(x_down, y_down);
+    };
     // Touch detectors =============================================================================
 
 
@@ -570,9 +569,14 @@ public class BlocksView extends View {
 
             int index = 0;
             for (Integer block_top : top_positions) {
+
+                int previous_block_top = index - 1 != -1 ? top_positions.get(index - 1) : 0;
+
                 // Check if this block is in the bounds of the drag position
-                if (!(picked_up_block_position.y + event_top > block_top && picked_up_block_position.y + event_top < top_positions.get(index - 1)))
+                if (!(picked_up_block_position.y + unconnected_top_offset > block_top && picked_up_block_position.y + unconnected_top_offset < previous_block_top))
                     continue;
+
+                Log.d(TAG, "predictDropLocation: m");
 
                 // do onHover
 
@@ -741,12 +745,13 @@ public class BlocksView extends View {
         int top = event_top + event_height;
         int previous_height = event_height;
 
-        for (Block block : optimized_blocks) {
+        int index = 0;
+        for (Block block : event.blocks) {
             int current_block_height = block.getHeight(text_paint);
 
             // Only check if the top is lower than the y - previous block height
             if (top < y - previous_height) {
-                BlockField field = block.onClick(x, y, text_paint);
+                BlockField field = block.onClick(x - left_position, y - top, text_paint);
 
                 if (field != null) {
                     fieldClick.onFieldClick(field);
@@ -756,6 +761,8 @@ public class BlocksView extends View {
             previous_height = current_block_height;
             top += current_block_height;
         }
+
+        index++;
     }
     // Pickup, drop blocks utilities ===============================================================
 

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * This class is used to represent a collection of blocks and an event / orange-yellow thingy at the top
  */
-public class SketchwareEvent {
+public class BlocksViewEvent {
 
     public String activity_name;
     public String name;
@@ -19,9 +19,9 @@ public class SketchwareEvent {
 
     public int text_padding = 10;
 
-    public ArrayList<SketchwareBlock> blocks = new ArrayList<>();
+    public ArrayList<Block> blocks = new ArrayList<>();
 
-    public SketchwareEvent(String activity_name, String name) {
+    public BlocksViewEvent(String activity_name, String name) {
         this.activity_name = activity_name;
         this.name = name;
     }
@@ -75,14 +75,14 @@ public class SketchwareEvent {
     @NonNull
     @Override
     public String toString() {
-        return "Sketchware Event:\n\tActivityName:" + activity_name + "\n\tEventName: " + name + "\nBlocks:\n" + blocks.toString();
+        return "BlocksView Event:\n\tActivityName:" + activity_name + "\n\tEventName: " + name + "\nBlocks:\n" + blocks.toString();
     }
 
     @NonNull
     @Override
     protected Object clone() {
-        SketchwareEvent clone_event = new SketchwareEvent(this.activity_name, this.name);
-        clone_event.blocks = (ArrayList<SketchwareBlock>) blocks.clone();
+        BlocksViewEvent clone_event = new BlocksViewEvent(this.activity_name, this.name);
+        clone_event.blocks = (ArrayList<Block>) blocks.clone();
         return clone_event;
     }
 }

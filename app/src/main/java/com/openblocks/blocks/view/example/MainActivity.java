@@ -3,7 +3,6 @@ package com.openblocks.blocks.view.example;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,13 +14,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.openblocks.blocks.view.SketchwareBlocksParser;
-import com.openblocks.blocks.view.SketchwareBlocksView;
-import com.openblocks.blocks.view.SketchwareEvent;
+import com.openblocks.blocks.view.BlocksView;
+import com.openblocks.blocks.view.BlocksViewEvent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import javax.crypto.Cipher;
@@ -31,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class MainActivity extends AppCompatActivity {
 
     final int PICK_EVENT_REC_CODE = 10;
-    ArrayList<SketchwareEvent> events = new ArrayList<>();
+    ArrayList<BlocksViewEvent> events = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         alertDialog.setItems(items, (dialog, which) -> {
-            SketchwareBlocksView blocksView = findViewById(R.id.blocks_view);
+            BlocksView blocksView = findViewById(R.id.blocks_view);
             blocksView.setEvent(events.get(which));
             Log.d("MainActivity", "pickEvent: event: " + events);
             blocksView.invalidate();

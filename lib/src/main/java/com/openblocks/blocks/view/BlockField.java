@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 import java.util.Objects;
 
-public class SketchwareField {
+public class BlockField {
 
     /**
      * This type enum is used to identify what this field's type is
@@ -24,7 +24,7 @@ public class SketchwareField {
     public boolean is_block; // This boolean indicates if this is a block or not
     public String value = "";  // This value is going to be used if is_block is false
 
-    public SketchwareBlock block;
+    public Block block;
     public Type type;
 
     // Indicates the return type if type is OTHER
@@ -38,10 +38,10 @@ public class SketchwareField {
     int text_padding = 10;
 
     /**
-     * This will initialize this class as a SketchwareBlock (return value block)
+     * This will initialize this class as a Block (return value block)
      * @param block The block
      */
-    public SketchwareField(SketchwareBlock block, Type return_type) {
+    public BlockField(Block block, Type return_type) {
         this.block = block;
         this.block.is_return_block = true;
         this.block.return_type = return_type;
@@ -53,7 +53,7 @@ public class SketchwareField {
      * This constructor initializes this class as a fixed value
      * @param value The value
      */
-    public SketchwareField(String value) {
+    public BlockField(String value) {
         this.value = value;
         this.type = Type.STRING;
         is_block = false;
@@ -66,7 +66,7 @@ public class SketchwareField {
      * @param type The type of this field
      * @param other_type The custom type if {@param type} is OTHER, set to null if otherwise
      */
-    public SketchwareField(String value, Type type, @Nullable String other_type) {
+    public BlockField(String value, Type type, @Nullable String other_type) {
         this.value = value;
         this.type = type;
         this.other_type = other_type;
@@ -77,7 +77,7 @@ public class SketchwareField {
 
 
     /**
-     * This function initializes paints, just like initialize() on SketchwareBlocksView
+     * This function initializes paints, just like initialize() on BlocksView
      */
     private void init() {
         text_paint.setColor(0xFF000000);
@@ -212,7 +212,7 @@ public class SketchwareField {
     @NonNull
     @Override
     public String toString() {
-        return "SketchwareField{" +
+        return "BlocksViewField{" +
                 "is_block=" + is_block +
                 ", value='" + value + '\'' +
                 ", block=" + block +
@@ -227,7 +227,7 @@ public class SketchwareField {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SketchwareField that = (SketchwareField) o;
+        BlockField that = (BlockField) o;
         return is_block == that.is_block &&
                 text_padding == that.text_padding &&
                 value.equals(that.value) &&

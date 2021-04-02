@@ -269,9 +269,6 @@ public class BlocksView extends View {
         black_rect.setColor(0x88000000);
         black_rect.setStyle(Paint.Style.FILL);
 
-        // Set our click listener (to detect field clicks etc)
-        setOnClickListener(clickListener);
-
         // Initialize our gesture detector
         initGestureDetector();
     }
@@ -377,6 +374,17 @@ public class BlocksView extends View {
      */
     private void initGestureDetector() {
         gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+
+            // Used to detect clicking on fields
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                checkFieldClick((int) e.getX(), (int) e.getY());
+
+                return super.onSingleTapConfirmed(e);
+            }
+
+            // Used to detect dragging blocks
+            @Override
             public void onLongPress(MotionEvent e) {
                 Log.d(TAG, "onLongPress: long press!");
 
@@ -430,9 +438,6 @@ public class BlocksView extends View {
                     move_x_delta = (int) mot_event.getX() - left_position;
                     move_y_delta = (int) mot_event.getY() - event_top;
                 }
-
-                x_down = (int) mot_event.getX();
-                y_down = (int) mot_event.getX();
 
                 // We handled the ACTION_DOWN, return true!
                 return true;
@@ -506,16 +511,6 @@ public class BlocksView extends View {
 
         return false;
     }
-
-    int x_down = 0;
-    int y_down = 0;
-
-    OnClickListener clickListener = v -> {
-        Log.d(TAG, "onTouchEvent: a click");
-
-        // This is a click, check if there is any field below us
-        checkFieldClick(x_down, y_down);
-    };
     // Touch detectors =============================================================================
 
 
@@ -739,30 +734,32 @@ public class BlocksView extends View {
      * This function is used to check if a click clicks a field
      */
     private void checkFieldClick(int x, int y) {
+        Log.d(TAG, "checkFieldClick: y: " + y);
         if (fieldClick == null)
             return;
 
-        int top = event_top + event_height;
-        int previous_height = event_height;
+        int top = event_top + event_height + event_height; // I have no idea why this works, but this works
 
-        int index = 0;
         for (Block block : event.blocks) {
+            Log.d(TAG, "checkFieldClick: at block " + block.getFormat());
+            Log.d(TAG, "checkFieldClick: top: " + top);
             int current_block_height = block.getHeight(text_paint);
+            Log.d(TAG, "checkFieldClick: bottom: " + (top + current_block_height));
 
             // Only check if the top is lower than the y - previous block height
-            if (top < y - previous_height) {
+            if (top < y && top + current_block_height > y) {
+                Log.d(TAG, "checkFieldClick: ye this is a click");
                 BlockField field = block.onClick(x - left_position, y - top, text_paint);
 
                 if (field != null) {
+                    Log.d(TAG, "checkFieldClick: valid click");
                     fieldClick.onFieldClick(field);
+                    return;
                 }
             }
 
-            previous_height = current_block_height;
             top += current_block_height;
         }
-
-        index++;
     }
     // Pickup, drop blocks utilities ===============================================================
 

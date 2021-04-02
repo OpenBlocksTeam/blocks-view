@@ -3,6 +3,7 @@ package com.openblocks.blocks.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.util.Pair;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
  * This class is used to represent a nested block, where it can contain a collection of blocks inside itself
  */
 public class NestedBlock extends Block {
+
+    private static final String TAG = "NestedBlock";
 
     public ArrayList<Block> blocks;
 
@@ -52,6 +55,40 @@ public class NestedBlock extends Block {
         }
 
         return sum;
+    }
+
+    @Override
+    public BlockField onClick(int x, int y, Paint text_paint) {
+        Log.d(TAG, "onClick() called with: x = [" + x + "], y = [" + y + "], text_paint = [" + text_paint + "]");
+        int y_start = getBlockHeight(text_paint) * 2; // I have no idea how this works, b u t   i t   w o r k s.. anyway
+
+        // Check if this click is on the nested block's "block"
+        if (y < y_start) {
+            Log.d(TAG, "onClick: On our top block");
+            // Yes this is, call super
+            return super.onClick(x, y, text_paint);
+        }
+
+        // TODO: 3/17/21 optimize this
+
+        int index = 0;
+        for (Block block : blocks) {
+            int height = block.getHeight(text_paint);
+
+            Log.d(TAG, "onClick: top: " + y_start + " bottom: " + (y_start + height));
+
+            // Check if the click is somewhere in the block
+            if (y > y_start && y < y_start + height) {
+                Log.d(TAG, "onClick: Somewhere in this block, call onClick on them");
+                return block.onClick(x, y - y_start, text_paint);
+            }
+
+            index++;
+            y_start += height;
+        }
+
+        // Nothing found :(
+        return null;
     }
 
     @Override
